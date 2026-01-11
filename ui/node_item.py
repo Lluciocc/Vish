@@ -63,7 +63,6 @@ class NodeItem(QGraphicsItem):
         header_rect = QRectF(0, 0, self.WIDTH, self.HEADER_HEIGHT)
         header_path = QPainterPath()
         header_path.addRoundedRect(header_rect, 8, 8)
-        header_path.addRect(QRectF(0, self.HEADER_HEIGHT - 8, self.WIDTH, 8))
         
         painter.setBrush(QBrush(QColor(self.node.color)))
         painter.setPen(Qt.NoPen)

@@ -72,7 +72,7 @@ class VisualBashEditor(QMainWindow):
         
         splitter = QSplitter(Qt.Horizontal)
         
-        self.graph_view = GraphView(self.graph)
+        self.graph_view = GraphView(self.graph, self)
         splitter.addWidget(self.graph_view)
 
         
@@ -94,7 +94,7 @@ class VisualBashEditor(QMainWindow):
     def show_node_palette(self):
         palette = NodePalette(self)
         palette.node_selected.connect(self.add_node)
-        palette.exec()
+        palette.show()
     
     def add_node(self, node_type: str):
         node = self.node_factory.create_node(node_type)
@@ -129,11 +129,9 @@ class VisualBashEditor(QMainWindow):
         with open(file_path, "r") as f:
             json_data = f.read()
 
-        # nouveau graph
         self.graph = Serializer.deserialize(json_data, self.node_factory)
 
-        # remplacer la view dans le splitter
-        splitter = self.graph_view.parent()  # QSplitter
+        splitter = self.graph_view.parent()
         old_view = self.graph_view
 
         self.graph_view = GraphView(self.graph)
@@ -142,17 +140,11 @@ class VisualBashEditor(QMainWindow):
         old_view.setParent(None)
         old_view.deleteLater()
 
-        # recréer nodes
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
 
-        # recréer edges visuels depuis core graph
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
-
-            
-
-
 
 def main():
     app = QApplication(sys.argv)

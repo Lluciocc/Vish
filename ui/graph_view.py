@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QGraphicsView
 from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QPainter
 from core.graph import Graph, Port
+from ui.palette import NodePalette
 from .graph_scene import GraphScene
 from .node_item import NodeItem
 from .edge_item import EdgeItem
@@ -9,9 +10,10 @@ from .edge_item import EdgeItem
 class GraphView(QGraphicsView):
     connection_request = Signal(Port, Port)
     
-    def __init__(self, graph):
+    def __init__(self, graph, editor):
         super().__init__()
         self.graph = graph
+        self.editor = editor
         self.graph_scene = GraphScene(self.graph)
         self.setScene(self.graph_scene)
         
@@ -29,6 +31,67 @@ class GraphView(QGraphicsView):
         self.edge_items = {}
         
         self.scale_factor = 1.0
+
+    def contextMenuEvent(self, event):
+        scene_pos = self.mapToScene(event.pos())
+        items = self.scene().items(scene_pos)
+        if not items:
+            self.show_node_palette(scene_pos)
+            event.accept()
+        else:
+            event.ignore()
+
+    def show_node_palette(self, scene_pos):
+        palette = NodePalette(self)
+        palette.node_selected.connect(
+            lambda node_type: self._add_node_from_palette(node_type, scene_pos)
+        )
+
+        view_pos = self.mapFromScene(scene_pos)
+        global_pos = self.viewport().mapToGlobal(view_pos)
+
+        palette.move(global_pos)
+        palette.show()
+
+    def _add_node_from_palette(self, node_type, scene_pos):
+        editor = self.editor
+        node = editor.node_factory.create_node(node_type)
+        if not node:
+            return
+
+        node.x = scene_pos.x()
+        node.y = scene_pos.y()
+
+        editor.graph.add_node(node)
+        node_item = self.add_node_item(node)
+
+        scene = self.scene()
+        if scene.pending_port:
+            self._auto_connect(scene.pending_port, node_item)
+            scene.pending_port = None
+            scene.pending_scene_pos = None
+
+
+    def _auto_connect(self, from_port_item, node_item):
+        scene = self.scene()
+        want_input = not from_port_item.is_input
+
+        for port_item in node_item.port_items.values():
+            if port_item.is_input == want_input:
+                if scene._is_valid_connection(from_port_item, port_item):
+                    scene.drag_edge = EdgeItem()
+                    scene.drag_edge.source_port = (
+                        from_port_item if not from_port_item.is_input else port_item
+                    )
+                    scene.drag_edge.target_port = (
+                        port_item if not port_item.is_input else from_port_item
+                    )
+                    scene.drag_edge.update_positions()
+                    scene.edges.append(scene.drag_edge)
+                    scene.addItem(scene.drag_edge)
+                    return
+
+
     
     def add_node_item(self, node):
         node_item = NodeItem(node)

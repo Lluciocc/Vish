@@ -28,7 +28,7 @@ class BashEmitter:
         context = BashContext()
         context.add_line("#!/bin/bash")
         context.add_line("")
-        context.add_line("# Generated from Visual Bash Editor")
+        context.add_line("# Generated from Visual Bash Editor (Vish)")
         context.add_line("")
         
         execution_order = self.graph.get_execution_order()

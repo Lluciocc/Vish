@@ -1,16 +1,16 @@
-from PySide6.QtWidgets import QDialog, QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QListWidget, QListWidgetItem
 from PySide6.QtCore import Qt, Signal
 
-class NodePalette(QDialog):
+class NodePalette(QWidget):
     node_selected = Signal(str)
     
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Add Node")
-        self.setModal(True)
         self.resize(300, 400)
         
         layout = QVBoxLayout(self)
+        self.setWindowFlags(Qt.Popup)
         
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search nodes...")
@@ -50,4 +50,14 @@ class NodePalette(QDialog):
     def on_node_selected(self, item):
         node_type = item.data(Qt.UserRole)
         self.node_selected.emit(node_type)
-        self.accept()
+        self.close()
+    
+    def focusOutEvent(self, event):
+        self.close()
+        super().focusOutEvent(event)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.close()
+        else:
+            super().keyPressEvent(event)

@@ -1,34 +1,32 @@
 from PySide6.QtWidgets import QGraphicsScene
 from PySide6.QtCore import Signal, QTimer
-from ui.edge_item import EdgeItem
 from PySide6.QtGui import QCursor
+from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 from core.graph import Edge
-
 
 class GraphScene(QGraphicsScene):
     node_selected = Signal(object)
     connection_created = Signal(object, object)
-    
+
     def __init__(self, graph):
         super().__init__()
         self.graph = graph
         self.edges = []
         self.drag_edge = None
         self.start_port = None
+        self.pending_port = None
+        self.pending_scene_pos = None
         self.setBackgroundBrush(self.palette().dark())
 
     def start_connection(self, port_item):
-        self.start_port = port_item
         self.drag_edge = EdgeItem()
+        self.drag_edge.source_port = port_item
         self.addItem(self.drag_edge)
 
-        source_pos = port_item.center_scene_pos()
-
-        self.drag_edge.source_pos = source_pos
-        self.drag_edge.target_pos = source_pos
-        self.drag_edge.update_path()
-
+        pos = port_item.center_scene_pos()
+        self.drag_edge.target_pos = pos
+        self.drag_edge.update_positions()
 
 
     def end_connection(self, start_port_item):
@@ -48,9 +46,10 @@ class GraphScene(QGraphicsScene):
         if target_port:
             self.finalize_connection(start_port_item, target_port)
         else:
+            self.pending_port = start_port_item
+            self.pending_scene_pos = mouse_pos
             self._cancel_drag_edge()
-
-
+            self.views()[0].show_node_palette(mouse_pos)
 
     def finalize_connection(self, start_port, end_port):
         if not self._is_valid_connection(start_port, end_port):
@@ -60,30 +59,27 @@ class GraphScene(QGraphicsScene):
         source = start_port if not start_port.is_input else end_port
         target = end_port if source is start_port else start_port
 
-        self.drag_edge.source_port = source
-        self.drag_edge.target_port = target
-        self.drag_edge.update_positions()
-
         edge_item = self.drag_edge
+        edge_item.source_port = source
+        edge_item.target_port = target
+        edge_item.update_positions()
+
         self.edges.append(edge_item)
         self.drag_edge = None
         self.start_port = None
 
         def commit_core_edge():
             core_edge = Edge(source=source.port, target=target.port)
-            self.graph.add_edge(source.port, target.port)
+            self.graph.edges.append(core_edge)
             edge_item.edge = core_edge
 
         QTimer.singleShot(0, commit_core_edge)
 
-
     def _is_valid_connection(self, a: PortItem, b: PortItem) -> bool:
         if a is b:
             return False
-
         if a.port.node.id == b.port.node.id:
             return False
-
         if a.is_input == b.is_input:
             return False
 
@@ -112,25 +108,22 @@ class GraphScene(QGraphicsScene):
         src_port_item = src_node_item.port_items[core_edge.source.id]
         tgt_port_item = tgt_node_item.port_items[core_edge.target.id]
 
-        edge_item = EdgeItem(core_edge, source_port=src_port_item, target_port=tgt_port_item)
+        edge_item = EdgeItem()
+        edge_item.source_port = src_port_item
+        edge_item.target_port = tgt_port_item
+        edge_item.edge = core_edge
+
         self.addItem(edge_item)
         edge_item.update_positions()
         self.edges.append(edge_item)
 
-    def update_edges_for_port(self, port_item):
-        for edge in list(self.edges):
-            if edge.source_port == port_item or edge.target_port == port_item:
-                edge.update_positions()
-
-
     def update_edges_for_node(self, node_item):
         for port_item in node_item.port_items.values():
-            for edge in list(self.edges):
+            for edge in self.edges:
                 if edge.source_port == port_item or edge.target_port == port_item:
                     edge.update_positions()
 
-
     def mouseMoveEvent(self, event):
-        if self.drag_edge is not None:
+        if self.drag_edge:
             self.drag_edge.set_target_pos(event.scenePos())
         super().mouseMoveEvent(event)
