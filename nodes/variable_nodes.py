@@ -3,7 +3,7 @@ from core.bash_emitter import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 
-@register_node("set_variable")
+@register_node("set_variable", category="Variables", label="Set Variable")
 class SetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("set_variable", "Set Variable", "#F39C12")
@@ -30,7 +30,7 @@ class SetVariableNode(BaseNode):
         context.variables[var_name] = value_expr
         return f'{var_name}={value_expr}'
 
-@register_node("get_variable")
+@register_node("get_variable", category="Variables", label="Get Variable")
 class GetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("get_variable", "Get Variable", "#F39C12")
@@ -44,7 +44,7 @@ class GetVariableNode(BaseNode):
     def emit_bash_value(self, context):
         return f"${self.properties['variable']}"
 
-@register_node("file_exists")
+@register_node("file_exists", category="Variables", label="File Exists")
 class FileExistsNode(BaseNode):
     def __init__(self):
         super().__init__("file_exists", "File Exists", "#1ABC9C")

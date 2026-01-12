@@ -2,6 +2,7 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QTreeWidget, QTreeWidgetItem
 )
 from PySide6.QtCore import Qt, Signal
+from nodes.registry import NODE_REGISTRY
 
 
 class NodePalette(QWidget):
@@ -14,63 +15,41 @@ class NodePalette(QWidget):
         self.setWindowFlags(Qt.Popup)
 
         layout = QVBoxLayout(self)
+
         self.search_input = QLineEdit()
         self.search_input.setPlaceholderText("Search nodes...")
         self.search_input.textChanged.connect(self.filter_nodes)
         layout.addWidget(self.search_input)
+
         self.tree = QTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
         layout.addWidget(self.tree)
 
         self._node_chosen = False
-        self.nodes = {
-            "Flow": [
-                ("Start", "start"),
-                ("If", "if"),
-                ("For Loop", "for"),
-                ("Exit", "exit"),
-            ],
-            "Commands": [
-                ("Run Command", "run_command"),
-                ("Echo", "echo"),
-                ("File Exists", "file_exists"),
-            ],
-            "Variables": [
-                ("Set Variable", "set_variable"),
-                ("Get Variable", "get_variable"),
-            ],
-            "Operations": [
-                ("Addition", "addition"),
-                ("Subtraction", "subtraction"),
-                ("Multiplication", "multiplication"),
-                ("Division", "division"),
-                ("Modulo", "modulo"),
-            ],
-            "Logic": [
-                ("Equals", "equals"),
-                ("Less Than", "less_than"),
-                ("Greater Than", "greater_than"),
-                ("AND", "logical_and"),
-                ("OR", "logical_or"),
-                ("NOT", "logical_not"),
-            ]
-        }
-
         self.populate_tree()
 
     def populate_tree(self):
         self.tree.clear()
 
-        for category, nodes in self.nodes.items():
+        categories = {}
+
+        for node_type, meta in NODE_REGISTRY.items():
+            cat = meta["category"]
+            categories.setdefault(cat, []).append(
+                (meta["label"], node_type)
+            )
+
+        for category in sorted(categories.keys()):
             cat_item = QTreeWidgetItem([category])
             cat_item.setFlags(cat_item.flags() & ~Qt.ItemIsSelectable)
             cat_item.setExpanded(True)
 
-            for name, node_type in nodes:
-                node_item = QTreeWidgetItem([name])
-                node_item.setData(0, Qt.UserRole, node_type)
-                cat_item.addChild(node_item)
+            for label, node_type in sorted(categories[category]):
+                item = QTreeWidgetItem([label])
+                item.setData(0, Qt.UserRole, node_type)
+                item.setToolTip(0, meta["description"])
+                cat_item.addChild(item)
 
             self.tree.addTopLevelItem(cat_item)
 
@@ -93,7 +72,7 @@ class NodePalette(QWidget):
     def on_item_activated(self, item, column):
         node_type = item.data(0, Qt.UserRole)
         if not node_type:
-            return 
+            return
 
         self._node_chosen = True
         self.node_selected.emit(node_type)

@@ -3,7 +3,7 @@ from core.bash_emitter import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 
-@register_node("start")
+@register_node("start", category="Flow", label="Start")
 class StartNode(BaseNode):
     def __init__(self):
         super().__init__("start", "Start", "#4A90E2")
@@ -12,7 +12,7 @@ class StartNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         return ""
 
-@register_node("if")
+@register_node("if", category="Flow", label="If Condition")
 class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If", "#E94B3C")
@@ -55,7 +55,7 @@ class IfNode(BaseNode):
         context.add_line("fi")
         return ""
 
-@register_node("for")
+@register_node("for", category="Flow", label="For Loop")
 class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop", "#9B59B6")

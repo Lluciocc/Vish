@@ -3,14 +3,14 @@ from core.port_types import PortType
 from core.bash_emitter import BashContext
 from nodes.registry import register_node
 
-@register_node("math_node_base")
+@register_node("math_node_base", category="Math", label="Math Node Base")
 class MathNode(BaseNode):
     def _resolve(self, port, context: BashContext, default="0"):
         if port.connected_edges:
             return port.connected_edges[0].source.node.emit_bash_value(context)
         return default
 
-@register_node("int_constant")
+@register_node("int_constant", category="Math", label="Integer Constant")
 class IntConstant(MathNode):
     def __init__(self):
         super().__init__("int_const", "Int", "#BDC3C7")
@@ -20,7 +20,7 @@ class IntConstant(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         return str(self.properties.get("value", 0))
 
-@register_node("addition")
+@register_node("addition", category="Math", label="Addition")
 class Addition(MathNode):
     def __init__(self):
         super().__init__("addition", "Addition", "#F1C40F")
@@ -33,7 +33,7 @@ class Addition(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} + {b}))"
 
-@register_node("subtraction")
+@register_node("subtraction", category="Math", label="Subtraction")
 class Subtraction(MathNode):
     def __init__(self):
         super().__init__("subtraction", "Subtraction", "#E67E22")
@@ -46,7 +46,7 @@ class Subtraction(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} - {b}))"
 
-@register_node("multiplication")
+@register_node("multiplication", category="Math", label="Multiplication")
 class Multiplication(MathNode):
     def __init__(self):
         super().__init__("multiplication", "Multiplication", "#9B59B6")
@@ -59,7 +59,7 @@ class Multiplication(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} * {b}))"
 
-@register_node("division")
+@register_node("division", category="Math", label="Division")
 class Division(MathNode):
     def __init__(self):
         super().__init__("division", "Division", "#3498DB")
@@ -72,7 +72,7 @@ class Division(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} / {b}))"
 
-@register_node("modulo")
+@register_node("modulo", category="Math", label="Modulo")
 class Modulo(MathNode):
     def __init__(self):
         super().__init__("modulo", "Modulo", "#1ABC9C")
@@ -85,7 +85,7 @@ class Modulo(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} % {b}))"
 
-@register_node("less_than")
+@register_node("less_than", category="Logic", label="Less Than")
 class LessThan(MathNode):
     def __init__(self):
         super().__init__("less_than", "Less Than", "#95A5A6")
@@ -98,7 +98,7 @@ class LessThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} < {b}))"
 
-@register_node("greater_than")
+@register_node("greater_than", category="Logic", label="Greater Than")
 class GreaterThan(MathNode):
     def __init__(self):
         super().__init__("greater_than", "Greater Than", "#95A5A6")
@@ -111,7 +111,7 @@ class GreaterThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} > {b}))"
 
-@register_node("equals")
+@register_node("equals", category="Logic", label="Equals")
 class Equals(MathNode):
     def __init__(self):
         super().__init__("equals", "Equals", "#2ECC71")
@@ -124,7 +124,7 @@ class Equals(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} == {b}))"
 
-@register_node("logical_and")
+@register_node("logical_and", category="Logic", label="AND")
 class LogicalAnd(MathNode):
     def __init__(self):
         super().__init__("logical_and", "AND", "#34495E")
@@ -137,7 +137,7 @@ class LogicalAnd(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} && {b}))"
 
-@register_node("logical_or")
+@register_node("logical_or", category="Logic", label="OR")
 class LogicalOr(MathNode):
     def __init__(self):
         super().__init__("logical_or", "OR", "#34495E")
@@ -150,7 +150,7 @@ class LogicalOr(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} || {b}))"
 
-@register_node("logical_not")
+@register_node("logical_not", category="Logic", label="NOT")
 class LogicalNot(MathNode):
     def __init__(self):
         super().__init__("logical_not", "NOT", "#34495E")

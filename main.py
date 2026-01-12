@@ -19,8 +19,9 @@ from nodes.registry import NODE_REGISTRY
 class NodeFactory:
     @staticmethod
     def create_node(node_type: str):
-        cls = NODE_REGISTRY.get(node_type)
-        return cls() if cls else None
+        entry = NODE_REGISTRY.get(node_type)
+        return entry["class"]() if entry else None
+
 
 
 class VisualBashEditor(QMainWindow):

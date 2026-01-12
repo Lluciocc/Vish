@@ -3,7 +3,7 @@ from core.bash_emitter import BashContext
 from .base_node import BaseNode
 from nodes.registry import register_node
 
-@register_node("run_command")
+@register_node("run_command", category="Commands", label="Run a command")
 class RunCommandNode(BaseNode):
     def __init__(self):
         super().__init__("run_command", "Run Command", "#2ECC71")
@@ -23,7 +23,7 @@ class RunCommandNode(BaseNode):
         
         return command
 
-@register_node("echo")
+@register_node("echo", category="Commands", label="Print a text")
 class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo", "#3498DB")
@@ -46,7 +46,7 @@ class EchoNode(BaseNode):
 
         return f'echo "{text}"'
 
-@register_node("exit")
+@register_node("exit", category="Commands", label="Exit script")
 class ExitNode(BaseNode):
     def __init__(self):
         super().__init__("exit", "Exit", "#E74C3C")
