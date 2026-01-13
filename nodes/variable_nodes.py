@@ -3,12 +3,12 @@ from core.bash_emitter import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 
-@register_node("set_variable", category="Variables", label="Set Variable")
+@register_node("set_variable", category="Variables", label="Set Variable", description="Sets a variable to a specific value")
 class SetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("set_variable", "Set Variable", "#F39C12")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Value", PortType.STRING)
+        self.add_input("Value", PortType.STRING, "Value")
         self.add_output("Exec", PortType.EXEC)
 
         self.properties["variable"] = "VAR"
@@ -30,11 +30,11 @@ class SetVariableNode(BaseNode):
         context.variables[var_name] = value_expr
         return f'{var_name}={value_expr}'
 
-@register_node("get_variable", category="Variables", label="Get Variable")
+@register_node("get_variable", category="Variables", label="Get Variable", description="Gets the value of a variable")
 class GetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("get_variable", "Get Variable", "#F39C12")
-        self.add_output("Value", PortType.VARIABLE)
+        self.add_output("Value", PortType.VARIABLE, "Variable value")
         self.properties["variable"] = "VAR"
     
     def emit_bash(self, context: BashContext) -> str:
@@ -44,12 +44,12 @@ class GetVariableNode(BaseNode):
     def emit_bash_value(self, context):
         return f"${self.properties['variable']}"
 
-@register_node("file_exists", category="Variables", label="File Exists")
+@register_node("file_exists", category="Variables", label="File Exists", description="Checks if a file exists")
 class FileExistsNode(BaseNode):
     def __init__(self):
         super().__init__("file_exists", "File Exists", "#1ABC9C")
-        self.add_input("Path", PortType.PATH)
-        self.add_output("Result", PortType.STRING)
+        self.add_input("Path", PortType.PATH, "File path")
+        self.add_output("Result", PortType.STRING, "Existence check result")
         self.properties["path"] = ""
     
     def emit_bash(self, context: BashContext) -> str:

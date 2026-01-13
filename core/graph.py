@@ -3,7 +3,7 @@ from uuid import uuid4
 from .port_types import PortType, PortDirection
 
 class Port:
-    def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node'):
+    def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node', tooltip=""):
         self.id = str(uuid4())
         self.name = name
         self.port_type = port_type
@@ -11,6 +11,7 @@ class Port:
         self.node = node
         self.value: Any = None
         self.connected_edges: List['Edge'] = []
+        self.tooltip = tooltip
     
     def can_connect_to(self, other: 'Port') -> bool:
         if self.direction == other.direction:
@@ -33,13 +34,13 @@ class Node:
         self.y = 0.0
         self.properties: Dict[str, Any] = {}
     
-    def add_input(self, name: str, port_type: PortType) -> Port:
-        port = Port(name, port_type, PortDirection.INPUT, self)
+    def add_input(self, name: str, port_type: PortType, tooltip="") -> Port:
+        port = Port(name, port_type, PortDirection.INPUT, self, tooltip)
         self.inputs.append(port)
         return port
     
-    def add_output(self, name: str, port_type: PortType) -> Port:
-        port = Port(name, port_type, PortDirection.OUTPUT, self)
+    def add_output(self, name: str, port_type: PortType, tooltip="") -> Port:
+        port = Port(name, port_type, PortDirection.OUTPUT, self, tooltip)
         self.outputs.append(port)
         return port
     

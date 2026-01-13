@@ -21,6 +21,8 @@ class PortItem(QGraphicsEllipseItem):
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, False)
         self.setZValue(10)
+        # SET THE TOOLTIP
+        self.setToolTip(self.port.tooltip)
 
         self.highlight = False
 

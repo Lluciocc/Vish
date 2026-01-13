@@ -3,23 +3,23 @@ from core.bash_emitter import BashContext
 from nodes.registry import register_node
 from .base_node import BaseNode
 
-@register_node("start", category="Flow", label="Start")
+@register_node("start", category="Flow", label="Start", description="The starting point of the flow")
 class StartNode(BaseNode):
     def __init__(self):
         super().__init__("start", "Start", "#4A90E2")
-        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC, "Start of the flow")
     
     def emit_bash(self, context: BashContext) -> str:
         return ""
 
-@register_node("if", category="Flow", label="If Condition")
+@register_node("if", category="Flow", label="If Condition", description="Evaluates a condition and branches the flow")
 class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If", "#E94B3C")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Condition", PortType.STRING)
-        self.add_output("True", PortType.EXEC)
-        self.add_output("False", PortType.EXEC)
+        self.add_input("Condition", PortType.STRING, "Must be a string")
+        self.add_output("True", PortType.EXEC, "If condition is true")
+        self.add_output("False", PortType.EXEC, "If condition is false")
         self.properties["condition"] = ""
     
     def emit_bash(self, context: BashContext) -> str:
@@ -55,14 +55,14 @@ class IfNode(BaseNode):
         context.add_line("fi")
         return ""
 
-@register_node("for", category="Flow", label="For Loop")
+@register_node("for", category="Flow", label="For Loop", description="Iterates over a list")
 class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop", "#9B59B6")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("List", PortType.STRING)
+        self.add_input("List", PortType.STRING, "List to iterate over")
         self.add_output("Loop Body", PortType.EXEC)
-        self.add_output("Item", PortType.VARIABLE)
+        self.add_output("Item", PortType.VARIABLE, "Current item in the loop")
         self.properties["variable"] = "item"
     
     def emit_bash(self, context: BashContext) -> str:

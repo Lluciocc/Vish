@@ -3,14 +3,14 @@ from core.bash_emitter import BashContext
 from .base_node import BaseNode
 from nodes.registry import register_node
 
-@register_node("run_command", category="Commands", label="Run a command")
+@register_node("run_command", category="Commands", label="Run a command", description="Executes a shell command")
 class RunCommandNode(BaseNode):
     def __init__(self):
         super().__init__("run_command", "Run Command", "#2ECC71")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Command", PortType.STRING)
+        self.add_input("Command", PortType.STRING, "Command to run")
         self.add_output("Exec", PortType.EXEC)
-        self.add_output("Output", PortType.STRING)
+        self.add_output("Output", PortType.STRING, "Command output")
         self.properties["command"] = "ls"
     
     def emit_bash(self, context: BashContext) -> str:
@@ -23,12 +23,12 @@ class RunCommandNode(BaseNode):
         
         return command
 
-@register_node("echo", category="Commands", label="Print a text")
+@register_node("echo", category="Commands", label="Print a text", description="Prints a text to the console")
 class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo", "#3498DB")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Text", PortType.VARIABLE)
+        self.add_input("Text", PortType.VARIABLE, "Things to print")
         self.add_output("Exec", PortType.EXEC)
         self.properties["text"] = "Hello"
         
@@ -46,12 +46,12 @@ class EchoNode(BaseNode):
 
         return f'echo "{text}"'
 
-@register_node("exit", category="Commands", label="Exit script")
+@register_node("exit", category="Commands", label="Exit script", description="Exits the script with a status code")
 class ExitNode(BaseNode):
     def __init__(self):
         super().__init__("exit", "Exit", "#E74C3C")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Code", PortType.INT)
+        self.add_input("Code", PortType.INT, "Exit code")
         self.properties["code"] = 0
     
     def emit_bash(self, context: BashContext) -> str:
