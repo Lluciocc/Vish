@@ -15,7 +15,7 @@ class BaseNode(Node):
         return None
     
     @staticmethod
-    def emit_exec_chain(start_node, context):
+    def emit_exec_chain(start_node, context, stop_at=None):
         current = start_node
         while current:
             if current.id in context.emitted_nodes:
@@ -26,7 +26,10 @@ class BaseNode(Node):
             bash = current.emit_bash(context)
             if bash:
                 context.add_line(bash)
-                
+
+            if current == stop_at:
+                break
+
             exec_outputs = [
                 o for o in current.outputs
                 if o.port_type == PortType.EXEC and o.connected_edges
@@ -35,4 +38,3 @@ class BaseNode(Node):
                 break
 
             current = exec_outputs[0].connected_edges[0].target.node
-

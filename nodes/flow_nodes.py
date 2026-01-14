@@ -42,6 +42,11 @@ class IfNode(BaseNode):
             context.dedent()
 
         context.add_line("fi")
+        next_port = self.outputs[2]
+        if next_port.connected_edges:
+            start_node = next_port.connected_edges[0].target.node
+            BaseNode.emit_exec_chain(start_node, context)
+        
         return ""
 
     def _emit_branch(self, context: BashContext, output_index: int):
@@ -56,31 +61,38 @@ class IfNode(BaseNode):
 class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop", "#9B59B6")
+
         self.add_input("Exec", PortType.EXEC)
         self.add_input("List", PortType.STRING, "List to iterate over")
-        self.add_output("Loop Body", PortType.EXEC)
+
+        self.add_output("Loop Body", PortType.EXEC, "Executed for each item")
         self.add_output("Item", PortType.VARIABLE, "Current item in the loop")
+        self.add_output("Next", PortType.EXEC, "Continue after loop")
+
         self.properties["variable"] = "item"
-    
+
     def emit_bash(self, context: BashContext) -> str:
         var_name = self.properties.get("variable", "item")
         list_expr = self.properties.get("list", "*")
-        
+
         list_port = self.inputs[1]
         if list_port.connected_edges:
             source_node = list_port.connected_edges[0].source.node
             list_expr = source_node.properties.get("value", list_expr)
-        
+
         context.add_line(f"for {var_name} in {list_expr}; do")
         context.indent()
-        
+
         body_port = self.outputs[0]
         if body_port.connected_edges:
-            next_node = body_port.connected_edges[0].target.node
-            bash = next_node.emit_bash(context)
-            if bash:
-                context.add_line(bash)
-        
+            start_node = body_port.connected_edges[0].target.node
+            BaseNode.emit_exec_chain(start_node, context)
+
         context.dedent()
         context.add_line("done")
+
+        next_port = self.outputs[2]
+        if next_port.connected_edges:
+            start_node = next_port.connected_edges[0].target.node
+            BaseNode.emit_exec_chain(start_node, context)
         return ""
