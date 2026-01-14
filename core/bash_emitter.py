@@ -6,6 +6,7 @@ class BashContext:
         self.variables: Dict[str, str] = {}
         self.indent_level = 0
         self.lines: List[str] = []
+        self.emitted_nodes = set()
     
     def add_line(self, line: str):
         indent = "    " * self.indent_level
@@ -36,9 +37,12 @@ class BashEmitter:
         for node in execution_order:
             if node.node_type == "start":
                 continue
-            
+
+            if node.id in context.emitted_nodes:
+                continue
+
+            context.emitted_nodes.add(node.id)
             bash_code = node.emit_bash(context)
             if bash_code:
                 context.add_line(bash_code)
-        
         return context.get_script()

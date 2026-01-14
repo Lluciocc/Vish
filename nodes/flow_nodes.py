@@ -20,40 +20,37 @@ class IfNode(BaseNode):
         self.add_input("Condition", PortType.STRING, "Must be a string")
         self.add_output("True", PortType.EXEC, "If condition is true")
         self.add_output("False", PortType.EXEC, "If condition is false")
+        self.add_output("Next", PortType.EXEC, "Continue after if")
         self.properties["condition"] = ""
-    
+
     def emit_bash(self, context: BashContext) -> str:
         condition = self.properties.get("condition", "")
-        
         condition_port = self.inputs[1]
         if condition_port.connected_edges:
             source_node = condition_port.connected_edges[0].source.node
             condition = source_node.properties.get("value", condition)
-        
+
         context.add_line(f"if [ {condition} ]; then")
         context.indent()
-        
-        true_port = self.outputs[0]
-        if true_port.connected_edges:
-            next_node = true_port.connected_edges[0].target.node
-            bash = next_node.emit_bash(context)
-            if bash:
-                context.add_line(bash)
-        
+        self._emit_branch(context, 0)
+
         context.dedent()
-        
-        false_port = self.outputs[1]
-        if false_port.connected_edges:
+        if self.outputs[1].connected_edges:
             context.add_line("else")
             context.indent()
-            next_node = false_port.connected_edges[0].target.node
-            bash = next_node.emit_bash(context)
-            if bash:
-                context.add_line(bash)
+            self._emit_branch(context, 1)
             context.dedent()
-        
+
         context.add_line("fi")
         return ""
+
+    def _emit_branch(self, context: BashContext, output_index: int):
+        port = self.outputs[output_index]
+        if not port.connected_edges:
+            return
+
+        start_node = port.connected_edges[0].target.node
+        BaseNode.emit_exec_chain(start_node, context)
 
 @register_node("for", category="Flow", label="For Loop", description="Iterates over a list")
 class ForNode(BaseNode):
