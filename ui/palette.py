@@ -2,7 +2,10 @@ from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QTreeWidget, QTreeWidgetItem
 )
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QIcon
 from nodes.registry import NODE_REGISTRY
+from theme.theme import Theme
+import os
 
 
 class NodePalette(QWidget):
@@ -44,6 +47,9 @@ class NodePalette(QWidget):
             cat_item = QTreeWidgetItem([category])
             cat_item.setFlags(cat_item.flags() & ~Qt.ItemIsSelectable)
             cat_item.setExpanded(True)
+            ico = self.get_icon(category)
+            if ico:
+                cat_item.setIcon(0, ico)
 
             for label, node_type in sorted(categories[category]):
                 item = QTreeWidgetItem([label])
@@ -128,3 +134,13 @@ class NodePalette(QWidget):
                 if scene and scene.drag_edge:
                     scene._cancel_drag_edge()
         super().closeEvent(event)
+
+    def get_icon(self, category):
+        theme = Theme.selected_theme
+        if theme == "dark":
+            if os.path.exists("assets/icons/dark/{}.png".format(category.lower().replace(" ", "_"))):
+                return QIcon("assets/icons/dark/{}.png".format(category.lower().replace(" ", "_")))
+        elif theme == "white":
+            if os.path.exists("assets/icons/light/{}.png".format(category.lower().replace(" ", "_"))):
+                return QIcon("assets/icons/light/{}.png".format(category.lower().replace(" ", "_")))
+        return None
