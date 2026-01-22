@@ -19,6 +19,7 @@ from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 from nodes.registry import NODE_REGISTRY
+from core.highlights import BashHighlighter
 
 class NodeFactory:
     @staticmethod
@@ -88,6 +89,7 @@ class VisualBashEditor(QMainWindow):
         self.output_text.setReadOnly(True)
         self.output_text.setMinimumWidth(300)
         splitter.addWidget(self.output_text)
+        self.bash_highlighter = BashHighlighter(self.output_text.document())
 
         splitter.setSizes([900, 300, 400])
         main_layout.addWidget(splitter)

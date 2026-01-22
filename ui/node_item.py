@@ -96,7 +96,7 @@ class NodeItem(QGraphicsItem):
         super().mousePressEvent(event)
 
     def get_icon_node(self, item: Node):
-        node = NODE_REGISTRY.get(item.title.lower())
+        node = NODE_REGISTRY.get(item.title.lower().replace(" ", "_"))
         if node is not None:
             category = node["category"]
             path = "assets/icons/nodes/{}/{}.png".format(
