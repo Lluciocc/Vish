@@ -1,5 +1,5 @@
 from unicodedata import category
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem, QGraphicsPixmapItem, QGraphicsSvgItem
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem, QGraphicsPixmapItem
 from PySide6.QtCore import QRectF, Qt, QPointF
 from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath, QIcon, QPixmap
 from core.graph import Node
