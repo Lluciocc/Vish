@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem
-from PySide6.QtCore import Qt, Signal, QRectF, QPointF
-from PySide6.QtGui import QPainter, QColor, QCursor
+from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent
+from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent
 from core.graph import Port
 from ui.palette import NodePalette
 from ui.graph_scene import GraphScene
@@ -145,9 +145,14 @@ class GraphView(QGraphicsView):
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
             self.setDragMode(QGraphicsView.ScrollHandDrag)
-            fake_event = event.clone()
-            fake_event.button = Qt.LeftButton
-            super().mousePressEvent(fake_event)
+            fake = QMouseEvent(
+                QEvent.MouseButtonPress,
+                event.position(),
+                Qt.LeftButton,
+                Qt.LeftButton,
+                event.modifiers()
+            )
+            super().mousePressEvent(fake)
         else:
             super().mousePressEvent(event)
 

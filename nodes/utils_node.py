@@ -11,7 +11,11 @@ class ToString(BaseNode):
         self.add_output("Output", PortType.VARIABLE, "String representation")
 
     def emit_bash(self, context):
-        try:
-            return str(context.get_variable(self.inputs[0]))
-        except Exception as e:
-            return None
+        input_port = self.inputs[0]
+
+        if input_port.connected_edges:
+            expr = input_port.connected_edges[0].source.node.emit_bash(context)
+        else:
+            expr = input_port.value or ""
+
+        return f'"{expr}"'
