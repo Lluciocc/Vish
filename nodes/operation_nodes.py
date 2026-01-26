@@ -90,12 +90,12 @@ class LessThan(MathNode):
         super().__init__("less_than", "Less Than", "#95A5A6")
         self.add_input("A", PortType.INT, "A")
         self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
+    def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} < {b}))"
+        return f"(( {a} < {b} ))"
 
 @register_node("greater_than", category="Logic", label="Greater Than")
 class GreaterThan(MathNode):
@@ -103,12 +103,12 @@ class GreaterThan(MathNode):
         super().__init__("greater_than", "Greater Than", "#95A5A6")
         self.add_input("A", PortType.INT, "A")
         self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
+    def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} > {b}))"
+        return f"(( {a} > {b} ))"
 
 @register_node("equals", category="Logic", label="Equals")
 class Equals(MathNode):
@@ -116,46 +116,56 @@ class Equals(MathNode):
         super().__init__("equals", "Equals", "#2ECC71")
         self.add_input("A", PortType.INT, "A")
         self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
+    def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} == {b}))"
+        return f"(( {a} == {b} ))"
 
 @register_node("logical_and", category="Logic", label="AND")
 class LogicalAnd(MathNode):
     def __init__(self):
         super().__init__("logical_and", "AND", "#34495E")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.CONDITION, "A")
+        self.add_input("B", PortType.CONDITION, "B")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
-        a = self._resolve(self.inputs[0], context)
-        b = self._resolve(self.inputs[1], context)
-        return f"$(({a} && {b}))"
+    def emit_condition(self, context: BashContext) -> str:
+        a = self.inputs[0].get_condition(context)
+        b = self.inputs[1].get_condition(context)
+        if not a:
+            a = "false"
+        if not b:
+            b = "false"
+        return f"{a} && {b}"
 
 @register_node("logical_or", category="Logic", label="OR")
 class LogicalOr(MathNode):
     def __init__(self):
         super().__init__("logical_or", "OR", "#34495E")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.CONDITION, "A")
+        self.add_input("B", PortType.CONDITION, "B")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
-        a = self._resolve(self.inputs[0], context)
-        b = self._resolve(self.inputs[1], context)
-        return f"$(({a} || {b}))"
+    def emit_condition(self, context: BashContext) -> str:
+        a = self.inputs[0].get_condition(context)
+        b = self.inputs[1].get_condition(context)
+        if not a:
+            a = "false"
+        if not b:
+            b = "false"
+        return f"{a} || {b}"
 
 @register_node("logical_not", category="Logic", label="NOT")
 class LogicalNot(MathNode):
     def __init__(self):
         super().__init__("logical_not", "NOT", "#34495E")
-        self.add_input("A", PortType.INT, "A")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.CONDITION, "A")
+        self.add_output("Result", PortType.CONDITION, "Result")
 
-    def emit_bash_value(self, context: BashContext) -> str:
-        a = self._resolve(self.inputs[0], context)
-        return f"$((!{a}))"
+    def emit_condition(self, context: BashContext) -> str:
+        a = self.inputs[0].get_condition(context)
+        if not a:
+            a = "false"
+        return f"! {a}"

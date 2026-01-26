@@ -14,6 +14,9 @@ class BaseNode(Node):
     def emit_bash_value(self, context):
         return None
     
+    def emit_condition(self, context):
+        return None
+
     def get_next_exec_node(self):
         exec_outputs = [
             o for o in self.outputs

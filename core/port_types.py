@@ -7,6 +7,7 @@ class PortType(Enum):
     STRING = "string"
     INT = "int"
     BOOL = "bool"
+    CONDITION = "condition"
     PATH = "path"
     VARIABLE = "variable"
 
@@ -25,12 +26,14 @@ INT_STYLE = PortStyle("#4ECDC4", 10)
 BOOL_STYLE = PortStyle("#95E1D3", 10)
 PATH_STYLE = PortStyle("#F38181", 10)
 VARIABLE_STYLE = PortStyle("#FFA07A", 10)
+CONDITION_STYLE = PortStyle("#F7D046", 10)
 
 PORT_STYLES = {
     PortType.EXEC: EXEC_STYLE,
     PortType.STRING: STRING_STYLE,
     PortType.INT: INT_STYLE,
     PortType.BOOL: BOOL_STYLE,
+    PortType.CONDITION: CONDITION_STYLE,
     PortType.PATH: PATH_STYLE,
     PortType.VARIABLE: VARIABLE_STYLE,
 }

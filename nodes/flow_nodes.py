@@ -17,23 +17,19 @@ class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If", "#E94B3C")
         self.add_input("Exec", PortType.EXEC)
-        self.add_input("Condition", PortType.STRING, "Must be a string")
+        self.add_input("Condition", PortType.CONDITION, "Condition to evaluate")
         self.add_output("True", PortType.EXEC, "If condition is true")
         self.add_output("False", PortType.EXEC, "If condition is false")
         self.add_output("Next", PortType.EXEC, "Continue after if")
-        self.properties["condition"] = ""
 
     def emit_bash(self, context: BashContext) -> str:
-        condition = self.properties.get("condition", "")
-        condition_port = self.inputs[1]
-        if condition_port.connected_edges:
-            source_node = condition_port.connected_edges[0].source.node
-            condition = source_node.properties.get("value", condition)
+        cond = self.inputs[1].get_condition(context)
+        if not cond:
+            return ""
 
-        context.add_line(f"if [ {condition} ]; then")
+        context.add_line(f"if {cond}; then")
         context.indent()
         self._emit_branch(context, 0)
-
         context.dedent()
         if self.outputs[1].connected_edges:
             context.add_line("else")
@@ -44,18 +40,22 @@ class IfNode(BaseNode):
         context.add_line("fi")
         next_port = self.outputs[2]
         if next_port.connected_edges:
-            start_node = next_port.connected_edges[0].target.node
-            BaseNode.emit_exec_chain(start_node, context)
-        
+            BaseNode.emit_exec_chain(
+                next_port.connected_edges[0].target.node,
+                context
+            )
+
         return ""
 
     def _emit_branch(self, context: BashContext, output_index: int):
         port = self.outputs[output_index]
         if not port.connected_edges:
             return
+        BaseNode.emit_exec_chain(
+            port.connected_edges[0].target.node,
+            context
+        )
 
-        start_node = port.connected_edges[0].target.node
-        BaseNode.emit_exec_chain(start_node, context)
 
 @register_node("for", category="Flow", label="For Loop", description="Iterates over a list")
 class ForNode(BaseNode):
@@ -96,6 +96,46 @@ class ForNode(BaseNode):
             start_node = next_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
         return ""
+    
+@register_node("while", category="Flow", label="While Loop", description="Repeats execution while a condition is true")
+class WhileNode(BaseNode):
+    def __init__(self):
+        super().__init__("while", "While", "#8E44AD")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Condition", PortType.CONDITION)
+        self.add_output("Body", PortType.EXEC, "Loop body")
+        self.add_output("Next", PortType.EXEC, "Continue after loop")
+
+    def emit_bash(self, context: BashContext) -> str:
+        cond = self.inputs[1].get_condition(context)
+        if not cond:
+            return ""
+
+        context.add_line(f"while {cond}; do")
+        context.indent()
+
+        body_port = self.outputs[0]
+        if body_port.connected_edges:
+            BaseNode.emit_exec_chain(
+                body_port.connected_edges[0].target.node,
+                context,
+                stop_at=self
+            )
+
+        context.dedent()
+        context.add_line("done")
+
+        next_port = self.outputs[1]
+        if next_port.connected_edges:
+            BaseNode.emit_exec_chain(
+                next_port.connected_edges[0].target.node,
+                context
+            )
+
+        return ""
+
+    def get_next_exec_node(self):
+        return None
     
 @register_node("function", category="Flow", label="Function", description="Defines a bash function")
 class FunctionNode(BaseNode):

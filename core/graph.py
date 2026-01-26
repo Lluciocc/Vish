@@ -25,6 +25,11 @@ class Port:
     def is_connected(self) -> bool:
         return len(self.connected_edges) > 0
 
+    def get_condition(self, context):
+        if self.connected_edges:
+            return self.connected_edges[0].source.node.emit_condition(context)
+        return self.value
+    
 class Node:
     def __init__(self, node_type: str, title: str):
         self.id = str(uuid4())
