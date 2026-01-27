@@ -193,7 +193,9 @@ class GraphView(QGraphicsView):
             return
 
         if event.matches(QKeySequence.Paste):
-            self.paste()
+            view_pos = self.mapFromGlobal(QCursor.pos())
+            scene_pos = self.mapToScene(view_pos)
+            self.paste(scene_pos)
             return
         if event.key() == Qt.Key_C:
             self.create_comment_box()
@@ -257,32 +259,46 @@ class GraphView(QGraphicsView):
     def get_selected_nodes(self):
         return [item.node for item in self.get_selected_node_items()]
     
+    # TODO: CTRL X / CTRL D/ CTRL A/ F to cut/duplicate/select all/focus node
     def copy_selection(self):
         nodes = self.get_selected_nodes()
         if not nodes:
             return
 
+        self.paste_offset = (30, 30)
         Debug.Log(f"Copying {len(nodes)} nodes")
 
         data = self.serializer.serialize_subgraph(nodes)
         self.clipboard.set(data)
 
-    def paste(self):
+    def paste(self, scene_pos=None):
         if not self.clipboard.has_data():
             return
 
         data = self.clipboard.get()
         id_map = {}
 
-        for node_data in data["nodes"]:
+        nodes_data = data.get("nodes", [])
+        if not nodes_data:
+            return
+
+        avg_x = sum(n["x"] for n in nodes_data) / len(nodes_data)
+        avg_y = sum(n["y"] for n in nodes_data) / len(nodes_data)
+
+        if scene_pos:
+            dx = scene_pos.x() - avg_x
+            dy = scene_pos.y() - avg_y
+        else:
+            dx, dy = self.paste_offset
+
+        for node_data in nodes_data:
             node = self.node_factory(node_data["type"])
-            node.properties.update(node_data["properties"])
-            node.x = node_data["x"] + self.paste_offset[0]
-            node.y = node_data["y"] + self.paste_offset[1]
+            node.properties.update(node_data.get("properties", {}))
+            node.x = node_data["x"] + dx
+            node.y = node_data["y"] + dy
 
             self.graph.add_node(node)
             self.add_node_item(node)
-
             id_map[node_data["id"]] = node
 
         for edge_data in data.get("edges", []):
@@ -294,9 +310,7 @@ class GraphView(QGraphicsView):
             src_i = edge_data["source_output_index"]
             tgt_i = edge_data["target_input_index"]
 
-            if src_i >= len(src_node.outputs):
-                continue
-            if tgt_i >= len(tgt_node.inputs):
+            if src_i >= len(src_node.outputs) or tgt_i >= len(tgt_node.inputs):
                 continue
 
             src_port = src_node.outputs[src_i]
@@ -306,7 +320,8 @@ class GraphView(QGraphicsView):
             if edge:
                 self.add_edge_item(edge)
 
-        Debug.Log(f"Pasted {len(data['nodes'])} nodes")
+        self.paste_offset = (self.paste_offset[0] + 10, self.paste_offset[1] + 10)
+        Debug.Log(f"Pasted {len(nodes_data)} nodes")
 
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
