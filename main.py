@@ -1,4 +1,7 @@
+import os
 import sys
+import subprocess
+import time
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
                                QSplitter, QFileDialog, QComboBox)
@@ -15,7 +18,6 @@ from nodes.operation_nodes import Addition
 from nodes.utils_node import ToString
 from ui.comment_box import CommentBoxItem
 from ui.graph_view import GraphView
-from ui.palette import NodePalette
 from ui.property_panel import PropertyPanel
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 from nodes.registry import NODE_REGISTRY
@@ -80,11 +82,30 @@ class VisualBashEditor(QMainWindow):
 
         self.property_panel = PropertyPanel()
         splitter.addWidget(self.property_panel)
-
+        
+        self.output_splitter = QSplitter(Qt.Vertical)
         self.output_text = QTextEdit()
         self.output_text.setReadOnly(True)
         self.output_text.setMinimumWidth(300)
-        splitter.addWidget(self.output_text)
+
+        self.run_bash_btn = QPushButton("Run Bash Script")
+        self.run_bash_btn.clicked.connect(self.run_bash)
+        toolbar.addWidget(self.run_bash_btn)
+
+        self.copy_btn = QPushButton("Copy to Clipboard")
+        self.copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(self.output_text.toPlainText()))
+        toolbar.addWidget(self.copy_btn)
+
+        self.run_output_text = QTextEdit()
+        self.run_output_text.setReadOnly(True)
+        self.run_output_text.setVisible(False)
+        self.run_output_text.setMinimumHeight(150)
+
+        self.output_splitter.addWidget(self.output_text)
+        self.output_splitter.addWidget(self.run_output_text)
+        self.output_splitter.setSizes([300, 0])
+
+        splitter.addWidget(self.output_splitter)
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
         splitter.setSizes([900, 300, 400])
@@ -187,6 +208,53 @@ class VisualBashEditor(QMainWindow):
 
         self.graph_view.apply_theme()
 
+    def run_bash(self):
+        self.set_run_output_visible(True)
+        bash_script = self.output_text.toPlainText()
+        self.run_output_text.clear()
+        if not bash_script.strip():
+            Debug.Warn("No bash script to run.")
+            return
+
+        temp_script_path = f"temp_script_{int(time.time())}.sh"
+        with open(temp_script_path, "w") as f:
+            f.write(bash_script)
+
+        os.chmod(temp_script_path, 0o755)
+
+        Debug.Log(f"Running generated bash script...")
+
+        try:
+            result = subprocess.run(
+                ["bash", temp_script_path],
+                capture_output=True,
+                text=True
+            )
+            output = result.stdout
+            error = result.stderr
+
+            self.run_output_text.setVisible(True)
+            self.output_splitter.setSizes([200, 150])
+            self.run_output_text.setPlainText(f"{output} \n{f'Error: \n{error}' if error else ''}")
+
+        except Exception as e:
+            self.run_output_text.setVisible(True)
+            self.run_output_text.setPlainText(str(e))
+
+        finally:
+            os.remove(temp_script_path)
+
+    def set_run_output_visible(self, visible: bool):
+        self.run_output_text.setVisible(visible)
+
+    def toggle_run_output(self):
+        visible = self.run_output_text.isVisible()
+        self.run_output_text.setVisible(not visible)
+
+        if visible:
+            self.output_splitter.setSizes([1, 0])
+        else:
+            self.output_splitter.setSizes([200, 150])
 
 def main():
     app = QApplication(sys.argv)
