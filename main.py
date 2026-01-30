@@ -22,6 +22,7 @@ from ui.property_panel import PropertyPanel
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
+from core.ansi_to_html import ansi_to_html
 
 class NodeFactory:
     @staticmethod
@@ -212,7 +213,7 @@ class VisualBashEditor(QMainWindow):
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
         self.run_output_text.clear()
-        if not bash_script.strip():
+        if not bash_script.strip() or len(bash_script) == 49: # 49 is length of the header
             Debug.Warn("No bash script to run.")
             return
 
@@ -235,7 +236,12 @@ class VisualBashEditor(QMainWindow):
 
             self.run_output_text.setVisible(True)
             self.output_splitter.setSizes([200, 150])
-            self.run_output_text.setPlainText(f"{output} \n{f'Error: \n{error}' if error else ''}")
+
+            if error:
+                ansi = f"\x1b[1;31mError:\x1b[0m\n{error}"
+                self.run_output_text.setHtml(ansi_to_html(ansi))
+            else:
+                self.run_output_text.setHtml(ansi_to_html(output))
 
         except Exception as e:
             self.run_output_text.setVisible(True)

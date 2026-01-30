@@ -36,6 +36,7 @@ Note: Please ensure your code adheres to the existing coding style and includes 
 - Developed by Lluciocc
 - Inspired by Unreal Engine's Blueprint system
 - Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)
+- ANSI to HTML conversion code inspired from [ansi-to-html](https://github.com/pycontribs/ansi2html)
 
 ## License
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
