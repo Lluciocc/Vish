@@ -178,4 +178,4 @@ class CommandConditionNode(BaseNode):
         self.properties["command"] = ""
 
     def emit_condition(self, context: BashContext) -> str:
-        return self.properties["command"]
+        return f"[ {self.properties['command']} ]"
