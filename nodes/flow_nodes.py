@@ -1,7 +1,8 @@
 from core.port_types import PortType
 from core.bash_context import BashContext
 from nodes.registry import register_node
-from .base_node import BaseNode
+from core.debug import Debug
+from nodes.base_node import BaseNode
 
 @register_node("start", category="Flow", label="Start", description="The starting point of the flow")
 class StartNode(BaseNode):
@@ -25,6 +26,7 @@ class IfNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         cond = self.inputs[1].get_condition(context)
         if not cond:
+            Debug.Warn("If Node: No condition connected, skipping if statement.")
             return ""
 
         context.add_line(f"if {cond}; then")
@@ -109,6 +111,7 @@ class WhileNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         cond = self.inputs[1].get_condition(context)
         if not cond:
+            Debug.Warn("While Node: No condition connected, skipping while loop.")
             return ""
 
         context.add_line(f"while {cond}; do")
@@ -147,7 +150,7 @@ class FunctionNode(BaseNode):
 
     def emit_bash(self, context: BashContext) -> str:
         name = self.properties.get("name", "my_function")
-        context.add_function_line(f"{name}() {{")
+        context.add_function_line(f"{name}() {{") # double { to escape in f-string
 
         prev_buffer = context._current_buffer
         prev_indent = context.indent_level

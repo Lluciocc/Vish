@@ -169,3 +169,13 @@ class LogicalNot(MathNode):
         if not a:
             a = "false"
         return f"! {a}"
+
+@register_node("command_condition", category="Logic", label="Command Condition", description="Uses a custom command as a condition")
+class CommandConditionNode(BaseNode):
+    def __init__(self):
+        super().__init__("command_condition", "Command Condition", "#34495E")
+        self.add_output("command", PortType.CONDITION, "Command")
+        self.properties["command"] = ""
+
+    def emit_condition(self, context: BashContext) -> str:
+        return self.properties["command"]
