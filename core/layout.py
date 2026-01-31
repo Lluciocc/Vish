@@ -1,3 +1,8 @@
+# Hi there! If you're reading this, you're probably interested in how the graph layout engine works.
+# This module provides a simple yet effective way to automatically arrange nodes in the graph.
+# You should look at compute to have an idea of the overall flow.
+# NOTE: Im using something call "Barycentric coordinate system" for minimizing edge crossings. and HELL YEAH it works pretty well!
+# If you want to learn more about it, check out: https://en.wikipedia.org/wiki/Barycentric_coordinate_system
 from __future__ import annotations
 from dataclasses import dataclass
 from collections import defaultdict,deque
@@ -43,6 +48,7 @@ class GraphLayoutEngine:
         self._build()
         self._compute_x()
         self._compute_y()
+        self._minimize_crossings()
         self._refine_data_proximity()
         self._resolve_collisions()
         self._center_layout()
@@ -176,3 +182,26 @@ class GraphLayoutEngine:
         for n in self.nodes.values():
             n.x-=cx
             n.y-=cy
+
+    def _minimize_crossings(self, passes=4):
+        cols=defaultdict(list)
+        for n in self.nodes.values():
+            cols[n.x].append(n)
+        xs=sorted(cols)
+        for _ in range(passes):
+            for i in range(1,len(xs)):
+                left=cols[xs[i-1]]
+                cur=cols[xs[i]]
+                index={n.id:j for j,n in enumerate(left)}
+                def bary(n):
+                    ys=[]
+                    for e in n.in_edges:
+                        if self.nodes[e.src].x==xs[i-1]:
+                            ys.append(index.get(e.src,0))
+                    return sum(ys)/len(ys) if ys else float("inf")
+                cur.sort(key=bary)
+                y=0
+                for n in cur:
+                    n.y=y
+                    y+=self.y_spacing
+
