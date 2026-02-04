@@ -55,3 +55,48 @@ class SleepNode(BaseNode):
             duration = source_node.properties.get("value", duration)
 
         return f'sleep {duration}'
+    
+@register_node("download_file", category="Utilities", label="Download File", description="Downloads a file from a specified URL")
+class DownloadFileNode(BaseNode):
+    def __init__(self):
+        super().__init__("download_file", "Download File", "#1ABC9C")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC)
+        self.properties["url"] = ""
+        self.properties["output_path"] = ""
+
+    def emit_bash(self, context: BashContext) -> str:
+        url = self.properties.get("url", "")
+        output_path = self.properties.get("output_path", "")
+
+        return f'curl -o "{output_path}" "{url}"'
+
+@register_node("git_clone", category="Utilities", label="Git Clone", description="Clones a Git repository to a specified destination")
+class GitCloneNode(BaseNode):
+    def __init__(self):
+        super().__init__("git_clone", "Git Clone", "#3498DB")
+        self.add_input("Exec", PortType.EXEC)        
+        self.add_output("Exec", PortType.EXEC)
+        self.properties["repo_url"] = ""
+        self.properties["destination_path"] = ""
+
+    def emit_bash(self, context: BashContext) -> str:
+        repo_url = self.properties.get("repo_url", "")
+        destination_path = self.properties.get("destination_path", "")
+
+        return f'git clone "{repo_url}" "{destination_path}"'
+
+
+
+@register_node("open_website", category="Utilities", label="Open Website", description="Opens a specified URL in the default web browser")  
+class OpenWebsiteNode(BaseNode):
+    def __init__(self):
+        super().__init__("open_website", "Open Website", "#8E44AD")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC)
+        self.properties["url"] = ""
+
+    def emit_bash(self, context: BashContext) -> str:
+        url = self.properties.get("url", "")
+
+        return f'xdg-open "{url}"'

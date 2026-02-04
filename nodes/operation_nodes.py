@@ -9,10 +9,10 @@ class MathNode(BaseNode):
             return port.connected_edges[0].source.node.emit_bash_value(context)
         return default
 
-@register_node("int_constant", category="Math", label="Integer Constant", description="Represents an integer constant value")
-class IntConstant(MathNode):
+@register_node("number_constant", category="Constants", label="Number Constant", description="Represents a number constant value")
+class NumberConstant(MathNode):
     def __init__(self):
-        super().__init__("int_constant", "Int", "#BDC3C7")
+        super().__init__("number_constant", "Number Constant", "#BDC3C7")
         self.add_output("Value", PortType.INT, "Integer value")
         self.properties["value"] = 0
 

@@ -66,3 +66,13 @@ class FileExistsNode(BaseNode):
             path = source_node.properties.get("value", path)
         
         return f'[ -f "{path}" ]'
+    
+@register_node("string_constant", category="Constants", label="String Constant", description="Represents a string constant value")
+class StringConstantNode(BaseNode):
+    def __init__(self):
+        super().__init__("string_constant", "String Constant", "#BDC3C7")
+        self.add_output("Value", PortType.STRING, "String value")
+        self.properties["value"] = ""
+
+    def emit_bash_value(self, context: BashContext) -> str:
+        return f'"{self.properties.get("value", "")}"'
