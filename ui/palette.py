@@ -6,21 +6,23 @@ from PySide6.QtGui import QIcon
 from nodes.registry import NODE_REGISTRY
 from theme.theme import Theme
 import os
+from core.traduction import Traduction
 
+links = {}
 
 class NodePalette(QWidget):
     node_selected = Signal(str)
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Add Node")
+        self.setWindowTitle(Traduction.get_trad("add_node", "Add Node"))
         self.resize(320, 420)
         self.setWindowFlags(Qt.Popup)
 
         layout = QVBoxLayout(self)
 
         self.search_input = QLineEdit()
-        self.search_input.setPlaceholderText("Search nodes...")
+        self.search_input.setPlaceholderText(Traduction.get_trad("search_nodes", "Search nodes..."))
         self.search_input.textChanged.connect(self.filter_nodes)
         layout.addWidget(self.search_input)
 
@@ -40,23 +42,28 @@ class NodePalette(QWidget):
         categories = {}
 
         for node_type, meta in NODE_REGISTRY.items():
-            cat = meta["category"]
+            cat = Traduction.get_trad(meta["category"], meta["category"])
+            links[cat] = meta["category"]
             categories.setdefault(cat, []).append(
-                (meta["label"], node_type, meta.get("description", ""))
+                (
+                    Traduction.get_trad(f"{meta["label"]}_label", meta["label"]),
+                    node_type,
+                    Traduction.get_trad(f"{meta["label"]}_desc",meta.get("description", ""))
+                )
             )
 
         for category in sorted(categories.keys()):
             cat_item = QTreeWidgetItem([category])
             cat_item.setFlags(cat_item.flags() & ~Qt.ItemIsSelectable)
             cat_item.setExpanded(True)
-            ico = self.get_icon(category)
+            ico = self.get_icon(links[category])
             if ico:
                 cat_item.setIcon(0, ico)
 
             for label, node_type, description in sorted(categories[category]):
-                item = QTreeWidgetItem([label])
+                item = QTreeWidgetItem([Traduction.get_trad(f"{node_type}_label", label)])
                 item.setData(0, Qt.UserRole, node_type)
-                item.setToolTip(0, description)
+                item.setToolTip(0, Traduction.get_trad(f"{node_type}_desc",description))
                 cat_item.addChild(item)
 
             self.tree.addTopLevelItem(cat_item)

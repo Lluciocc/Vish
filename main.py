@@ -11,7 +11,6 @@ from PySide6.QtGui import QColor
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
-from core.debug import Debug
 from nodes.flow_nodes import StartNode, IfNode, ForNode
 from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
@@ -25,7 +24,7 @@ from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config
-from core.debug import Info
+from core.debug import Info, Debug
 from core.traduction import Traduction
 
 class NodeFactory:
@@ -140,7 +139,7 @@ class VisualBashEditor(QMainWindow):
     
     def generate_bash(self):
         if not self.graph.nodes:
-            Debug.Warn("Generating graph from an empty graph.")
+            Debug.Warn(Traduction.get_trad("warn_generating_empty_graph", "Generating an empty graph."))
         print(f"EDGES: {len(self.graph.edges)}")
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
@@ -148,7 +147,7 @@ class VisualBashEditor(QMainWindow):
     
     def save_graph(self):
         if not self.graph.nodes:
-            Debug.Warn("Cannot save an empty graph.")
+            Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
             return
 
         file_path, _ = QFileDialog.getSaveFileName(
@@ -158,14 +157,14 @@ class VisualBashEditor(QMainWindow):
             json_data = Serializer.serialize(self.graph, self.graph_view)
             with open(file_path, 'w') as f:
                 f.write(json_data)
-            Debug.Log(f"Graph saved to {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
+            Debug.Log(Traduction.get_trad(f"graph_saved_successfully", f"Graph saved successfully to {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
     
     def load_graph(self):
         file_path, _ = QFileDialog.getOpenFileName(
             self, "Load Graph", "", "JSON Files (*.json)"
         )
         if not file_path:
-            Debug.Error("No file selected for loading graph.")
+            Debug.Error(Traduction.get_trad("error_no_file_selected", "No file selected."))
             return
 
         with open(file_path, "r") as f:
@@ -204,8 +203,7 @@ class VisualBashEditor(QMainWindow):
         )
         splitter.setSizes([900, 300, 400])
 
-        Debug.Log(f"Graph loaded from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
-
+        Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
     def set_theme(self, theme_name: str):
         if theme_name == "Dark":
             set_dark_theme()
@@ -272,13 +270,13 @@ class VisualBashEditor(QMainWindow):
     
     def run_bash(self):
         if Info.get_os() == "Windows":
-            Debug.Error("Running bash scripts is not supported on Windows.")
+            Debug.Warn(Traduction.get_trad("running_windows", "It is not possible to run scripts on Windows."))
             return
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
         self.run_output_text.clear()
         if not bash_script.strip() or len(bash_script) == 49: # 49 is length of the header
-            Debug.Warn("No bash script to run.")
+            Debug.Warn(Traduction.get_trad("no_bash_script", "No bash script found to run the graph."))
             return
 
         temp_script_path = f"temp_script_{int(time.time())}.sh"
@@ -287,7 +285,7 @@ class VisualBashEditor(QMainWindow):
 
         os.chmod(temp_script_path, 0o755)
 
-        Debug.Log(f"Running generated bash script...")
+        Debug.Log(Traduction.get_trad("running_generated_bash_script", "Running generated bash script..."))
 
         try:
             if Config.USING_TTY:
@@ -323,7 +321,7 @@ def main():
     app = QApplication(sys.argv)
     editor = VisualBashEditor()
     Debug.init(editor)
-    Traduction.set_translate_model("en")
+    Traduction.set_translate_model("fr")
     editor.show()
     sys.exit(app.exec())
 

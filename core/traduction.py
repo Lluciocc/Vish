@@ -13,6 +13,10 @@ class Traduction:
             print(f"Cannot find language model for {lang}")
 
     @staticmethod
-    def get_trad(msgid, fallback=""):
-        return Traduction.model.get(msgid, fallback)
-    
+    def get_trad(msgid, fallback="", **kwargs):
+        text = Traduction.model.get(msgid, fallback)
+        try:
+            return text.format(**kwargs)
+        except Exception:
+            return text
+        

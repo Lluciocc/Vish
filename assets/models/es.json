@@ -1,0 +1,153 @@
+{
+  "__categories__": {
+    "Commands": "Comandos",
+    "Flow": "Flujo",
+    "Math": "Matemáticas",
+    "Logic": "Lógica",
+    "Variables": "Variables",
+    "Constants": "Constantes",
+    "Conversion": "Conversión",
+    "Utilities": "Utilidades",
+    "Other": "Otros"
+  },
+
+  "run_command": "Ejecutar un comando",
+  "run_command_label": "Ejecutar un comando",
+  "run_command_desc": "Ejecuta un comando shell dentro del script bash.",
+  "run_command_tooltip": "Permite ejecutar un comando bash arbitrario.",
+
+  "echo": "Mostrar un texto",
+  "echo_label": "Mostrar un texto",
+  "echo_desc": "Muestra un texto en la salida estándar.",
+  "echo_tooltip": "Muestra un mensaje o un valor en el terminal.",
+
+  "exit": "Salir del script",
+  "exit_label": "Salir del script",
+  "exit_desc": "Detiene la ejecución del script con un código de salida.",
+  "exit_tooltip": "Interrumpe inmediatamente la ejecución del script bash.",
+
+  "start": "Inicio",
+  "start_label": "Inicio",
+  "start_desc": "Punto de inicio del flujo de ejecución.",
+  "start_tooltip": "Primer nodo ejecutado en el grafo.",
+
+  "if": "Condición SI",
+  "if_label": "Condición SI",
+  "if_desc": "Evalúa una condición y bifurca el flujo según el resultado.",
+  "if_tooltip": "Ejecuta un camino diferente según la condición sea verdadera o falsa.",
+
+  "for": "Bucle PARA",
+  "for_label": "Bucle PARA",
+  "for_desc": "Itera sobre una lista o un rango de valores.",
+  "for_tooltip": "Repite una serie de acciones para cada valor.",
+
+  "while": "Bucle MIENTRAS",
+  "while_label": "Bucle MIENTRAS",
+  "while_desc": "Repite la ejecución mientras una condición sea verdadera.",
+  "while_tooltip": "Continúa la ejecución mientras la condición se cumpla.",
+
+  "function": "Función",
+  "function_label": "Función",
+  "function_desc": "Define una función bash reutilizable.",
+  "function_tooltip": "Permite encapsular instrucciones dentro de una función.",
+
+  "call": "Llamar a una función",
+  "call_label": "Llamar a una función",
+  "call_desc": "Llama a una función bash definida previamente.",
+  "call_tooltip": "Ejecuta una función definida en otra parte del script.",
+
+  "return": "Retorno",
+  "return_label": "Retorno",
+  "return_desc": "Devuelve un valor desde una función.",
+  "return_tooltip": "Devuelve un valor y finaliza la ejecución de la función.",
+
+  "number_constant": "Constante numérica",
+  "number_constant_label": "Constante numérica",
+  "number_constant_desc": "Representa un valor numérico constante.",
+  "number_constant_tooltip": "Valor numérico fijo utilizado en cálculos.",
+
+  "string_constant": "Constante de texto",
+  "string_constant_label": "Constante de texto",
+  "string_constant_desc": "Representa una cadena de caracteres constante.",
+  "string_constant_tooltip": "Cadena de texto fija.",
+
+  "addition": "Suma",
+  "addition_label": "Suma",
+  "addition_desc": "Suma dos valores numéricos.",
+  "addition_tooltip": "Operación matemática de suma.",
+
+  "subtraction": "Resta",
+  "subtraction_label": "Resta",
+  "subtraction_desc": "Resta un valor de otro.",
+  "subtraction_tooltip": "Operación matemática de resta.",
+
+  "multiplication": "Multiplicación",
+  "multiplication_label": "Multiplicación",
+  "multiplication_desc": "Multiplica dos valores numéricos.",
+  "multiplication_tooltip": "Operación matemática de multiplicación.",
+
+  "division": "División",
+  "division_label": "División",
+  "division_desc": "Divide un valor entre otro.",
+  "division_tooltip": "Operación matemática de división.",
+
+  "modulo": "Módulo",
+  "modulo_label": "Módulo",
+  "modulo_desc": "Calcula el resto de una división.",
+  "modulo_tooltip": "Resto de una división entera.",
+
+  "less_than": "Menor que",
+  "less_than_label": "Menor que",
+  "less_than_desc": "Verifica si un valor es menor que otro.",
+  "less_than_tooltip": "Comparación estricta menor.",
+
+  "greater_than": "Mayor que",
+  "greater_than_label": "Mayor que",
+  "greater_than_desc": "Verifica si un valor es mayor que otro.",
+  "greater_than_tooltip": "Comparación estricta mayor.",
+
+  "equals": "Igual a",
+  "equals_label": "Igual a",
+  "equals_desc": "Verifica si dos valores son iguales.",
+  "equals_tooltip": "Comprueba la igualdad entre dos valores.",
+
+  "logical_and": "Y lógico",
+  "logical_and_label": "Y lógico",
+  "logical_and_desc": "Devuelve verdadero si ambas condiciones son verdaderas.",
+  "logical_and_tooltip": "Operador lógico Y.",
+
+  "logical_or": "O lógico",
+  "logical_or_label": "O lógico",
+  "logical_or_desc": "Devuelve verdadero si al menos una condición es verdadera.",
+  "logical_or_tooltip": "Operador lógico O.",
+
+  "logical_not": "NO lógico",
+  "logical_not_label": "NO lógico",
+  "logical_not_desc": "Invierte el resultado de una condición.",
+  "logical_not_tooltip": "Invierte una condición lógica.",
+
+  "set_variable": "Definir una variable",
+  "set_variable_label": "Definir una variable",
+  "set_variable_desc": "Asigna un valor a una variable.",
+  "set_variable_tooltip": "Crea o modifica una variable.",
+
+  "get_variable": "Leer una variable",
+  "get_variable_label": "Leer una variable",
+  "get_variable_desc": "Obtiene el valor de una variable.",
+  "get_variable_tooltip": "Accede al valor de una variable existente.",
+
+  "file_exists": "El archivo existe",
+  "file_exists_label": "El archivo existe",
+  "file_exists_desc": "Verifica si un archivo existe en el sistema.",
+  "file_exists_tooltip": "Comprueba la existencia de un archivo.",
+
+  "to_string": "Convertir a texto",
+  "to_string_label": "Convertir a texto",
+  "to_string_desc": "Convierte un valor en una cadena de texto.",
+  "to_string_tooltip": "Transforma un valor en texto.",
+
+  "to_int": "Convertir a entero",
+  "to_int_label": "Convertir a entero",
+  "to_int_desc": "Convierte un valor en un número entero.",
+  "to_int_tooltip": "Transforma un valor en entero."
+}

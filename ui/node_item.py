@@ -6,6 +6,7 @@ from core.graph import Node
 from theme.theme import Theme
 from ui.port_item import PortItem
 from nodes.registry import NODE_REGISTRY
+from core.traduction import Traduction
 import os
 
 class NodeItem(QGraphicsItem):
@@ -24,7 +25,7 @@ class NodeItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
         
-        self.title_item = QGraphicsTextItem(node.title, self)
+        self.title_item = QGraphicsTextItem(Traduction.get_trad(node.node_type, node.title), self)
         self.title_item.setDefaultTextColor(QColor("#ECF0F1"))
         self.title_item.setPos(10, 8)
         

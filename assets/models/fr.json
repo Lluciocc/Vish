@@ -1,1 +1,162 @@
-{}
+{
+    "warn_generating_empty_graph": "Génération d'un graphe vide.",
+    "error_no_file_selected": "Aucun fichier sélectionné.",
+    "error_cannot_save_empty_graph": "Impossible de sauvegarder un graphe vide.",
+    "graph_saved_successfully": "Graphe sauvegardé à {file_path} avec {node_count} nœuds et {edge_count} arêtes.",
+    "graph_loaded_successfully": "Graphe chargé depuis {file_path} avec {node_count} nœuds et {edge_count} arêtes.",
+    "running_windows": "Il n'est pas possible d'exécuter le script sur Windows.",
+    "no_bash_script": "Aucun script bash trouvé pour exécuter le graphe.",
+    "running_generated_bash_script": "Exécution du script bash généré...",
+    "add_node":"Ajouter un noeud",
+    "search_nodes": "Rechercher...",
+
+    "Commands": "Commandes",
+    "Flow": "Flux",
+    "Math": "Mathématiques",
+    "Logic": "Logique",
+    "Variables": "Variables",
+    "Constants": "Constantes",
+    "Conversion": "Conversion",
+    "Utilities": "Utilitaires",
+    "Other": "Autres",
+
+    "run_command": "Exécuter une commande",
+    "run_command_label": "Exécuter une commande",
+    "run_command_desc": "Exécute une commande shell dans le script bash.",
+    "run_command_tooltip": "Permet d'exécuter une commande bash arbitraire.",
+
+    "echo": "Afficher un texte",
+    "echo_label": "Afficher un texte",
+    "echo_desc": "Affiche un texte dans la sortie standard.",
+    "echo_tooltip": "Affiche un message ou une valeur dans le terminal.",
+
+    "exit": "Quitter le script",
+    "exit_label": "Quitter le script",
+    "exit_desc": "Arrête l'exécution du script avec un code de sortie.",
+    "exit_tooltip": "Interrompt immédiatement l'exécution du script bash.",
+
+    "start": "Début",
+    "start_label": "Début",
+    "start_desc": "Point de départ du flux d'exécution.",
+    "start_tooltip": "Premier nœud exécuté dans le graphe.",
+
+    "if": "Condition SI",
+    "if_label": "Condition SI",
+    "if_desc": "Évalue une condition et bifurque le flux selon le résultat.",
+    "if_tooltip": "Exécute un chemin différent selon que la condition est vraie ou fausse.",
+
+    "for": "Boucle POUR",
+    "for_label": "Boucle POUR",
+    "for_desc": "Itère sur une liste ou une plage de valeurs.",
+    "for_tooltip": "Répète une série d'actions pour chaque valeur.",
+
+    "while": "Boucle TANT QUE",
+    "while_label": "Boucle TANT QUE",
+    "while_desc": "Répète l'exécution tant qu'une condition est vraie.",
+    "while_tooltip": "Continue l'exécution tant que la condition est satisfaite.",
+
+    "function": "Fonction",
+    "function_label": "Fonction",
+    "function_desc": "Définit une fonction bash réutilisable.",
+    "function_tooltip": "Permet d'encapsuler des instructions dans une fonction.",
+
+    "call": "Appeler une fonction",
+    "call_label": "Appeler une fonction",
+    "call_desc": "Appelle une fonction bash définie précédemment.",
+    "call_tooltip": "Exécute une fonction définie ailleurs dans le script.",
+
+    "return": "Retour",
+    "return_label": "Retour",
+    "return_desc": "Retourne une valeur depuis une fonction.",
+    "return_tooltip": "Renvoie une valeur et termine l'exécution de la fonction.",
+
+    "number_constant": "Constante numérique",
+    "number_constant_label": "Constante numérique",
+    "number_constant_desc": "Représente une valeur numérique constante.",
+    "number_constant_tooltip": "Valeur numérique fixe utilisée dans les calculs.",
+
+    "string_constant": "Constante texte",
+    "string_constant_label": "Constante texte",
+    "string_constant_desc": "Représente une chaîne de caractères constante.",
+    "string_constant_tooltip": "Chaîne de caractères fixe.",
+
+    "addition": "Addition",
+    "addition_label": "Addition",
+    "addition_desc": "Additionne deux valeurs numériques.",
+    "addition_tooltip": "Addition mathématique entre deux valeurs.",
+
+    "subtraction": "Soustraction",
+    "subtraction_label": "Soustraction",
+    "subtraction_desc": "Soustrait une valeur d'une autre.",
+    "subtraction_tooltip": "Soustraction mathématique.",
+
+    "multiplication": "Multiplication",
+    "multiplication_label": "Multiplication",
+    "multiplication_desc": "Multiplie deux valeurs numériques.",
+    "multiplication_tooltip": "Multiplication mathématique.",
+
+    "division": "Division",
+    "division_label": "Division",
+    "division_desc": "Divise une valeur par une autre.",
+    "division_tooltip": "Division mathématique.",
+
+    "modulo": "Modulo",
+    "modulo_label": "Modulo",
+    "modulo_desc": "Calcule le reste d'une division.",
+    "modulo_tooltip": "Reste d'une division entière.",
+
+    "less_than": "Inférieur à",
+    "less_than_label": "Inférieur à",
+    "less_than_desc": "Vérifie si une valeur est inférieure à une autre.",
+    "less_than_tooltip": "Comparaison stricte inférieur.",
+
+    "greater_than": "Supérieur à",
+    "greater_than_label": "Supérieur à",
+    "greater_than_desc": "Vérifie si une valeur est supérieure à une autre.",
+    "greater_than_tooltip": "Comparaison stricte supérieur.",
+
+    "equals": "Égal à",
+    "equals_label": "Égal à",
+    "equals_desc": "Vérifie si deux valeurs sont égales.",
+    "equals_tooltip": "Teste l'égalité entre deux valeurs.",
+
+    "logical_and": "ET logique",
+    "logical_and_label": "ET logique",
+    "logical_and_desc": "Retourne vrai si les deux conditions sont vraies.",
+    "logical_and_tooltip": "Opérateur logique ET.",
+
+    "logical_or": "OU logique",
+    "logical_or_label": "OU logique",
+    "logical_or_desc": "Retourne vrai si au moins une condition est vraie.",
+    "logical_or_tooltip": "Opérateur logique OU.",
+
+    "logical_not": "NON logique",
+    "logical_not_label": "NON logique",
+    "logical_not_desc": "Inverse le résultat d'une condition.",
+    "logical_not_tooltip": "Inverse une condition logique.",
+
+    "set_variable": "Définir une variable",
+    "set_variable_label": "Définir une variable",
+    "set_variable_desc": "Assigne une valeur à une variable.",
+    "set_variable_tooltip": "Crée ou modifie une variable.",
+
+    "get_variable": "Lire une variable",
+    "get_variable_label": "Lire une variable",
+    "get_variable_desc": "Récupère la valeur d'une variable.",
+    "get_variable_tooltip": "Accède à la valeur d'une variable existante.",
+
+    "file_exists": "Fichier existe",
+    "file_exists_label": "Fichier existe",
+    "file_exists_desc": "Vérifie si un fichier existe sur le système.",
+    "file_exists_tooltip": "Teste la présence d'un fichier.",
+
+    "to_string": "Convertir en texte",
+    "to_string_label": "Convertir en texte",
+    "to_string_desc": "Convertit une valeur en chaîne de caractères.",
+    "to_string_tooltip": "Transforme une valeur en texte.",
+
+    "to_int": "Convertir en entier",
+    "to_int_label": "Convertir en entier",
+    "to_int_desc": "Convertit une valeur en nombre entier.",
+    "to_int_tooltip": "Transforme une valeur en entier."
+}
