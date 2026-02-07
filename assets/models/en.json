@@ -22,6 +22,15 @@
     "lang_fr": "French",
     "lang_es": "Spanish",
 
+    "settings": "Settings",
+    "appearance": "Appearance",
+    "theme": "Theme",
+    "language": "Language",
+    "advanced": "Advanced",
+    "debug": "Debug mode",
+    "using_tty": "Use TTY",
+    "close": "Close",
+
     "Commands": "Commands",
     "Flow": "Flow",
     "Math": "Mathematics",

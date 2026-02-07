@@ -22,6 +22,15 @@
     "lang_fr": "Français",
     "lang_es": "Espagnol",
 
+    "settings": "Paramètres",
+    "appearance": "Apparence",
+    "theme": "Thème",
+    "language": "Langue",
+    "advanced": "Avancé",
+    "debug": "Mode debug",
+    "using_tty": "Utiliser le TTY",
+    "close": "Fermer",
+
 
     "Commands": "Commandes",
     "Flow": "Flux",

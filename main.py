@@ -5,7 +5,7 @@ import subprocess
 import time
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
-                               QSplitter, QFileDialog, QComboBox)
+                               QSplitter, QFileDialog, QToolButton, QMenu)
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QColor
 from core.graph import Graph
@@ -19,13 +19,14 @@ from nodes.utils_node import ToString
 from ui.comment_box import CommentBoxItem
 from ui.graph_view import GraphView
 from ui.property_panel import PropertyPanel
-from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from ui.settings import SettingsDialog
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config
 from core.debug import Info, Debug
 from core.traduction import Traduction
+from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
 
 class NodeFactory:
     @staticmethod
@@ -48,49 +49,72 @@ class VisualBashEditor(QMainWindow):
         self.create_initial_graph()
     
     def setup_ui(self):
-        set_dark_theme()
-        #set_purple_theme()
-        #set_white_theme()
+        if Config.theme == "dark":
+            set_dark_theme()
+        elif Config.theme == "purple":
+            set_purple_theme()
+        elif Config.theme == "white":
+            set_white_theme()
+        Traduction.set_translate_model(Config.lang)
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
-        
         main_layout = QVBoxLayout(central_widget)
-        
         toolbar = QHBoxLayout()
-        
-        self.generate_btn = QPushButton("Generate Bash")
+
+        self.generate_btn = QPushButton(Traduction.get_trad("btn_generate_bash", "Generate Bash"))
         self.generate_btn.clicked.connect(self.generate_bash)
         toolbar.addWidget(self.generate_btn)
-        
-        self.save_btn = QPushButton("Save")
+
+        self.save_btn = QPushButton(Traduction.get_trad("btn_save", "Save"))
         self.save_btn.clicked.connect(self.save_graph)
         toolbar.addWidget(self.save_btn)
-        
-        self.load_btn = QPushButton("Load")
+
+        self.load_btn = QPushButton(Traduction.get_trad("btn_load", "Load"))
         self.load_btn.clicked.connect(self.load_graph)
         toolbar.addWidget(self.load_btn)
 
-        self.set_theme_btn = QComboBox()
-        self.set_theme_btn.addItem(Traduction.get_trad("theme_dark", "Dark"), "dark")
-        self.set_theme_btn.addItem(Traduction.get_trad("theme_purple", "Purple"), "purple")
-        self.set_theme_btn.addItem(Traduction.get_trad("theme_white", "White"), "white")
-        self.set_theme_btn.currentIndexChanged.connect(
-            lambda _: self.set_theme(self.set_theme_btn.currentData())
-        )
-        self.set_theme_btn.setFixedHeight(self.generate_btn.sizeHint().height())
-        toolbar.addWidget(self.set_theme_btn)
-
-        self.set_lang_btn = QComboBox()
-        self.set_lang_btn.addItem(Traduction.get_trad("lang_en", "English"), "en")
-        self.set_lang_btn.addItem(Traduction.get_trad("lang_fr", "French"), "fr")
-        self.set_lang_btn.addItem(Traduction.get_trad("lang_es", "Spanish"), "es")
-        self.set_lang_btn.currentIndexChanged.connect(
-            lambda _: self.set_lang(self.set_lang_btn.currentData())
-        )
-        self.set_lang_btn.setFixedHeight(self.generate_btn.sizeHint().height())
-        toolbar.addWidget(self.set_lang_btn)
-
         toolbar.addStretch()
+
+        self.run_bash_btn = QPushButton(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
+        self.run_bash_btn.clicked.connect(self.run_bash)
+        toolbar.addWidget(self.run_bash_btn)
+
+        self.copy_btn = QPushButton(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
+        self.copy_btn.clicked.connect(
+            lambda: QApplication.clipboard().setText(self.output_text.toPlainText())
+        )
+        toolbar.addWidget(self.copy_btn)
+
+        self.more_btn = QToolButton()
+        self.more_btn.setText("⋮")
+        self.more_btn.setPopupMode(QToolButton.InstantPopup)
+        self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
+        self.more_btn.setStyleSheet("""
+            QToolButton {
+                color: white;
+                font-size: 18px;
+                padding: 0 6px;
+            }
+            QToolButton::menu-indicator {
+                image: none;
+            }
+        """)
+
+        self.more_menu = QMenu(self)
+
+        self.settings_action = self.more_menu.addAction(
+            Traduction.get_trad("settings", "Settings")
+        )
+        self.settings_action.triggered.connect(self.open_settings)
+
+        self.about_action = self.more_menu.addAction(
+            Traduction.get_trad("about", "About")
+        )
+        self.about_action.triggered.connect(self.open_about)
+
+        self.more_btn.setMenu(self.more_menu)
+        toolbar.addWidget(self.more_btn)
+
         main_layout.addLayout(toolbar)
 
         splitter = QSplitter(Qt.Horizontal)
@@ -100,19 +124,12 @@ class VisualBashEditor(QMainWindow):
 
         self.property_panel = PropertyPanel()
         splitter.addWidget(self.property_panel)
-        
+
         self.output_splitter = QSplitter(Qt.Vertical)
+
         self.output_text = QTextEdit()
         self.output_text.setReadOnly(True)
         self.output_text.setMinimumWidth(300)
-
-        self.run_bash_btn = QPushButton("Run Bash Script")
-        self.run_bash_btn.clicked.connect(self.run_bash)
-        toolbar.addWidget(self.run_bash_btn)
-
-        self.copy_btn = QPushButton("Copy to Clipboard")
-        self.copy_btn.clicked.connect(lambda: QApplication.clipboard().setText(self.output_text.toPlainText()))
-        toolbar.addWidget(self.copy_btn)
 
         self.run_output_text = QTextEdit()
         self.run_output_text.setReadOnly(True)
@@ -127,6 +144,7 @@ class VisualBashEditor(QMainWindow):
         self.output_splitter.setSizes([300, 0])
 
         splitter.addWidget(self.output_splitter)
+
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
         splitter.setSizes([900, 300, 400])
@@ -135,6 +153,7 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.graph_scene.node_selected.connect(
             self.property_panel.set_node
         )
+
 
     def create_initial_graph(self):
         start_node = StartNode()
@@ -158,6 +177,14 @@ class VisualBashEditor(QMainWindow):
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)
+
+    def open_settings(self):
+        dialog = SettingsDialog(self)
+        dialog.exec()
+
+    def open_about(self):
+        Debug.Log("About dialog not implemented yet")
+
     
     def save_graph(self):
         if not self.graph.nodes:
@@ -218,21 +245,6 @@ class VisualBashEditor(QMainWindow):
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
-    
-    def set_theme(self, theme_name: str):
-        if theme_name == "dark":
-            set_dark_theme()
-        elif theme_name == "purple":
-            set_purple_theme()
-        elif theme_name == "white":
-            set_white_theme()
-
-        self.graph_view.apply_theme()
-    
-    def set_lang(self, lang:str):
-        Traduction.set_translate_model(lang)
-        self.refresh_ui_texts()
-        Debug.Log(Traduction.get_trad("lang_set", f"Language set to {lang}", lang=lang))
         
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
@@ -342,16 +354,10 @@ class VisualBashEditor(QMainWindow):
         self.save_btn.setText(Traduction.get_trad("btn_save", "Save"))
         self.load_btn.setText(Traduction.get_trad("btn_load", "Load"))
         self.run_bash_btn.setText(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
-        self.copy_btn.setText(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
 
-        self.set_theme_btn.setItemText(0, Traduction.get_trad("theme_dark", "Dark"))
-        self.set_theme_btn.setItemText(1, Traduction.get_trad("theme_purple", "Purple"))
-        self.set_theme_btn.setItemText(2, Traduction.get_trad("theme_white", "White"))
-
-        self.set_lang_btn.setItemText(0, Traduction.get_trad("lang_en", "English"))
-        self.set_lang_btn.setItemText(1, Traduction.get_trad("lang_fr", "French"))
-        self.set_lang_btn.setItemText(2, Traduction.get_trad("lang_es", "Spanish"))
-
+        self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
+        self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
+        self.about_action.setText(Traduction.get_trad("about", "About"))
 
 def main():
     app = QApplication(sys.argv)
