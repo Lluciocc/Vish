@@ -23,7 +23,7 @@ from ui.settings import SettingsDialog
 from nodes.registry import NODE_REGISTRY
 from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
-from core.config import Config
+from core.config import Config, ConfigManager
 from core.debug import Info, Debug
 from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
@@ -55,7 +55,6 @@ class VisualBashEditor(QMainWindow):
             set_purple_theme()
         elif Config.theme == "white":
             set_white_theme()
-        Traduction.set_translate_model(Config.lang)
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
@@ -360,11 +359,15 @@ class VisualBashEditor(QMainWindow):
         self.about_action.setText(Traduction.get_trad("about", "About"))
 
 def main():
+    ConfigManager.load_config() # Load config before setting theme and language
+    Traduction.set_translate_model(Config.lang)
+
     app = QApplication(sys.argv)
     editor = VisualBashEditor()
+
     Debug.init(editor)
-    Traduction.set_translate_model("en")
     editor.show()
+
     sys.exit(app.exec())
 
 if __name__ == "__main__":

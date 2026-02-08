@@ -5,14 +5,19 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
 from PySide6.QtGui import QPainter, QColor
-from core.config import Config
+from core.config import Config, ConfigManager
 from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+
+# BUGS FOUNDS:
+# - When changing theme from dark to purple, it don't update te graph view ?? JUST WHY ??????
+# - Missing some translations in settings dialog 
 
 def set_config_bool(attr_name: str, value: bool):
     if not hasattr(Config, attr_name):
         raise AttributeError(f"Config has no attribute '{attr_name}'")
     setattr(Config, attr_name, bool(value))
+    ConfigManager.save_config()
 
 
 def add_separator(layout: QVBoxLayout):
@@ -150,6 +155,7 @@ class SettingsDialog(QDialog):
             return
 
         Config.theme = theme
+        ConfigManager.save_config()
 
         if theme == "dark":
             set_dark_theme()
@@ -165,6 +171,7 @@ class SettingsDialog(QDialog):
 
         Config.lang = lang
         Traduction.set_translate_model(lang)
+        ConfigManager.save_config()
 
         self.refresh_ui_texts()
 
