@@ -346,6 +346,7 @@ class VisualBashEditor(QMainWindow):
         self.save_btn.setText(Traduction.get_trad("btn_save", "Save"))
         self.load_btn.setText(Traduction.get_trad("btn_load", "Load"))
         self.run_bash_btn.setText(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
+        self.copy_btn.setText(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
 
         self.more_btn.setToolTip(Traduction.get_trad("more_options", "More options"))
         self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
