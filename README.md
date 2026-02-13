@@ -12,6 +12,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 - Themes support (Light/Dark/Purple)
 - Translation support (English/French/Spanish)
 - Settings to customize the editor behavior and appearance
+- Partial Windows support (some features may be limited or unavailable on Windows)
 
 ## Screenshots
 
