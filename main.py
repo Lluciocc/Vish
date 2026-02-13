@@ -127,10 +127,6 @@ class VisualBashEditor(QMainWindow):
 
         self.graph_view = GraphView(self.graph, self)
         splitter.addWidget(self.graph_view)
-
-        self.graph_view.graph_scene.graph_changed.connect(
-            self.generate_bash
-        )
         
         self.property_panel = PropertyPanel()
         splitter.addWidget(self.property_panel)
@@ -160,9 +156,7 @@ class VisualBashEditor(QMainWindow):
         splitter.setSizes([900, 300, 400])
         main_layout.addWidget(splitter)
 
-        self.graph_view.graph_scene.node_selected.connect(
-            self.property_panel.set_node
-        )
+        self._connect_signals()
 
 
     def create_initial_graph(self):
@@ -199,7 +193,7 @@ class VisualBashEditor(QMainWindow):
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
         
-    def save_graph(self):
+    def save_graph(self, msg=True):
         if not self.graph.nodes:
             Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
             return
@@ -215,7 +209,8 @@ class VisualBashEditor(QMainWindow):
         with open(file_path, 'w') as f:
             f.write(json_data)
 
-        Debug.Log("Project saved.")
+        if msg:
+            Debug.Log("Project saved.")
 
     
     def load_graph(self):
@@ -257,9 +252,7 @@ class VisualBashEditor(QMainWindow):
             box.set_locked(c.get("locked", False))
             self.graph_view.scene().addItem(box)
 
-        self.graph_view.graph_scene.node_selected.connect(
-            self.property_panel.set_node
-        )
+        self._connect_signals()
         splitter.setSizes([900, 300, 400])
 
         Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
@@ -284,14 +277,7 @@ class VisualBashEditor(QMainWindow):
         old_view.setParent(None)
         old_view.deleteLater()
 
-        self.graph_view.graph_scene.graph_changed.connect(
-            self.generate_bash
-        )
-
-        self.graph_view.graph_scene.node_selected.connect(
-            self.property_panel.set_node
-        )
-        self.create_initial_graph()
+        self._connect_signals()
 
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
@@ -301,6 +287,14 @@ class VisualBashEditor(QMainWindow):
 
         splitter.setSizes([900, 300, 400])
 
+    def auto_save(self):
+        if Config.AUTO_SAVE:
+            self.save_graph(msg=False)
+
+    def _connect_signals(self):
+        self.graph_view.graph_scene.graph_changed.connect(self.generate_bash)
+        self.graph_view.graph_scene.graph_changed.connect(self.auto_save)
+        self.graph_view.graph_scene.node_selected.connect(self.property_panel.set_node)
 
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
