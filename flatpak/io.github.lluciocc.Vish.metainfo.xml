@@ -9,16 +9,14 @@
 
   <description>
     <p>
-        Vish is an editor for creating Bash scripts using a nodeinterface. 
-        It allows users to design their scripts by connecting nodes that represent different 
-        Bash commands and basic programmation.
-        Vish is made for educational purposes and to simplify the process of creating Bash scripts.
+      Vish is a graphical editor for creating and managing Bash scripts using a node-based interface.
     </p>
   </description>
 
   <launchable type="desktop-id">io.github.lluciocc.Vish.desktop</launchable>
 
   <url type="homepage">https://github.com/Lluciocc/Vish</url>
+  <url type="vcs-browser">https://github.com/Lluciocc/Vish</url>
 
   <developer id="io.github.lluciocc">
     <name>Lluciocc</name>
@@ -28,11 +26,20 @@
 
   <screenshots>
     <screenshot type="default">
+      <caption>Node scripting workflow (1)</caption>
       <image>https://raw.githubusercontent.com/Lluciocc/Vish/master/screenshots/screenshot1.png</image>
     </screenshot>
     <screenshot>
+      <caption>Node scripting workflow (2)</caption>
       <image>https://raw.githubusercontent.com/Lluciocc/Vish/master/screenshots/screenshot2.png</image>
     </screenshot>
   </screenshots>
 
+  <releases>
+    <release version="1.0.2" date="2026-02-18">
+      <description>
+        <p>Initial Flathub release.</p>
+      </description>
+    </release>
+  </releases>
 </component>
