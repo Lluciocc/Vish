@@ -29,7 +29,7 @@ For more detailed information about Vish, including installation instructions, u
 
 ## Installation
 ### From flatpak
-You can install Vish from Flathub using the following command:
+You can install Vish from a self hosted source using the following command:
 ```bash 
 flatpak install --from https://flatpak.lluciocc.fr/vish.flatpakref
 ```
