@@ -113,7 +113,7 @@ class GreaterThan(MathNode):
 @register_node("equals", category="Logic", label="Equals (numeric)")
 class Equals(MathNode):
     def __init__(self):
-        super().__init__("equals", "Equals", "#2ECC71")
+        super().__init__("equals", "Equals (Numeric)", "#2ECC71")
         self.add_input("A", PortType.INT, "A")
         self.add_input("B", PortType.INT, "B")
         self.add_output("Result", PortType.CONDITION, "Result")
@@ -126,7 +126,7 @@ class Equals(MathNode):
 @register_node("equals_string", category="Logic", label="Equals (string)")
 class Equals(MathNode):
     def __init__(self):
-        super().__init__("equals", "Equals", "#2ECC71")
+        super().__init__("equals_string", "Equals (String)", "#2ECC71")
         self.add_input("A", PortType.STRING, "A")
         self.add_input("B", PortType.STRING, "B")
         self.add_output("Result", PortType.CONDITION, "Result")
@@ -139,7 +139,7 @@ class Equals(MathNode):
 @register_node("equals_variable", category="Logic", label="Equals (variable)")
 class Equals(MathNode):
     def __init__(self):
-        super().__init__("equals", "Equals", "#2ECC71")
+        super().__init__("equals_variable", "Equals (Variable)", "#2ECC71")
         self.add_input("A", PortType.VARIABLE, "A")
         self.add_input("B", PortType.STRING, "B")
         self.add_output("Result", PortType.CONDITION, "Result")
