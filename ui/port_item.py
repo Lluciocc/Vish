@@ -1,4 +1,3 @@
-from asyncio.unix_events import SelectorEventLoop
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QBrush, QPainterPath, QPen, QColor
