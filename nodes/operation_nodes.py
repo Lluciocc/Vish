@@ -110,7 +110,7 @@ class GreaterThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} > {b} ))"
 
-@register_node("equals", category="Logic", label="Equals")
+@register_node("equals", category="Logic", label="Equals (numeric)")
 class Equals(MathNode):
     def __init__(self):
         super().__init__("equals", "Equals", "#2ECC71")
@@ -122,6 +122,19 @@ class Equals(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} == {b} ))"
+
+@register_node("equals_string", category="Logic", label="Equals (string)")
+class Equals(MathNode):
+    def __init__(self):
+        super().__init__("equals", "Equals", "#2ECC71")
+        self.add_input("A", PortType.STRING, "A")
+        self.add_input("B", PortType.STRING, "B")
+        self.add_output("Result", PortType.CONDITION, "Result")
+
+    def emit_condition(self, context: BashContext) -> str:
+        a = self._resolve(self.inputs[0], context)
+        b = self._resolve(self.inputs[1], context)
+        return f"[ \"{a}\" = \"{b}\" ]"
 
 @register_node("logical_and", category="Logic", label="AND")
 class LogicalAnd(MathNode):
