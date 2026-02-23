@@ -134,7 +134,7 @@ class Equals(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"[ \"{a}\" = \"{b}\" ]"
+        return f"[ {a} = {b} ]"
 
 @register_node("equals_variable", category="Logic", label="Equals (variable)")
 class Equals(MathNode):
@@ -147,7 +147,7 @@ class Equals(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"[ \"{a}\" = \"{b}\" ]"
+        return f"[ \"{a}\" = {b} ]"
 
 @register_node("logical_and", category="Logic", label="AND")
 class LogicalAnd(MathNode):
