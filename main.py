@@ -17,7 +17,7 @@ from core.graph import Graph
 from core.bash_emitter import BashEmitter
 from core.serializer import Serializer
 from nodes.flow_nodes import StartNode, IfNode, ForNode
-from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode
+from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode, PipeNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
 from nodes.operation_nodes import Addition
 from nodes.utils_node import ToString

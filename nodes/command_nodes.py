@@ -23,6 +23,34 @@ class RunCommandNode(BaseNode):
         
         return command
 
+@register_node("pipe", category="Commands", label="Pipe", description="Pipes output from Command 1 into Command 2")
+class PipeNode(BaseNode):
+    def __init__(self):
+        super().__init__("pipe", "Pipe", "#8E44AD")
+        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Command 1", PortType.STRING, "Left command")
+        self.add_input("Command 2", PortType.STRING, "Right command")
+        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Output", PortType.STRING, "Output of piped command")
+        self.properties["cmd1"] = "ls"
+        self.properties["cmd2"] = "grep test"
+        
+    def emit_bash(self, context: BashContext) -> str:
+        cmd1 = self.properties.get("cmd1", "ls")
+        cmd2 = self.properties.get("cmd2", "")
+        
+        cmd1_port = self.inputs[1]
+        if cmd1_port.connected_edges:
+            source_node = cmd1_port.connected_edges[0].source.node
+            cmd1 = source_node.properties.get("value", cmd1)
+            
+        cmd2_port = self.inputs[2]
+        if cmd2_port.connected_edges:
+            source_node = cmd2_port.connected_edges[0].source.node
+            cmd2 = source_node.properties.get("value", cmd2)
+            
+        return f"{cmd1} | {cmd2}"
+
 @register_node("echo", category="Commands", label="Print a text", description="Prints a text to the console")
 class EchoNode(BaseNode):
     def __init__(self):
