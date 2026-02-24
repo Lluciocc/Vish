@@ -3,11 +3,11 @@ from pathlib import Path
 from core.debug import Debug, Info
 
 class Config:
-    DEBUG = False
+    DEBUG = True
     USING_TTY = True
     SYNC_NODES_AND_GEN = False
     AUTO_SAVE = False
-    lang = "en"
+    lang = "fr"
     theme = "dark"
     CUSTOM_SHEBANG = "#!/usr/bin/env bash"
     
