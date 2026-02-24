@@ -23,7 +23,7 @@ class RunCommandNode(BaseNode):
         
         return command
 
-@register_node("pipe", category="Commands", label="Pipe", description="Pipes output from Command 1 into Command 2")
+@register_node("pipe", category="Commands", label="Pipe command", description="Pipes output from Command 1 into Command 2")
 class PipeNode(BaseNode):
     def __init__(self):
         super().__init__("pipe", "Pipe", "#8E44AD")
