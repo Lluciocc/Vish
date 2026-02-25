@@ -56,9 +56,11 @@ An other way to contribute Vish is to help translating it in other languages. If
 1. Fork the repository
 2. Create a new branch (`git checkout -b translation-branch`)
 3. Create a new translation file in `assets/model/{language}.json` to add translations for the new language you want to add. **You can use the existing translations as a reference.**
-4. Commit your changes (`git commit -am 'Add translation for [Language]'`)
-5. Push to the branch (`git push origin translation-branch`)
-6. Create a new Pull Request
+4. Add the translations for the new language in the newly created file (Use a basic translator if you don't know the language, but please try to be as accurate as possible) and make sure to include translations for the language name (e.g. "lang_en", "lang_fr", etc.) so that it can be displayed in the settings.
+5. Add the new language to the language combo box in `ui/settings.py` (You should update `_build_language_section` to add the new language to the combo box and also update `refresh_ui_texts` function to update the language name in the combo box when the language is changed with `update_combo_item` function)
+6. Commit your changes (`git commit -am 'Add translation for [Language]'`)
+7. Push to the branch (`git push origin translation-branch`)
+8. Create a new Pull Request
 
 ## Credits
 - Developed by Lluciocc

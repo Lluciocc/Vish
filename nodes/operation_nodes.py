@@ -23,9 +23,9 @@ class NumberConstant(MathNode):
 class Addition(MathNode):
     def __init__(self):
         super().__init__("addition", "Addition", "#F1C40F")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.INT, "Summand")
+        self.add_input("B", PortType.INT, "Summand")
+        self.add_output("Result", PortType.INT, "Sum")
 
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
@@ -36,9 +36,9 @@ class Addition(MathNode):
 class Subtraction(MathNode):
     def __init__(self):
         super().__init__("subtraction", "Subtraction", "#E67E22")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.INT, "Minuend")
+        self.add_input("B", PortType.INT, "Subtrahend")
+        self.add_output("Result", PortType.INT, "Difference")
 
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
@@ -49,9 +49,9 @@ class Subtraction(MathNode):
 class Multiplication(MathNode):
     def __init__(self):
         super().__init__("multiplication", "Multiplication", "#9B59B6")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.INT, "Multiplier")
+        self.add_input("B", PortType.INT, "Mulitplicand")
+        self.add_output("Result", PortType.INT, "Product")
 
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
@@ -62,9 +62,9 @@ class Multiplication(MathNode):
 class Division(MathNode):
     def __init__(self):
         super().__init__("division", "Division", "#3498DB")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.INT, "Numerator")
+        self.add_input("B", PortType.INT, "Denominator")
+        self.add_output("Result", PortType.INT, "Fraction")
 
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
@@ -75,16 +75,16 @@ class Division(MathNode):
 class Modulo(MathNode):
     def __init__(self):
         super().__init__("modulo", "Modulo", "#1ABC9C")
-        self.add_input("A", PortType.INT, "A")
-        self.add_input("B", PortType.INT, "B")
-        self.add_output("Result", PortType.INT, "Result")
+        self.add_input("A", PortType.INT, "Dividend")
+        self.add_input("B", PortType.INT, "Divisor")
+        self.add_output("Result", PortType.INT, "Remainder")
 
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} % {b}))"
 
-@register_node("less_than", category="Logic", label="Less Than")
+@register_node("less_than", category="Logic", label="Less Than", description="Is A less than B?")
 class LessThan(MathNode):
     def __init__(self):
         super().__init__("less_than", "Less Than", "#95A5A6")
@@ -97,7 +97,7 @@ class LessThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} < {b} ))"
 
-@register_node("greater_than", category="Logic", label="Greater Than")
+@register_node("greater_than", category="Logic", label="Greater Than", description="Is A greater than B?")
 class GreaterThan(MathNode):
     def __init__(self):
         super().__init__("greater_than", "Greater Than", "#95A5A6")

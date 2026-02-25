@@ -7,9 +7,9 @@ from .base_node import BaseNode
 class SetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("set_variable", "Set Variable", "#F39C12")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Value", PortType.VARIABLE, "Value")
-        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
 
         self.properties["variable"] = "VAR"
         self.properties["value"] = ""

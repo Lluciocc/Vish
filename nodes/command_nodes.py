@@ -7,9 +7,9 @@ from nodes.registry import register_node
 class RunCommandNode(BaseNode):
     def __init__(self):
         super().__init__("run_command", "Run Command", "#2ECC71")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Command", PortType.STRING, "Command to run")
-        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.add_output("Output", PortType.STRING, "Command output")
         self.properties["command"] = "ls"
     
@@ -27,9 +27,9 @@ class RunCommandNode(BaseNode):
 class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo", "#3498DB")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Text", PortType.VARIABLE, "Things to print")
-        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["text"] = "Hello"
         
     def emit_bash(self, context: BashContext) -> str:
@@ -50,7 +50,7 @@ class EchoNode(BaseNode):
 class ExitNode(BaseNode):
     def __init__(self):
         super().__init__("exit", "Exit", "#E74C3C")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Code", PortType.INT, "Exit code")
         self.properties["code"] = 0
     

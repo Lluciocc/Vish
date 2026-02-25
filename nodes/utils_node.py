@@ -41,9 +41,9 @@ class ToInt(BaseNode):
 class SleepNode(BaseNode):
     def __init__(self):
         super().__init__("sleep", "Sleep", "#E67E22")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Duration", PortType.INT, "Duration to sleep in seconds")
-        self.add_output("Exec", PortType.EXEC)
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["duration"] = 1
 
     def emit_bash(self, context: BashContext) -> str:
@@ -60,8 +60,8 @@ class SleepNode(BaseNode):
 class DownloadFileNode(BaseNode):
     def __init__(self):
         super().__init__("download_file", "Download File", "#1ABC9C")
-        self.add_input("Exec", PortType.EXEC)
-        self.add_output("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["url"] = ""
         self.properties["output_path"] = ""
 
@@ -75,8 +75,8 @@ class DownloadFileNode(BaseNode):
 class GitCloneNode(BaseNode):
     def __init__(self):
         super().__init__("git_clone", "Git Clone", "#3498DB")
-        self.add_input("Exec", PortType.EXEC)        
-        self.add_output("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")        
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["repo_url"] = ""
         self.properties["destination_path"] = ""
 
@@ -92,8 +92,8 @@ class GitCloneNode(BaseNode):
 class OpenWebsiteNode(BaseNode):
     def __init__(self):
         super().__init__("open_website", "Open Website", "#8E44AD")
-        self.add_input("Exec", PortType.EXEC)
-        self.add_output("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["url"] = ""
 
     def emit_bash(self, context: BashContext) -> str:

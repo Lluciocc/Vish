@@ -31,7 +31,16 @@ class ProjectManager:
 
         (directory / "graph.json").write_text(
             json.dumps({
-                "nodes": [],
+                "nodes": [    {"id": "58f0bf92-a7a0-4d1d-8f07-916fa9a6f21e","type": "start","title": "Start","x": -74.0,"y": -174.0,"properties": {},"inputs": [],
+                "outputs": [
+                    {
+                    "id": "0d391cac-0455-43d3-84b3-c3ac042326d9",
+                    "name": "Exec",
+                    "type": "exec"
+                    }
+                ]
+                },
+                ],
                 "edges": [],
                 "comments": []
             }, indent=4)

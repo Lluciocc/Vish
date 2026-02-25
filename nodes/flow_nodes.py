@@ -17,7 +17,7 @@ class StartNode(BaseNode):
 class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If", "#E94B3C")
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Condition", PortType.CONDITION, "Condition to evaluate")
         self.add_output("True", PortType.EXEC, "If condition is true")
         self.add_output("False", PortType.EXEC, "If condition is false")
@@ -64,7 +64,7 @@ class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop", "#9B59B6")
 
-        self.add_input("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("List", PortType.STRING, "List to iterate over")
 
         self.add_output("Loop Body", PortType.EXEC, "Executed for each item")
@@ -103,8 +103,8 @@ class ForNode(BaseNode):
 class WhileNode(BaseNode):
     def __init__(self):
         super().__init__("while", "While", "#8E44AD")
-        self.add_input("Exec", PortType.EXEC)
-        self.add_input("Condition", PortType.CONDITION)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+        self.add_input("Condition", PortType.CONDITION, "Loop Condition")
         self.add_output("Body", PortType.EXEC, "Loop body")
         self.add_output("Next", PortType.EXEC, "Continue after loop")
 
@@ -175,8 +175,8 @@ class CallNode(BaseNode):
     def __init__(self):
         super().__init__("call", "Call", "#F39C12")
 
-        self.add_input("Exec", PortType.EXEC)
-        self.add_output("Exec", PortType.EXEC)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+        self.add_output("Exec", PortType.EXEC, "Control flow output")
 
         self.properties["function"] = "my_function"
 
@@ -187,8 +187,8 @@ class CallNode(BaseNode):
 class ReturnNode(BaseNode):
     def __init__(self):
         super().__init__("return", "Return", "#E74C3C")
-        self.add_input("Exec", PortType.EXEC)
-        self.add_input("Value", PortType.STRING)
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+        self.add_input("Value", PortType.STRING, "Return value")
 
     def emit_bash(self, context):
         value = "0"
