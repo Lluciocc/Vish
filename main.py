@@ -463,6 +463,13 @@ class VisualBashEditor(QMainWindow):
         apply_icon_for_btn(self.settings_action, "settings")
         apply_icon_for_btn(self.about_action, "about")
         apply_icon_for_btn(self.keyboard, "keyboard")
+        apply_icon_for_btn(self.generate_btn, "generate")
+        apply_icon_for_btn(self.load_btn, "load")
+        apply_icon_for_btn(self.run_bash_btn, "play")
+        apply_icon_for_btn(self.copy_btn, "clipboard")
+        apply_icon_for_btn(self.save_btn, "save")
+        apply_icon_for_btn(self.full_screenfs, "fullscreen")
+
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Save): # Ctrl+S
