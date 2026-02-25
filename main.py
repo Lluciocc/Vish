@@ -116,6 +116,11 @@ class VisualBashEditor(QMainWindow):
         self.keyboard.triggered.connect(self.open_keyboard_shortcuts)
         apply_icon_for_btn(self.keyboard, "keyboard")
 
+        self.full_screenfs = self.more_menu.addAction(
+            Traduction.get_trad("full_screen", "Full Screen")
+        )
+        self.full_screenfs.triggered.connect(self.full_screen_action)
+        apply_icon_for_btn(self.full_screenfs, "fullscreen")
         self.about_action = self.more_menu.addAction(
             Traduction.get_trad("about", "About")
         )
@@ -194,6 +199,12 @@ class VisualBashEditor(QMainWindow):
 
     def open_about(self):
         AboutDialog(self).exec()
+
+    def full_screen_action(self):
+        if self.windowState() & Qt.WindowState.WindowFullScreen:
+            self.setWindowState(Qt.WindowState.WindowNoState)
+        else:
+            self.setWindowState(Qt.WindowState.WindowFullScreen)
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
