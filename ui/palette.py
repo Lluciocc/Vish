@@ -95,14 +95,15 @@ class NodePalette(QWidget):
         self.close()
 
     def focusOutEvent(self, event):
-        self.close()
+        if(not (self.search_input.hasFocus())):
+            self.close()
         super().focusOutEvent(event)
     
     def showEvent(self, event):
         super().showEvent(event)
-        self.tree.setFocus()
         if not self.tree.currentItem():
             self.tree.setCurrentItem(self.tree.topLevelItem(0))
+        self.search_input.setFocus()
 
 
     def keyPressEvent(self, event):
