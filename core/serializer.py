@@ -64,7 +64,7 @@ class Serializer:
         for node_data in data["nodes"]:
             node = node_factory.create_node(node_data["type"])
             if node is None:
-                raise ValueError(f"Unknown node type: {node_data['type']}")
+                raise ValueError((f"Unknown node type: {node_data['type']}", node_data['type']))
             
             node.id = node_data["id"]
             node.title = node_data["title"]

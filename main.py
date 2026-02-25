@@ -10,7 +10,8 @@ import subprocess
 import time
 from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout, 
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
-                               QSplitter, QFileDialog, QToolButton, QMenu, QDialog)
+                               QSplitter, QFileDialog, QToolButton, QMenu, QDialog,
+                               QMessageBox)
 from PySide6.QtCore import Qt, QRectF
 from PySide6.QtGui import QColor, QKeySequence, QIcon
 from core.graph import Graph
@@ -228,9 +229,16 @@ class VisualBashEditor(QMainWindow):
 
         with open(file_path, "r") as f:
             json_data = f.read()
-
-        self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
-
+        
+        try:
+            self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+        except ValueError as e:
+            print(e.args)
+            msg_box = QMessageBox()
+            msg_box.setText(f"Project contains unknown node type: '{e.args[1]}'\nPlease check if a newer version of this tool is available.")
+            msg_box.setIcon(QMessageBox.Icon.Critical)
+            msg_box.exec()
+            raise
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
@@ -271,7 +279,16 @@ class VisualBashEditor(QMainWindow):
         with open(graph_path, "r") as f:
             json_data = f.read()
 
-        self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+        try:
+            self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+        except ValueError as e:
+            print(e.args[0])
+            msg_box = QMessageBox()
+            msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
+            msg_box.setIcon(QMessageBox.Icon.Critical)
+            msg_box.exec()
+            raise
+
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
