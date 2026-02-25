@@ -216,9 +216,18 @@ class GraphView(QGraphicsView):
             super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MiddleButton:
-            self.setDragMode(QGraphicsView.RubberBandDrag)
-        super().mouseReleaseEvent(event)
+        if event.button() == Qt.MouseButton.MiddleButton:
+            fake_event = QMouseEvent(
+                event.type(),
+                event.localPos(),
+                Qt.MouseButton.LeftButton,
+                Qt.MouseButton.NoButton,
+                event.modifiers()
+            )
+            super().mouseReleaseEvent(fake_event)
+            self.setDragMode(QGraphicsView.DragMode.NoDrag)
+        else:
+            super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
         focus_item = self.scene().focusItem()
