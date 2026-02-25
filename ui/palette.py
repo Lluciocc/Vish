@@ -11,6 +11,18 @@ from core.debug import Info
 
 links = {}
 
+class CustomQLineEdit(QLineEdit):
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def keyPressEvent(self, event):
+        key_code = event.key()
+        if (key_code == Qt.Key_Up or key_code == Qt.Key_Down):
+            self.parent().keyPressEventArrow(event)
+
+        super().keyPressEvent(event)
+        
 class NodePalette(QWidget):
     node_selected = Signal(str)
 
@@ -22,7 +34,7 @@ class NodePalette(QWidget):
 
         layout = QVBoxLayout(self)
 
-        self.search_input = QLineEdit()
+        self.search_input = CustomQLineEdit(self)
         self.search_input.setPlaceholderText(Traduction.get_trad("search_nodes", "Search nodes..."))
         self.search_input.textChanged.connect(self.filter_nodes)
         layout.addWidget(self.search_input)
@@ -36,6 +48,10 @@ class NodePalette(QWidget):
 
         self._node_chosen = False
         self.populate_tree()
+
+    def keyPressEventArrow(self, event):
+        self.tree.keyPressEvent(event)
+        return
 
     def populate_tree(self):
         self.tree.clear()
