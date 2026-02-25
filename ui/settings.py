@@ -121,6 +121,9 @@ class SettingsDialog(QDialog):
         self.lang_combo.addItem(
             Traduction.get_trad("lang_it", "Italian"), "it"
         )
+        self.lang_combo.addItem(
+            Traduction.get_trad("lang_de", "German"), "de"
+        )
 
         self.lang_combo.setCurrentIndex(
             self.lang_combo.findData(Config.lang)
@@ -304,6 +307,7 @@ class SettingsDialog(QDialog):
         self.update_combo_item(self.lang_combo, "es", "lang_es", "Spanish")
         self.update_combo_item(self.lang_combo, "ar", "lang_ar", "Arabic")
         self.update_combo_item(self.lang_combo, "it", "lang_it", "Italian")
+        self.update_combo_item(self.lang_combo, "de", "lang_de", "German")
 
         if self.parent():
             self.parent().refresh_ui_texts()
