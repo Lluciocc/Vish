@@ -72,6 +72,7 @@ class NodePalette(QWidget):
     def filter_nodes(self, text):
         text = text.lower()
 
+        first_Visible_item = None; 
         for i in range(self.tree.topLevelItemCount()):
             category = self.tree.topLevelItem(i)
             visible_category = False
@@ -81,9 +82,13 @@ class NodePalette(QWidget):
                 visible = text in item.text(0).lower()
                 item.setHidden(not visible)
                 visible_category |= visible
+                if visible and (first_Visible_item is None):
+                    first_Visible_item = item
 
             category.setHidden(not visible_category)
             category.setExpanded(True)
+
+        self.tree.setCurrentItem(first_Visible_item)
 
     def on_item_activated(self, item, column):
         node_type = item.data(0, Qt.UserRole)
