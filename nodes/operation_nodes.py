@@ -111,7 +111,7 @@ class GreaterThan(MathNode):
         return f"(( {a} > {b} ))"
 
 @register_node("equals", category="Logic", label="Equals (numeric)")
-class Equals(MathNode):
+class EqualsNumeric(MathNode):
     def __init__(self):
         super().__init__("equals", "Equals (Numeric)", "#2ECC71")
         self.add_input("A", PortType.INT, "A")
@@ -124,7 +124,7 @@ class Equals(MathNode):
         return f"(( {a} == {b} ))"
 
 @register_node("equals_string", category="Logic", label="Equals (string)")
-class Equals(MathNode):
+class EqualsString(MathNode):
     def __init__(self):
         super().__init__("equals_string", "Equals (String)", "#2ECC71")
         self.add_input("A", PortType.STRING, "A")
@@ -137,7 +137,7 @@ class Equals(MathNode):
         return f"[ {a} = {b} ]"
 
 @register_node("equals_variable", category="Logic", label="Equals (variable)")
-class Equals(MathNode):
+class EqualsVariable(MathNode):
     def __init__(self):
         super().__init__("equals_variable", "Equals (Variable)", "#2ECC71")
         self.add_input("A", PortType.VARIABLE, "A")
