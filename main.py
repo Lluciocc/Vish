@@ -470,7 +470,6 @@ class VisualBashEditor(QMainWindow):
         apply_icon_for_btn(self.save_btn, "save")
         apply_icon_for_btn(self.full_screenfs, "fullscreen")
 
-
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Save): # Ctrl+S
             self.save_graph()
