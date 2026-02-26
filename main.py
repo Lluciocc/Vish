@@ -233,7 +233,6 @@ class VisualBashEditor(QMainWindow):
         try:
             self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
-            print(e.args)
             msg_box = QMessageBox()
             msg_box.setText(f"Project contains unknown node type: '{e.args[1]}'\nPlease check if a newer version of this tool is available.")
             msg_box.setIcon(QMessageBox.Icon.Critical)
@@ -282,7 +281,6 @@ class VisualBashEditor(QMainWindow):
         try:
             self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
-            print(e.args[0])
             msg_box = QMessageBox()
             msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
             msg_box.setIcon(QMessageBox.Icon.Critical)
