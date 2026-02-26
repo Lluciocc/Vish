@@ -12,7 +12,6 @@ from core.debug import Info
 links = {}
 
 class CustomQLineEdit(QLineEdit):
-    
     def __init__(self, parent=None):
         super().__init__(parent)
 
@@ -22,6 +21,29 @@ class CustomQLineEdit(QLineEdit):
             self.parent().keyPressEventArrow(event)
 
         super().keyPressEvent(event)
+
+        
+class CustomQTreeWidget(QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+
+        # if the user manually switches into the tree we want to 
+        # allow selection of the category 
+        if (not self.parent().search_input.hasFocus()):
+            return
+
+        # if a category is selected after the keyPressEvent,
+        # reapply the event to go in the same direction again
+        current_item = self.currentItem()
+        for i in range(self.topLevelItemCount()):
+            category = self.topLevelItem(i)
+            if (current_item == category):
+                super().keyPressEvent(event)
+                return
+
         
 class NodePalette(QWidget):
     node_selected = Signal(str)
@@ -39,7 +61,7 @@ class NodePalette(QWidget):
         self.search_input.textChanged.connect(self.filter_nodes)
         layout.addWidget(self.search_input)
 
-        self.tree = QTreeWidget()
+        self.tree = CustomQTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
         self.tree.setMouseTracking(True)
