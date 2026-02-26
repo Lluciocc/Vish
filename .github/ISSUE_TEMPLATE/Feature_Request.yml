@@ -1,0 +1,29 @@
+name: "Request a feature"
+description: Request or propose a new feature
+labels: [enhancement, new feature]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Please check if a feature is already in discussion at [Vish/issues](https://github.com/Lluciocc/Vish/issues) and if so, please provide input there
+
+- type: textarea
+  attributes:
+    label: Motivation
+    placeholder: What benefit brings the feature?
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Feature description
+    description: If you want to include screenshots of a mockup or concept, paste them into the markdown editor below.
+    placeholder: What shall the feature do?
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Technical details
+  validations:
+    required: false

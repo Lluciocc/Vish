@@ -1,0 +1,30 @@
+name: "Report Bug"
+description: Report an error or an unexpected behavior
+labels: [bug]
+body:
+- type: markdown
+  attributes:
+    value: |
+      Please check if the issue already exisits at [Vish/issues](https://github.com/Lluciocc/Vish/issues)
+
+- type: textarea
+  attributes:
+    label: Observed Behavior
+    placeholder: What happened?
+  validations:
+    required: true
+
+- type: textarea
+  attributes:
+    label: Expected Behavior
+    description: If you want to include screenshots, paste them into the markdown editor below.
+    placeholder: What were you expecting?
+  validations:
+    required: false
+
+- type: textarea
+  attributes:
+    label: Steps to reproduce
+    placeholder: Please describe how you got the error.
+  validations:
+    required: true
