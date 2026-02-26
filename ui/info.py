@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
 from PySide6.QtCore import Qt, QPropertyAnimation, QPoint, QTimer, QEasingCurve
 
-
+# test 2
 class MessageWidget(QWidget):
     STYLES = {
         "error": """
