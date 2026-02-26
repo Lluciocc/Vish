@@ -233,6 +233,7 @@ class VisualBashEditor(QMainWindow):
         try:
             self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
+            # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
             msg_box = QMessageBox()
             msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
             msg_box.setIcon(QMessageBox.Icon.Critical)
@@ -281,6 +282,7 @@ class VisualBashEditor(QMainWindow):
         try:
             self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
+            # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
             msg_box = QMessageBox()
             msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
             msg_box.setIcon(QMessageBox.Icon.Critical)
