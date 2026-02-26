@@ -107,22 +107,22 @@ class SettingsDialog(QDialog):
 
         self.lang_combo = QComboBox()
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_en", "English"), "en"
+            "English", "en"
         )
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_fr", "French"), "fr"
+            "Francais", "fr"
         )
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_es", "Spanish"), "es"
+            "Español", "es"
         )
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_ar", "Arabic"), "ar"
+            "العربية", "ar"
         )
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_it", "Italian"), "it"
+            "Italiano", "it"
         )
         self.lang_combo.addItem(
-            Traduction.get_trad("lang_de", "German"), "de"
+            "Deutsch", "de"
         )
 
         self.lang_combo.setCurrentIndex(
@@ -301,13 +301,6 @@ class SettingsDialog(QDialog):
         self.update_combo_item(self.theme_combo, "dark", "theme_dark", "Dark")
         self.update_combo_item(self.theme_combo, "purple", "theme_purple", "Purple")
         self.update_combo_item(self.theme_combo, "white", "theme_white", "White")
-
-        self.update_combo_item(self.lang_combo, "en", "lang_en", "English")
-        self.update_combo_item(self.lang_combo, "fr", "lang_fr", "French")
-        self.update_combo_item(self.lang_combo, "es", "lang_es", "Spanish")
-        self.update_combo_item(self.lang_combo, "ar", "lang_ar", "Arabic")
-        self.update_combo_item(self.lang_combo, "it", "lang_it", "Italian")
-        self.update_combo_item(self.lang_combo, "de", "lang_de", "German")
 
         if self.parent():
             self.parent().refresh_ui_texts()
