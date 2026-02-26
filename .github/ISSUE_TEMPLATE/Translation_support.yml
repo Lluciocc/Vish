@@ -1,6 +1,6 @@
 name: "Report a translation issue"
 description: Report incorrect, missing, or inconsistent translations
-labels: [translation]
+labels: [traduction]
 body:
   - type: markdown
     attributes:
