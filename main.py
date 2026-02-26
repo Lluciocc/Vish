@@ -237,7 +237,7 @@ class VisualBashEditor(QMainWindow):
     
     def load_graph(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self, "Load Graph", "", "JSON Files (*.json)"
+            self, Traduction.get_trad("file_dialog_open", "Load Graph"), "", "JSON Files (*.json)"
         )
         if not file_path:
             Debug.Error(Traduction.get_trad("error_no_file_selected", "No file selected."))
