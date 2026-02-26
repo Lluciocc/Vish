@@ -48,6 +48,11 @@
     "about_questions": "FAQs",
     "about_support": "Unterstütze das Projekt",
 
+    "file_dialog_open": "Graph laden",
+    "new_project_name": "Projektname",
+    "new_project_enter_name": "Projektname eingeben:",
+    "select_project_folder": "Projektordner auswählen",
+
     "keyboard_shortcuts": "Tastenkombinationen",
     "general": "Allgemein",
     "edition": "Bearbeiten",
