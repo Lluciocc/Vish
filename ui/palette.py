@@ -11,6 +11,40 @@ from core.debug import Info
 
 links = {}
 
+class CustomQLineEdit(QLineEdit):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def keyPressEvent(self, event):
+        key_code = event.key()
+        if (key_code == Qt.Key_Up or key_code == Qt.Key_Down):
+            self.parent().keyPressEventArrow(event)
+
+        super().keyPressEvent(event)
+
+        
+class CustomQTreeWidget(QTreeWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+    def keyPressEvent(self, event):
+        super().keyPressEvent(event)
+
+        # if the user manually switches into the tree we want to 
+        # allow selection of the category 
+        if (not self.parent().search_input.hasFocus()):
+            return
+
+        # if a category is selected after the keyPressEvent,
+        # reapply the event to go in the same direction again
+        current_item = self.currentItem()
+        for i in range(self.topLevelItemCount()):
+            category = self.topLevelItem(i)
+            if (current_item == category):
+                super().keyPressEvent(event)
+                return
+
+        
 class NodePalette(QWidget):
     node_selected = Signal(str)
 
@@ -22,12 +56,12 @@ class NodePalette(QWidget):
 
         layout = QVBoxLayout(self)
 
-        self.search_input = QLineEdit()
+        self.search_input = CustomQLineEdit(self)
         self.search_input.setPlaceholderText(Traduction.get_trad("search_nodes", "Search nodes..."))
         self.search_input.textChanged.connect(self.filter_nodes)
         layout.addWidget(self.search_input)
 
-        self.tree = QTreeWidget()
+        self.tree = CustomQTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
         self.tree.setMouseTracking(True)
@@ -36,6 +70,10 @@ class NodePalette(QWidget):
 
         self._node_chosen = False
         self.populate_tree()
+
+    def keyPressEventArrow(self, event):
+        self.tree.keyPressEvent(event)
+        return
 
     def populate_tree(self):
         self.tree.clear()
@@ -72,6 +110,7 @@ class NodePalette(QWidget):
     def filter_nodes(self, text):
         text = text.lower()
 
+        first_Visible_item = None; 
         for i in range(self.tree.topLevelItemCount()):
             category = self.tree.topLevelItem(i)
             visible_category = False
@@ -81,9 +120,13 @@ class NodePalette(QWidget):
                 visible = text in item.text(0).lower()
                 item.setHidden(not visible)
                 visible_category |= visible
+                if visible and (first_Visible_item is None):
+                    first_Visible_item = item
 
             category.setHidden(not visible_category)
             category.setExpanded(True)
+
+        self.tree.setCurrentItem(first_Visible_item)
 
     def on_item_activated(self, item, column):
         node_type = item.data(0, Qt.UserRole)
@@ -95,14 +138,15 @@ class NodePalette(QWidget):
         self.close()
 
     def focusOutEvent(self, event):
-        self.close()
+        if(not (self.search_input.hasFocus())):
+            self.close()
         super().focusOutEvent(event)
     
     def showEvent(self, event):
         super().showEvent(event)
-        self.tree.setFocus()
         if not self.tree.currentItem():
             self.tree.setCurrentItem(self.tree.topLevelItem(0))
+        self.search_input.setFocus()
 
 
     def keyPressEvent(self, event):
