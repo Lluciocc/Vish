@@ -5,7 +5,7 @@ body:
 - type: markdown
   attributes:
     value: |
-      Please check if a feature is already in discussion at [Vish/issues](https://github.com/Lluciocc/Vish/issues) and if so, please provide input there
+      Please check if the feature is already in discussion at [Vish/issues](https://github.com/Lluciocc/Vish/issues) and if so, please provide input there
 
 - type: textarea
   attributes:
