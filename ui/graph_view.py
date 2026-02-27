@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
 from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property, QTimer
-from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack
+from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack, QIcon
 from core.graph import Port
 from core.port_types import PortType
 from ui.palette import NodePalette
@@ -12,9 +12,10 @@ from theme.theme import Theme
 from core.clipboard import GraphClipboard
 from core.serializer import Serializer
 from nodes.registry import create_node
-from core.debug import Debug
+from core.debug import Debug, Info
 from commands.undo_commands import *
 from core.layout import GraphLayoutEngine
+import os
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
@@ -63,6 +64,7 @@ class GraphView(QGraphicsView):
         self._zoom_anim.setDuration(120)
 
     #     self._init_minimap()
+        self._init_frame_button()
         self._suspend_edge_undo = False
         self.undo_stack = QUndoStack(self)
         self.graph_scene.connection_created.connect(
@@ -447,6 +449,17 @@ class GraphView(QGraphicsView):
 
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
+        self.frame_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {Theme.BUTTON};
+                border: 1px solid #555;
+                border-radius: 6px;
+            }}
+            QPushButton:hover {{
+                background-color: {Theme.BUTTON_HOVER};
+            }}
+        """)
+        self.frame_btn.setIcon(self.get_icon("frame"))
         self.viewport().update()
 
     # def centerOn(self, *args):
@@ -464,6 +477,8 @@ class GraphView(QGraphicsView):
         super().resizeEvent(event)
         if hasattr(self, "zoom_widget"):
             self.zoom_widget.move(10, self.height() - 42)
+        if hasattr(self, "frame_btn"):
+            self._update_frame_button_position()
         # if hasattr(self, "minimap"):
         #     self.minimap.move(self.width() - 190, self.height() - 150)
 
@@ -600,3 +615,43 @@ class GraphView(QGraphicsView):
         self.paste_offset = (0, 0)
         self.paste(message=False)
         self.paste_offset = (30, 30)
+
+    def _init_frame_button(self):
+        self.frame_btn = QPushButton(self)
+        self.frame_btn.setFixedSize(36, 36)
+        self.frame_btn.setCursor(Qt.PointingHandCursor)
+
+        try:
+            self.frame_btn.setIcon(self.get_icon("frame"))
+            self.frame_btn.setIconSize(self.frame_btn.size() * 0.6)
+        except Exception:
+            self.frame_btn.setText("◻")
+
+        self.frame_btn.setStyleSheet(f"""
+            QPushButton {{
+                background-color: {Theme.BUTTON};
+                border: 1px solid #555;
+                border-radius: 6px;
+            }}
+            QPushButton:hover {{
+                background-color: {Theme.BUTTON_HOVER};
+            }}
+        """)
+
+        self.frame_btn.clicked.connect(self.frame_all)
+
+        self._update_frame_button_position()
+        self.frame_btn.show()
+
+    def _update_frame_button_position(self):
+        margin = 10
+        x = self.width() - self.frame_btn.width() - margin
+        y = self.height() - self.frame_btn.height() - margin
+        self.frame_btn.move(x, y)
+
+    def get_icon(self, name):
+        theme = Theme.type
+        path = Info.resource_path(f"assets/icons/{theme}/menu/{name.lower().replace(' ', '_')}.png")
+        if os.path.exists(path):
+            return QIcon(path)
+        return None

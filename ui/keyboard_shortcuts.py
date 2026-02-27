@@ -38,6 +38,7 @@ SHORTCUTS = {
             (["c"], "shortcut_comment_box"),
             (["f"], "shortcut_auto_layout"),
             (["r"], "shortcut_rebuild_graph"),
+            (["h"], "shortcut_frame_all")
         ],
     },
 }
