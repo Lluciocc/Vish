@@ -147,3 +147,49 @@ def set_purple_theme():
     """)
     Theme.selected_theme = "dark"
     Theme.type = "dark"
+
+def set_breeze_dark_theme():
+    app = QApplication.instance()
+    if not app:
+        return
+
+    Theme.BACKGROUND = "#141618"
+    Theme.PANEL = "#292C30"
+    Theme.TEXT = "#FCFCFC"
+    Theme.BUTTON = "#57595C"
+    Theme.BUTTON_HOVER = "#3584E4"
+    Theme.BUTTON_PRESSED = "#3584E4"
+
+    app.setStyleSheet(f"""
+        QWidget {{
+            background-color: {Theme.PANEL};
+            color: {Theme.TEXT};
+            font-size: 13px;
+        }}
+
+        QPushButton {{
+            background-color: {Theme.PANEL};
+            border: 1px solid {Theme.BUTTON};
+            padding: 6px 10px;
+            border-radius: 4px;
+        }}
+
+        QPushButton:hover {{
+            border-color: {Theme.BUTTON_HOVER};
+        }}
+
+        QPushButton:pressed {{
+            background-color: {Theme.BUTTON_PRESSED};
+        }}
+
+        QTextEdit {{
+            background-color: {Theme.BACKGROUND};
+            border: 1px solid {Theme.BUTTON};
+        }}
+
+        QSplitter::handle {{
+            background-color: {Theme.BUTTON};
+        }}
+    """)
+    Theme.selected_theme = "dark"
+    Theme.type = "dark"
