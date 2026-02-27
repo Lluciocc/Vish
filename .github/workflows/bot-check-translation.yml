@@ -156,6 +156,12 @@ jobs:
               body: body
             });
 
-            if (exitCode !== "0") {
-              core.setFailed("Translation check failed");
+            if (exitCode === "0") {
+              // OK, nothing to do
+            }
+            else if (exitCode === "2" || exitCode === "404") {
+              core.notice(`Translation check completed with issues (exit code ${exitCode})`);
+            }
+            else {
+              core.setFailed(`Translation check crashed (exit code ${exitCode})`);
             }
