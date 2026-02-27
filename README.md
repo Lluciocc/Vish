@@ -85,12 +85,17 @@ Each side describes the number and type of pins using the following identifiers:
 | P | Path |
 | V | Variable |
 | C | Condition |
+| n |	any number possible | 
+| m |	minimum required number |
+| x |	maximum allowed number |
+| a |	Array |
 
 ### Examples
 
 - `1S-2S` → 1 String input, 2 String outputs  
 - `1E-3E` → 1 Execution input, 3 Execution outputs  
-- `2S1I-1S` → 2 String inputs, 1 Integer input, 1 String output  
+- `2S1I-1S` → 2 String inputs, 1 Integer input, 1 String output
+- `1E-nE` → 1 Execution input, Any number of outputs possible.
 
 This notation is used for <ins>**documentation and design discussions only**</ins>.  
 It reflects the internal type system and ensures consistency across the project.
