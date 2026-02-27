@@ -1,0 +1,161 @@
+name: Bot translation check
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  check:
+    if: github.event.issue.pull_request != null
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Parse command
+        id: cmd
+        shell: bash
+        run: |
+          body="${{ github.event.comment.body }}"
+          if [[ "$body" =~ ^bot,\ check\ ([A-Za-z0-9._-]+\.json)\ *$ ]]; then
+            echo "filename=${BASH_REMATCH[1]}" >> $GITHUB_OUTPUT
+            echo "ok=true" >> $GITHUB_OUTPUT
+          else
+            echo "ok=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Stop if no command
+        if: steps.cmd.outputs.ok != 'true'
+        run: exit 0
+
+      - name: Set variables
+        shell: bash
+        run: |
+          echo "FILE_PATH=assets/models/${{ steps.cmd.outputs.filename }}" >> $GITHUB_ENV
+          echo "RUN_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
+
+      - name: Comment started
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.issue.number;
+            const filePath = process.env.FILE_PATH;
+            const runUrl = process.env.RUN_URL;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: `▶️ Started translation check for \`${filePath}\`.\n${runUrl}`
+            });
+
+      - name: Checkout base repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download checker script
+        run: |
+          curl -fsSL --retry 5 --retry-all-errors \
+            -o check_trad.py \
+            https://raw.githubusercontent.com/Lluciocc/vish-utils/main/check_trad.py
+
+      - name: Get PR info
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.issue.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+
+            core.setOutput("head_sha", pr.head.sha);
+            core.setOutput("head_owner", pr.head.repo.owner.login);
+            core.setOutput("head_repo", pr.head.repo.name);
+            core.setOutput("number", pr.number);
+
+      - name: Download JSON from PR
+        id: download
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          owner="${{ steps.pr.outputs.head_owner }}"
+          repo="${{ steps.pr.outputs.head_repo }}"
+          sha="${{ steps.pr.outputs.head_sha }}"
+          path="${FILE_PATH}"
+
+          url="https://raw.githubusercontent.com/${owner}/${repo}/${sha}/${path}"
+          echo "Downloading from: $url"
+
+          if ! curl -fsSL -H "Authorization: Bearer ${GH_TOKEN}" \
+               -o translation_to_check.json "$url"; then
+            echo "download_failed=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "download_failed=false" >> $GITHUB_OUTPUT
+
+      - name: Run translation check
+        id: check
+        shell: bash
+        run: |
+          if [ "${{ steps.download.outputs.download_failed }}" = "true" ]; then
+            echo "exit_code=404" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          set +e
+          python check_trad.py assets/models/en.json translation_to_check.json > result.txt 2>&1
+          EXIT_CODE=$?
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          exit 0
+
+      - name: Comment result
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require("fs");
+
+            const prNumber = context.payload.issue.number;
+            const filePath = process.env.FILE_PATH;
+            const runUrl = process.env.RUN_URL;
+            const exitCode = "${{ steps.check.outputs.exit_code }}";
+
+            let body = "";
+            let output = "";
+
+            try {
+              output = fs.readFileSync("result.txt", "utf8");
+            } catch (e) {
+              output = "";
+            }
+
+            if (exitCode === "404") {
+              body = `❌ File not found in this PR: \`${filePath}\`.\n\nMake sure the file exists at this path.\n\n${runUrl}`;
+            } else if (exitCode === "0") {
+              body = `✅ Translation check passed for \`${filePath}\`.\n\n${runUrl}`;
+            } else if (exitCode === "2") {
+              body = `❌ Translation check failed for \`${filePath}\`.\n\n\`\`\`\n${output}\n\`\`\`\n\n${runUrl}`;
+            } else {
+              body = `‼️ Translation check crashed (exit code ${exitCode}) for \`${filePath}\`.\n\n\`\`\`\n${output}\n\`\`\`\n\n${runUrl}`;
+            }
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: body
+            });
+
+            if (exitCode !== "0") {
+              core.setFailed("Translation check failed");
+            }
