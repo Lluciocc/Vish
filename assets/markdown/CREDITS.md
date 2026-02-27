@@ -2,6 +2,7 @@
 [GamerXD8991](https://github.com/GamerXD8991)                                   
 [kernbyte](https://github.com/kernbyte)            
 [mahaveergurjar](https://github.com/mahaveergurjar)                  
+[Half-and-Xat](https://github.com/Half-and-Xat)
 
 ### Translation Contributor
 
