@@ -7,7 +7,7 @@ from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
 from PySide6.QtGui import QPainter, QColor
 from core.config import Config, ConfigManager
 from core.traduction import Traduction
-from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, set_breeze_dark_theme
 from ui.menu_style import apply_menu_style, apply_btn_style
 
 def set_config_bool(attr_name: str, value: bool):
@@ -81,6 +81,9 @@ class SettingsDialog(QDialog):
         )
         self.theme_combo.addItem(
             Traduction.get_trad("theme_white", "White"), "white"
+        )
+        self.theme_combo.addItem(
+            Traduction.get_trad("theme_breeze_dark", "Breeze Dark"), "breeze_dark"
         )
 
         self.theme_combo.setCurrentIndex(
@@ -205,6 +208,8 @@ class SettingsDialog(QDialog):
             set_purple_theme()
         elif theme == "white":
             set_white_theme()
+        elif theme == "breeze_dark":
+            set_breeze_dark_theme()
 
         if self.parent():
             self.parent().graph_view.apply_theme()
@@ -301,6 +306,7 @@ class SettingsDialog(QDialog):
         self.update_combo_item(self.theme_combo, "dark", "theme_dark", "Dark")
         self.update_combo_item(self.theme_combo, "purple", "theme_purple", "Purple")
         self.update_combo_item(self.theme_combo, "white", "theme_white", "White")
+        self.update_combo_item(self.theme_combo, "breeze_dark", "theme_breeze_dark", "Breeze Dark")
 
         if self.parent():
             self.parent().refresh_ui_texts()

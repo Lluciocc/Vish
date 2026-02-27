@@ -37,7 +37,7 @@ from core.debug import Info, Debug
 from core.traduction import Traduction
 from core.projects import ProjectManager
 from ui.welcome import WelcomeScreen
-from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme
+from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme, set_breeze_dark_theme
 
 class NodeFactory:
     @staticmethod
@@ -67,6 +67,8 @@ class VisualBashEditor(QMainWindow):
             set_purple_theme()
         elif Config.theme == "white":
             set_white_theme()
+        elif Config.theme == "breeze_dark":
+            set_breeze_dark_theme()
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
