@@ -10,7 +10,9 @@ permissions:
 
 jobs:
   check:
-    if: github.event.issue.pull_request != null
+    if: |
+      github.event.issue.pull_request != null &&
+      startsWith(github.event.comment.body, 'bot, check ')
     runs-on: ubuntu-latest
 
     steps:
