@@ -13,6 +13,25 @@ class StartNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         return ""
 
+@register_node("sequencer",category="Flow",label="Sequencer",description="Executes connected nodes sequentially from top to bottom")
+class SequencerNode(BaseNode):
+    def __init__(self):
+        super().__init__("sequencer", "Sequencer", "#9d9d9d")
+
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
+
+        self.add_output("Step 1", PortType.EXEC, "First execution step")
+        self.add_output("Step 2", PortType.EXEC, "Second execution step")
+        self.add_output("Step 3", PortType.EXEC, "Third execution step")
+
+    def emit_bash(self, context: BashContext) -> str:
+        for output in self.outputs:
+            if output.connected_edges:
+                next_node = output.connected_edges[0].target.node
+                BaseNode.emit_exec_chain(next_node, context)
+
+        return ""
+
 @register_node("if", category="Flow", label="If Condition", description="Evaluates a condition and branches the flow")
 class IfNode(BaseNode):
     def __init__(self):
