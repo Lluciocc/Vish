@@ -66,6 +66,7 @@
     "shortcut_comment_box": "Create comment box",
     "shortcut_auto_layout": "Auto layout graph",
     "shortcut_rebuild_graph": "Rebuild graph",
+    "shortcut_frame_all": "Frame all",
 
     "Commands": "Commands",
     "Flow": "Flow",
