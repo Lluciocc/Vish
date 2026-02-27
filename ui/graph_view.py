@@ -203,7 +203,9 @@ class GraphView(QGraphicsView):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
+            self._previous_drag_mode = self.dragMode()
             self.setDragMode(QGraphicsView.ScrollHandDrag)
+
             fake = QMouseEvent(
                 QEvent.MouseButtonPress,
                 event.position(),
@@ -212,22 +214,28 @@ class GraphView(QGraphicsView):
                 event.modifiers()
             )
             super().mousePressEvent(fake)
-        else:
-            super().mousePressEvent(event)
+            event.accept()
+            return
+
+        super().mousePressEvent(event)
+
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.MiddleButton:
-            fake_event = QMouseEvent(
-                event.type(),
-                event.localPos(),
-                Qt.MouseButton.LeftButton,
-                Qt.MouseButton.NoButton,
+        if event.button() == Qt.MiddleButton:
+            fake = QMouseEvent(
+                QEvent.MouseButtonRelease,
+                event.position(),
+                Qt.LeftButton,
+                Qt.NoButton,
                 event.modifiers()
             )
-            super().mouseReleaseEvent(fake_event)
-            self.setDragMode(QGraphicsView.DragMode.NoDrag)
-        else:
-            super().mouseReleaseEvent(event)
+            super().mouseReleaseEvent(fake)
+
+            self.setDragMode(self._previous_drag_mode) # restore whatever it was before
+            event.accept()
+            return
+
+        super().mouseReleaseEvent(event)
 
     def keyPressEvent(self, event):
         focus_item = self.scene().focusItem()
