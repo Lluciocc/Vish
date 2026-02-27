@@ -1,5 +1,5 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
-from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property
+from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property, QTimer
 from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack
 from core.graph import Port
 from core.port_types import PortType
@@ -39,6 +39,7 @@ class GraphView(QGraphicsView):
         self.editor = editor
         self.graph_scene = GraphScene(self.graph)
         self.setScene(self.graph_scene)
+        self.graph_scene.setSceneRect(-50000, -50000, 100000, 100000)
 
         self.setRenderHint(QPainter.Antialiasing)
         self.setDragMode(QGraphicsView.RubberBandDrag)
@@ -60,6 +61,7 @@ class GraphView(QGraphicsView):
         self._zoom_anim = QPropertyAnimation(self, b"zoom_anim_value")
         self._zoom_anim.setEasingCurve(QEasingCurve.OutCubic)
         self._zoom_anim.setDuration(120)
+
     #     self._init_minimap()
         self._suspend_edge_undo = False
         self.undo_stack = QUndoStack(self)
@@ -302,6 +304,9 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_R: # R
             self.rebuild_graph()
             return
+        if event.key() == Qt.Key_H:
+            self.frame_all()
+            return
 
         super().keyPressEvent(event)
 
@@ -312,6 +317,13 @@ class GraphView(QGraphicsView):
         box = CommentBoxItem(title="Comment")
         box.setPos(scene_pos)
         self.scene().addItem(box)
+
+    def frame_all(self):
+        rect = self.scene().itemsBoundingRect()
+        if rect.isNull():
+            return
+        rect = rect.adjusted(-200, -200, 200, 200)
+        self.fitInView(rect, Qt.KeepAspectRatio)
 
 
     def remove_node_item(self, node_id):
@@ -588,4 +600,3 @@ class GraphView(QGraphicsView):
         self.paste_offset = (0, 0)
         self.paste(message=False)
         self.paste_offset = (30, 30)
-        
