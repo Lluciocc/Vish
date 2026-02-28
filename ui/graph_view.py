@@ -196,11 +196,29 @@ class GraphView(QGraphicsView):
 
     def wheelEvent(self, event):
         zoom_step = 1.15
+
+        self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
+
         if event.angleDelta().y() > 0:
-            new_factor = self.scale_factor * zoom_step
+            zoom_factor = zoom_step
         else:
-            new_factor = self.scale_factor / zoom_step
-        self.set_zoom(new_factor, animated=True)
+            zoom_factor = 1 / zoom_step
+
+        new_scale = self.scale_factor * zoom_factor
+        new_scale = max(0.2, min(3.0, new_scale))
+
+        zoom_factor = new_scale / self.scale_factor
+
+        self.scale(zoom_factor, zoom_factor)
+
+        self.scale_factor = new_scale
+
+        percent = int(self.scale_factor * 100)
+        self.zoom_label.setText(f"{percent}%")
+
+        self.zoom_slider.blockSignals(True)
+        self.zoom_slider.setValue(percent)
+        self.zoom_slider.blockSignals(False)
 
 
     def mousePressEvent(self, event):
@@ -492,6 +510,12 @@ class GraphView(QGraphicsView):
             self._apply_zoom(factor)
 
     def _apply_zoom(self, factor):
+        old_transform_anchor = self.transformationAnchor()
+        old_resize_anchor = self.resizeAnchor()
+
+        self.setTransformationAnchor(QGraphicsView.AnchorViewCenter)
+        self.setResizeAnchor(QGraphicsView.AnchorViewCenter)
+
         self.resetTransform()
         self.scale(factor, factor)
 
@@ -505,6 +529,9 @@ class GraphView(QGraphicsView):
             self.zoom_slider.blockSignals(True)
             self.zoom_slider.setValue(slider_value)
             self.zoom_slider.blockSignals(False)
+
+        self.setTransformationAnchor(old_transform_anchor)
+        self.setResizeAnchor(old_resize_anchor)
 
     def _on_zoom_slider_changed(self, value):
         self.set_zoom(value / 100.0)
