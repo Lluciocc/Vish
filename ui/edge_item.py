@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QGraphicsPathItem
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QPainterPath, QPen, QColor
 from core.graph import Edge
+from core.port_types import PORT_STYLES, PortType
 
 class EdgeItem(QGraphicsPathItem):
     def __init__(self, edge=None, source_port=None, target_port=None):
@@ -13,10 +14,29 @@ class EdgeItem(QGraphicsPathItem):
         self.source_pos = QPointF()
         self.target_pos = QPointF()
 
-        pen = QPen(QColor("#95A5A6"), 3)
+        self.apply_style_from_source()
+        self.setZValue(-1)
+
+    def apply_style_from_source(self):
+        if not self.source_port:
+            color = QColor("#95A5A6")
+            width = 3
+        else:
+            port_type = self.source_port.port.port_type
+            style = PORT_STYLES.get(port_type)
+
+            if style:
+                color = QColor(style.color)
+                width = style.thickness
+            else:
+                color = QColor("#95A5A6")
+                width = 3
+            if port_type == PortType.EXEC:
+                color = QColor("#95A5A6")
+
+        pen = QPen(color, width)
         pen.setCapStyle(Qt.RoundCap)
         self.setPen(pen)
-        self.setZValue(-1)
 
     def update_positions(self):
         if self.source_port:

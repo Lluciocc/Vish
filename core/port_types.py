@@ -19,8 +19,9 @@ class PortDirection(Enum):
 class PortStyle:
     color: str
     size: int
+    thickness: float = 3
     
-EXEC_STYLE = PortStyle("#FFFFFF", 12)
+EXEC_STYLE = PortStyle("#FFFFFF", 12, thickness=4.5)
 STRING_STYLE = PortStyle("#FF6B9D", 10)
 INT_STYLE = PortStyle("#4ECDC4", 10)
 BOOL_STYLE = PortStyle("#95E1D3", 10)

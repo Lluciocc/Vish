@@ -22,6 +22,7 @@ class GraphScene(QGraphicsScene):
         self.start_port = None
         self.pending_port = None
         self.pending_scene_pos = None
+        self._z_counter = 2
         self.setBackgroundBrush(self.palette().dark())
 
     def start_connection(self, port_item):
@@ -39,6 +40,7 @@ class GraphScene(QGraphicsScene):
 
         self.drag_edge = EdgeItem()
         self.drag_edge.source_port = port_item
+        self.drag_edge.apply_style_from_source()
         self.addItem(self.drag_edge)
 
         pos = port_item.center_scene_pos()
@@ -152,9 +154,7 @@ class GraphScene(QGraphicsScene):
         src_port_item = src_node_item.port_items[core_edge.source.id]
         tgt_port_item = tgt_node_item.port_items[core_edge.target.id]
 
-        edge_item = EdgeItem()
-        edge_item.source_port = src_port_item
-        edge_item.target_port = tgt_port_item
+        edge_item = EdgeItem(source_port=src_port_item, target_port=tgt_port_item)
         edge_item.edge = core_edge
 
         self.addItem(edge_item)

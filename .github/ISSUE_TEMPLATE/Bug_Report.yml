@@ -10,6 +10,7 @@ body:
 - type: textarea
   attributes:
     label: Observed Behavior
+    description: Please include a screenshot (or screen recording) if it’s too complicated to explain with words.
     placeholder: What happened?
   validations:
     required: true
@@ -25,6 +26,6 @@ body:
 - type: textarea
   attributes:
     label: Steps to reproduce
-    placeholder: Please describe how you got the error.
+    placeholder: Please describe how you encountered the issue. If there are too many steps, consider including a screen recording.
   validations:
     required: true

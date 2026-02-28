@@ -28,6 +28,7 @@ class NodeItem(QGraphicsItem):
         self.title_item = QGraphicsTextItem(Traduction.get_trad(node.node_type, node.title), self)
         self.title_item.setDefaultTextColor(QColor("#ECF0F1"))
         self.title_item.setPos(10, 8)
+        self.setZValue(1)
         
         self.setup_icon()
         self.setup_ports()
@@ -82,6 +83,13 @@ class NodeItem(QGraphicsItem):
                 scene.update_edges_for_node(self)
             self.node.x = value.x()
             self.node.y = value.y()
+
+        elif change == QGraphicsItem.ItemSelectedChange and value:
+            scene = self.scene()
+            if scene and hasattr(scene, "_z_counter"):
+                self.setZValue(scene._z_counter)
+                scene._z_counter += 1
+
         return super().itemChange(change, value)
  
     def get_port_scene_pos(self, port_id: str) -> QPointF:
@@ -94,6 +102,11 @@ class NodeItem(QGraphicsItem):
         scene = self.scene()
         if scene:
             scene.node_selected.emit(self.node)
+
+            if hasattr(scene, "_z_counter"):
+                self.setZValue(scene._z_counter)
+                scene._z_counter += 1
+
         super().mousePressEvent(event)
 
     def get_icon_node(self, item: Node):

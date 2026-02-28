@@ -25,6 +25,13 @@ class PortItem(QGraphicsEllipseItem):
         self.setToolTip(self.port.tooltip)
 
         self.highlight = False
+    
+    def get_color(self) -> QColor:
+        port_type = getattr(self.port, "type", None) or getattr(self.port, "port_type", None)
+        style = PORT_STYLES.get(port_type)
+        if style:
+            return QColor(style.color)
+        return QColor("#95A5A6")  
 
     def center_scene_pos(self):
         return self.mapToScene(self.boundingRect().center())

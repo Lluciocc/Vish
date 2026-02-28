@@ -14,7 +14,7 @@ class CommentBoxItem(QGraphicsRectItem):
 
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsRectItem.ItemIsFocusable)
-        self.setZValue(-10)
+        self.setZValue(-10000)  # Ensure it's behind all nodes and edges
 
         self.resize_margin = 10
         self.title_bar_height = 32
