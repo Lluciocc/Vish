@@ -173,9 +173,7 @@ class GraphView(QGraphicsView):
         if not src_port_item or not tgt_port_item:
             return None
 
-        edge_item = EdgeItem()
-        edge_item.source_port = src_port_item
-        edge_item.target_port = tgt_port_item
+        edge_item = EdgeItem(source_port=src_port_item, target_port=tgt_port_item)
         edge_item.edge = edge
 
         self.graph_scene.addItem(edge_item)
