@@ -31,6 +31,8 @@ class EdgeItem(QGraphicsPathItem):
             else:
                 color = QColor("#95A5A6")
                 width = 3
+            if port_type == PortType.EXEC:
+                color = QColor("#95A5A6")
 
         pen = QPen(color, width)
         pen.setCapStyle(Qt.RoundCap)
