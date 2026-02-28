@@ -19,6 +19,10 @@
     "theme_purple": "Purple",
     "theme_white": "White",
     "theme_breeze_dark": "Breeze Dark",
+    "welcome_title": "Welcome",
+    "welcome_recent_projects": "Last Projects",
+    "welcome_new_project": "New Project",
+    "welcome_open_project": "Open Project",
 
     "settings": "Settings",
     "appearance": "Appearance",
@@ -44,6 +48,11 @@
     "about_whats_new": "What's new?",
     "about_questions": "FAQs",
     "about_support": "Support the project",
+
+    "file_dialog_open": "Load Graph",
+    "new_project_name": "Project Name",
+    "new_project_enter_name": "Enter Project Name:",
+    "select_project_folder": "Choose Project Folder",
 
     "keyboard_shortcuts": "Keyboard Shortcuts",
     "general": "General",
@@ -173,10 +182,16 @@
     "greater_than_desc": "Checks if one value is greater than another.",
     "greater_than_tooltip": "Strict greater-than comparison.",
 
-    "equals": "Equal to",
-    "equals_label": "Equal to",
+    "equals": "Equal to (Number)",
+    "equals_label": "Equal to (Number)",
     "equals_desc": "Checks if two values are equal.",
     "equals_tooltip": "Tests equality between two values.",
+
+    "equals_string": "Equal to (Text)",
+    "equals_string_label": "Equal to (Text)",
+
+    "equals_variable": "Equal to (Variable)",
+    "equals_variable_label": "Equal to (Variable)",
 
     "logical_and": "Logical AND",
     "logical_and_label": "Logical AND",
@@ -207,6 +222,26 @@
     "file_exists_label": "File exists",
     "file_exists_desc": "Checks if a file exists on the system.",
     "file_exists_tooltip": "Tests the presence of a file.",
+
+    "download_file": "Download File",
+    "download_file_label": "Download File",
+    "download_file_desc": "Downloads a file from the specified URL.",
+    "download_file_tooltip": "Downloads a file.",
+    
+    "sleep": "Wait",
+    "sleep_label": "Wait",
+    "sleep_desc": "Waits for the specified amount of time in milliseconds.",
+    "sleep_tooltip": "Waits for a specified amount of time.",
+
+    "open_website": "Open Website",
+    "open_website_label": "Open Website",
+    "open_website_desc": "Opens the specified URL in a Browser.",
+    "open_website_tooltip": "Opens a Website.",
+
+    "git_clone": "Git clone",
+    "git_clone_label": "Git clone",
+    "git_clone_desc": "Clones a repository to the specified directory.",
+    "git_clone_tooltip": "Clones a git repository.",
 
     "to_string": "Convert to text",
     "to_string_label": "Convert to text",
