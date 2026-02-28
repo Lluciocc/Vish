@@ -22,6 +22,7 @@ class GraphScene(QGraphicsScene):
         self.start_port = None
         self.pending_port = None
         self.pending_scene_pos = None
+        self._z_counter = 2
         self.setBackgroundBrush(self.palette().dark())
 
     def start_connection(self, port_item):
