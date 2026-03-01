@@ -51,8 +51,11 @@ class EdgeItem(QGraphicsPathItem):
         self.target_pos = target
         self.update_path()
 
-    def set_target_pos(self, pos: QPointF):
-        self.target_pos = pos
+    def set_target_pos(self, pos: QPointF, is_port_input):
+        if is_port_input:
+            self.source_pos = pos
+        else:
+            self.target_pos = pos
         self.update_path()
 
     
