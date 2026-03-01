@@ -169,5 +169,5 @@ class GraphScene(QGraphicsScene):
 
     def mouseMoveEvent(self, event):
         if self.drag_edge:
-            self.drag_edge.set_target_pos(event.scenePos())
+            self.drag_edge.set_target_pos(event.scenePos(), self.drag_edge.source_port.is_input)
         super().mouseMoveEvent(event)
