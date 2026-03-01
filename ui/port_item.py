@@ -1,15 +1,14 @@
-from PySide6.QtWidgets import QGraphicsEllipseItem, QGraphicsItem
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
 from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QBrush, QPen, QColor
+from PySide6.QtGui import QBrush, QPainterPath, QPen, QColor
 from core.graph import Port
-from core.port_types import PORT_STYLES
+from core.port_types import PORT_STYLES, PortStyle, PortType
 
-class PortItem(QGraphicsEllipseItem):
+class PortItem(QGraphicsPathItem):
     def __init__(self, port: Port, parent=None, is_input=False):
         style = PORT_STYLES[port.port_type]
-        size = style.size
 
-        super().__init__(-size / 2, -size / 2, size, size, parent)
+        super().__init__(self.generate_path(port, style), parent)
 
         self.port = port
         self.is_input = is_input
@@ -32,6 +31,26 @@ class PortItem(QGraphicsEllipseItem):
         if style:
             return QColor(style.color)
         return QColor("#95A5A6")  
+
+    def generate_path(self, port: Port, style: PortStyle) -> QPainterPath:
+        retval = QPainterPath()
+        match port.port_type:
+            # Exec: triangular arrow
+            case PortType.EXEC:
+                half = style.size / 2
+                retval.moveTo(-half, -half)
+                retval.lineTo(0, -half)
+                retval.lineTo(half, 0)
+                retval.lineTo(0, half)
+                retval.lineTo(-half, half)
+                retval.closeSubpath()
+            # Default path
+            case _:
+                half = style.size / 2
+                retval.addEllipse(-half, -half, style.size, style.size)
+                retval.closeSubpath()
+
+        return retval
 
     def center_scene_pos(self):
         return self.mapToScene(self.boundingRect().center())
