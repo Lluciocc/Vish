@@ -3,6 +3,7 @@ from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QPainterPath, QPen, QColor
 from core.graph import Edge
 from core.port_types import PORT_STYLES, PortType
+import math
 
 class EdgeItem(QGraphicsPathItem):
     def __init__(self, edge=None, source_port=None, target_port=None):
@@ -51,8 +52,11 @@ class EdgeItem(QGraphicsPathItem):
         self.target_pos = target
         self.update_path()
 
-    def set_target_pos(self, pos: QPointF):
-        self.target_pos = pos
+    def set_target_pos(self, pos: QPointF, is_port_input):
+        if is_port_input:
+            self.source_pos = pos
+        else:
+            self.target_pos = pos
         self.update_path()
 
     
@@ -62,10 +66,11 @@ class EdgeItem(QGraphicsPathItem):
         
         dx = self.target_pos.x() - self.source_pos.x()
         dy = self.target_pos.y() - self.source_pos.y()
-        
-        ctrl1_x = self.source_pos.x() + abs(dx) * 0.5
+        d_str = math.sqrt(dx ** 2 + dy ** 2) * 1.35
+
+        ctrl1_x = self.source_pos.x() + min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
         ctrl1_y = self.source_pos.y()
-        ctrl2_x = self.target_pos.x() - abs(dx) * 0.5
+        ctrl2_x = self.target_pos.x() - min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
         ctrl2_y = self.target_pos.y()
         
         path.cubicTo(
@@ -73,5 +78,5 @@ class EdgeItem(QGraphicsPathItem):
             QPointF(ctrl2_x, ctrl2_y),
             self.target_pos
         )
-        
+
         self.setPath(path)
