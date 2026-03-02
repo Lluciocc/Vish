@@ -66,9 +66,9 @@ class EdgeItem(QGraphicsPathItem):
         dx = self.target_pos.x() - self.source_pos.x()
         dy = self.target_pos.y() - self.source_pos.y()
 
-        ctrl1_x = self.source_pos.x() + min(max(abs(dy) * 2.5, abs(dx)), max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        ctrl1_x = self.source_pos.x() + min(max(abs(dy) * 1.5, abs(dx)), max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
         ctrl1_y = self.source_pos.y()
-        ctrl2_x = self.target_pos.x() - min(max(abs(dy) * 2.5, abs(dx)), max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        ctrl2_x = self.target_pos.x() - min(max(abs(dy) * 1.5, abs(dx)), max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
         ctrl2_y = self.target_pos.y()
         
         path.cubicTo(
