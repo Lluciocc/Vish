@@ -6,7 +6,7 @@ from nodes.registry import register_node
 @register_node("run_command", category="Commands", label="Run a command", description="Executes a shell command")
 class RunCommandNode(BaseNode):
     def __init__(self):
-        super().__init__("run_command", "Run Command", "#2ECC71")
+        super().__init__("run_command", "Run Command")
         self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Command", PortType.STRING, "Command to run")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
@@ -26,7 +26,7 @@ class RunCommandNode(BaseNode):
 @register_node("pipe", category="Commands", label="Pipe", description="Pipes output from Command 1 into Command 2")
 class PipeNode(BaseNode):
     def __init__(self):
-        super().__init__("pipe", "Pipe", "#8E44AD")
+        super().__init__("pipe", "Pipe")
         self.add_input("Exec", PortType.EXEC, "Execution Input")
         self.add_input("Command 1", PortType.STRING, "Left command")
         self.add_input("Command 2", PortType.STRING, "Right command")
@@ -54,7 +54,7 @@ class PipeNode(BaseNode):
 @register_node("echo", category="Commands", label="Print a text", description="Prints a text to the console")
 class EchoNode(BaseNode):
     def __init__(self):
-        super().__init__("echo", "Echo", "#3498DB")
+        super().__init__("echo", "Echo")
         self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Text", PortType.VARIABLE, "Things to print")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
@@ -77,7 +77,7 @@ class EchoNode(BaseNode):
 @register_node("exit", category="Commands", label="Exit script", description="Exits the script with a status code")
 class ExitNode(BaseNode):
     def __init__(self):
-        super().__init__("exit", "Exit", "#E74C3C")
+        super().__init__("exit", "Exit")
         self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_input("Code", PortType.INT, "Exit code")
         self.properties["code"] = 0

@@ -3,6 +3,7 @@ from core.debug import Info
 
 class Traduction:
     model = {}
+    node_colors = {}
     
     @staticmethod
     def set_translate_model(lang: str):
@@ -20,4 +21,18 @@ class Traduction:
             return text.format(**kwargs)
         except Exception:
             return text
+        
+    @staticmethod
+    def set_node_colors():
+        trad_file = Info.resource_path(f"assets/models/node_colors.json")
+        try:
+            with open(trad_file) as data:
+                Traduction.node_colors = json.load(data)
+        except FileNotFoundError:
+            print(f"Cannot find node_colors file")
+
+    @staticmethod
+    def get_color(node_type):
+        color = Traduction.node_colors.get(node_type)
+        return color
         

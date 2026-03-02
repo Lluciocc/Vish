@@ -502,6 +502,8 @@ class VisualBashEditor(QMainWindow):
 
 def main():
     ConfigManager.load_config() # Load config before setting theme and language
+    # TODO: add user configuration from settings
+    Traduction.set_node_colors()
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)

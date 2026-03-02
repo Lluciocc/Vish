@@ -1,10 +1,14 @@
 from abc import abstractmethod
 from core.graph import Node, PortType
 from core.bash_context import BashContext
+from core.traduction import Traduction
 
 class BaseNode(Node):
-    def __init__(self, node_type: str, title: str, color: str):
+    def __init__(self, node_type: str, title: str):
         super().__init__(node_type, title)
+        color = Traduction.get_color(node_type)
+        if not color:
+            raise ValueError((f"Node type '{node_type}' has no color definition", node_type))
         self.color = color
     
     @abstractmethod
