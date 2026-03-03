@@ -217,6 +217,18 @@ class VisualBashEditor(QMainWindow):
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
+    
+    def open_welcome_screen(self):
+        welcome = WelcomeScreen(self, self.project_manager)
+        if welcome.exec() == QDialog.Accepted:
+            self.load_current_project()
+        else:
+            Debug.Log(
+                Traduction.get_trad(
+                    "no_project_loaded",
+                    "No project loaded. You can create or open a project from the welcome screen."
+                )
+            )
         
     def save_graph(self, msg=True):
         if not self.graph.nodes:
@@ -499,6 +511,8 @@ class VisualBashEditor(QMainWindow):
             self.generate_bash()
         elif event.key() == Qt.Key_R and event.modifiers() & Qt.ControlModifier: # Ctrl+R
             self.run_bash()
+        elif event.key() == Qt.Key_W and event.modifiers() & Qt.ControlModifier: # Ctrl+W
+            self.open_welcome_screen()
         elif event.key() == Qt.Key_F11: # F11
             self.full_screen_action()
         elif event.key() == Qt.Key_F1: # F1
@@ -526,11 +540,7 @@ def main():
     Debug.init(editor)
     editor.show()
 
-    welcome = WelcomeScreen(editor, editor.project_manager)
-    if welcome.exec() == QDialog.Accepted:
-        editor.load_current_project()
-    elif welcome.result() == QDialog.Rejected:
-        Debug.Log(Traduction.get_trad("no_project_loaded", "No project loaded. You can create or open a project from the welcome screen."))
+    editor.open_welcome_screen()
 
     sys.exit(app.exec())
 
