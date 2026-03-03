@@ -120,7 +120,7 @@ class CommentBoxItem(QGraphicsRectItem):
 
         self.resize_corner = self._get_resize_corner(event.pos())
         self.resizing = self.resize_corner is not None
-        self.drag_start_pos = event.pos()
+        self.drag_start_pos = event.screenPos()
         self.original_rect = QRectF(self.rect())
         self.original_item_pos = self.pos()
         super().mousePressEvent(event)
@@ -132,7 +132,7 @@ class CommentBoxItem(QGraphicsRectItem):
             return
 
         min_w, min_h = 120, 60
-        delta = event.pos() - self.drag_start_pos
+        delta = event.screenPos() - self.drag_start_pos
 
         orig = self.original_rect
         orig_pos = self.original_item_pos
