@@ -35,15 +35,20 @@
   <screenshots>
     <screenshot type="default">
       <caption>Node scripting workflow (1)</caption>
-      <image>https://raw.githubusercontent.com/Lluciocc/Vish/master/screenshots/screenshot1.png</image>
+      <image>https://github.com/user-attachments/assets/5a2711d7-e907-4531-81ac-7461e9867e32</image>
     </screenshot>
     <screenshot>
       <caption>Node scripting workflow (2)</caption>
-      <image>https://raw.githubusercontent.com/Lluciocc/Vish/master/screenshots/screenshot2.png</image>
+      <image>https://github.com/user-attachments/assets/c16cb2ae-68f0-4e4f-8a77-0009b20e7b83</image>
     </screenshot>
   </screenshots>
 
   <releases>
+    <release version="1.0.3" date="2026-03-10">
+      <description>
+        <p>Improve UI and stablity</p>
+      </description>
+    </release>
     <release version="1.0.2" date="2026-02-18">
       <description>
         <p>Initial Flathub release.</p>
