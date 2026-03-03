@@ -2,13 +2,15 @@ from abc import abstractmethod
 from core.graph import Node, PortType
 from core.bash_context import BashContext
 from core.node_color import NodeColor
+from core.debug import Debug
 
 class BaseNode(Node):
     def __init__(self, node_type: str, title: str):
         super().__init__(node_type, title)
         color = NodeColor.get_color(node_type)
         if not color:
-            raise ValueError((f"Node type '{node_type}' has no color definition", node_type))
+            color = "#9d9d9d"
+            Debug.Warn(f"no color for node type '{node_type}' found.")
         self.color = color
     
     @abstractmethod
