@@ -35,6 +35,7 @@ from core.ansi_to_html import ansi_to_html
 from core.config import Config, ConfigManager
 from core.debug import Info, Debug
 from core.traduction import Traduction
+from core.node_color import NodeColor
 from core.projects import ProjectManager
 from ui.welcome import WelcomeScreen
 from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme, set_breeze_dark_theme
@@ -503,7 +504,7 @@ class VisualBashEditor(QMainWindow):
 def main():
     ConfigManager.load_config() # Load config before setting theme and language
     # TODO: add user configuration from settings
-    Traduction.set_node_colors()
+    NodeColor.set_node_colors()
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)
