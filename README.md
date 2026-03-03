@@ -45,7 +45,7 @@ chmod +x Vish-*.AppImage
 ```
 
 ## Credits
-You can find the list of contributors and acknowledgements in the [CREDITS](assets/markdown/CREDITS.md) file.
+You can find the list of contributors and acknowledgements in the [CREDITS file](assets/markdown/CREDITS.md).
 
 ## License
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License. See the [LICENSE file](LICENSE) for details
