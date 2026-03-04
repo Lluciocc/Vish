@@ -286,15 +286,8 @@ class VisualBashEditor(QMainWindow):
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
         
-        for c in comments:
-            box = CommentBoxItem(
-                rect=QRectF(0, 0, c["w"], c["h"]),
-                title=c["title"]
-            )
-            box.setPos(c["x"], c["y"])
-            box.setBrush(QColor(*c["color"]))
-            box.set_locked(c.get("locked", False))
-            self.graph_view.scene().addItem(box)
+        for comment in comments:
+            self.load_comment(comment)
 
         self._connect_signals()
         splitter.setSizes([900, 300, 400])
@@ -338,7 +331,21 @@ class VisualBashEditor(QMainWindow):
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
 
+        for comment in comments:
+            self.load_comment(comment)
+
         splitter.setSizes([900, 300, 400])
+
+    def load_comment(self, comment):
+            box = CommentBoxItem(
+                rect=QRectF(0, 0, comment["w"], comment["h"]),
+                title=comment["title"]
+            )
+            box.setPos(comment["x"], comment["y"])
+            box.setBrush(QColor(*comment["color"]))
+            box.set_locked(comment.get("locked", False))
+            self.graph_view.scene().addItem(box)
+
 
     def auto_save(self):
         if Config.AUTO_SAVE:
