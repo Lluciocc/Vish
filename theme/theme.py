@@ -158,7 +158,7 @@ def set_breeze_dark_theme():
     Theme.TEXT = "#FCFCFC"
     Theme.BUTTON = "#57595C"
     Theme.BUTTON_HOVER = "#3584E4"
-    Theme.BUTTON_PRESSED = "#3584E4"
+    Theme.BUTTON_PRESSED = "#034D7A"
 
     app.setStyleSheet(f"""
         QWidget {{
