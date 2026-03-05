@@ -24,6 +24,18 @@ class SequencerNode(BaseNode):
         self.add_output("Step 2", PortType.EXEC, "Second execution step")
         self.add_output("Step 3", PortType.EXEC, "Third execution step")
 
+        self.properties["DYNAMIC_add_output_dynamic"] = ""
+        self.properties["DYNAMIC_remove_output_dynamic"] = ""
+
+    def add_output_dynamic(self):
+        self.add_output(f"Step {len(self.outputs)+1}", PortType.EXEC, "")
+
+    def remove_output_dynamic(self):
+        if len(self.outputs) <= 3:
+            Debug.Error('Cannot have less than 3 outputs')
+        else:
+            self.outputs.pop(-1)
+
     def emit_bash(self, context: BashContext) -> str:
         for output in self.outputs:
             if output.connected_edges:

@@ -147,7 +147,7 @@ class VisualBashEditor(QMainWindow):
         self.graph_view = GraphView(self.graph, self)
         splitter.addWidget(self.graph_view)
         
-        self.property_panel = PropertyPanel()
+        self.property_panel = PropertyPanel(graph_view=self.graph_view)
         splitter.addWidget(self.property_panel)
 
         self.output_splitter = QSplitter(Qt.Vertical)
@@ -280,6 +280,8 @@ class VisualBashEditor(QMainWindow):
         old_view.setParent(None)
         old_view.deleteLater()
 
+        self.property_panel.graph_view = self.graph_view
+        
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
 
@@ -319,11 +321,13 @@ class VisualBashEditor(QMainWindow):
 
         self.graph_view = GraphView(self.graph, self)
         splitter.insertWidget(0, self.graph_view)
+        
 
         old_view.setParent(None)
         old_view.deleteLater()
 
         self._connect_signals()
+        self.property_panel.graph_view = self.graph_view
 
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
