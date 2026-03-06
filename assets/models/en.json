@@ -20,6 +20,18 @@
     "theme_white": "White",
     "theme_breeze_dark": "Breeze Dark",
 
+    "never_modified": "Never saved",
+    "remove_recent": "Remove from recents",
+    "welcome_title": "Welcome",
+    "welcome_recent_projects": "Recent Projects",
+    "welcome_new_project": "New Project",
+    "welcome_open_project": "Open Project",
+    "no_recent_projects": "No recent projects",
+    "remove_recent_question": "Do you want to remove this project from the recent list?",
+    "new_project_name": "Project Name",
+    "new_project_enter_name": "Enter project name:",
+    "select_project_folder": "Select Project Folder",
+
     "settings": "Settings",
     "appearance": "Appearance",
     "theme": "Theme",

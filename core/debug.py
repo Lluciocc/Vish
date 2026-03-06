@@ -34,7 +34,7 @@ class Debug:
         Debug._show(message, "info")
 
 class Info:
-    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "config.json")
+    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish", "config.json")
     @staticmethod
     def get_os():
         return platform.system()
