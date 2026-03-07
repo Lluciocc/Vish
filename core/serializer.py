@@ -1,23 +1,19 @@
 import json
-from typing import Dict, Any
+from typing import Any, Dict
+
 from .graph import Graph, Node, Port
 
+
 class Serializer:
-    VERSION = "0.0.0.beta"
+    VERSION = open('VERSION').read().strip()
 
     def __init__(self, graph: Graph):
         self.graph = graph
-        
-    
+
     @staticmethod
     def serialize(graph: Graph, graph_view) -> str:
-        data = {
-            "version": Serializer.VERSION,
-            "nodes": [],
-            "edges": [],
-            "comments": []
-        }
-        
+        data = {"version": Serializer.VERSION, "nodes": [], "edges": [], "comments": []}
+
         for node in graph.nodes.values():
             node_data = {
                 "id": node.id,
@@ -26,16 +22,22 @@ class Serializer:
                 "x": node.x,
                 "y": node.y,
                 "properties": node.properties,
-                "inputs": [{"id": p.id, "name": p.name, "type": p.port_type.value} for p in node.inputs],
-                "outputs": [{"id": p.id, "name": p.name, "type": p.port_type.value} for p in node.outputs]
+                "inputs": [
+                    {"id": p.id, "name": p.name, "type": p.port_type.value}
+                    for p in node.inputs
+                ],
+                "outputs": [
+                    {"id": p.id, "name": p.name, "type": p.port_type.value}
+                    for p in node.outputs
+                ],
             }
             data["nodes"].append(node_data)
-        
+
         for edge in graph.edges.values():
             edge_data = {
                 "id": edge.id,
                 "source": edge.source.id,
-                "target": edge.target.id
+                "target": edge.target.id,
             }
             data["edges"].append(edge_data)
 
@@ -43,18 +45,20 @@ class Serializer:
             if item.__class__.__name__ == "CommentBoxItem":
                 r = item.rect()
                 c = item.brush().color()
-                data["comments"].append({
-                    "x": item.pos().x(),
-                    "y": item.pos().y(),
-                    "w": r.width(),
-                    "h": r.height(),
-                    "title": item.title_item.toPlainText(),
-                    "color": [c.red(), c.green(), c.blue(), c.alpha()],
-                    "locked": item.locked
-                })
-        
+                data["comments"].append(
+                    {
+                        "x": item.pos().x(),
+                        "y": item.pos().y(),
+                        "w": r.width(),
+                        "h": r.height(),
+                        "title": item.title_item.toPlainText(),
+                        "color": [c.red(), c.green(), c.blue(), c.alpha()],
+                        "locked": item.locked,
+                    }
+                )
+
         return json.dumps(data, indent=2)
-    
+
     @staticmethod
     def deserialize(json_str: str, node_factory) -> Graph:
         data = json.loads(json_str)
@@ -64,8 +68,10 @@ class Serializer:
         for node_data in data["nodes"]:
             node = node_factory.create_node(node_data["type"])
             if node is None:
-                raise ValueError((f"Unknown node type: {node_data['type']}", node_data['type']))
-            
+                raise ValueError(
+                    (f"Unknown node type: {node_data['type']}", node_data["type"])
+                )
+
             node.id = node_data["id"]
             node.title = node_data["title"]
             node.x = node_data["x"]
@@ -113,7 +119,6 @@ class Serializer:
             "target_input_index": tgt_in_index,
         }
 
-
     def serialize_subgraph(self, nodes):
         node_ids = {n.id for n in nodes}
         data = {"nodes": [], "edges": []}
@@ -122,10 +127,7 @@ class Serializer:
             data["nodes"].append(self.serialize_node(node))
 
         for edge in self.graph.edges.values():
-            if (
-                edge.source.node.id in node_ids
-                and edge.target.node.id in node_ids
-            ):
+            if edge.source.node.id in node_ids and edge.target.node.id in node_ids:
                 data["edges"].append(self.serialize_edge(edge))
 
         return data
