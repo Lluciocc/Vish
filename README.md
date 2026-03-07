@@ -32,11 +32,6 @@ For more detailed information about Vish, including contribution instructions, u
 You can install Vish directly from Flathub:
 https://flathub.org/apps/io.github.lluciocc.Vish
 
-### From flatpak
-You can install Vish from a self hosted source using the following command:
-```bash 
-flatpak install --from https://flatpak.lluciocc.fr/vish.flatpakref
-```
 ### From AppImage
 You can download the latest AppImage from the [releases page](https://github.com/lluciocc/vish/releases/latest). After downloading, make the AppImage executable and run it:
 ```bash
