@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QWidget, QHBoxLayout, QAbstractItemView,
     QLineEdit
 )
-from PySide6.QtCore import Qt, QSize, QTimer
+from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QFont, QKeySequence, QColor, QShortcut
 from ui.menu_style import apply_btn_style
 from core.traduction import Traduction
@@ -26,17 +26,22 @@ def _format_last_modified(iso: str | None) -> str:
         return ""
 
 
+class ClickableLabel(QLabel):
+    clicked = Signal()
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.LeftButton:
+            self.clicked.emit()
+        super().mousePressEvent(event)
+
+
 class ProjectListItem(QWidget):
     def __init__(self, name: str, path_str: str, last_modified: str | None, on_delete, on_rename, parent=None):
         super().__init__(parent)
         self.path_str = path_str
         self._name = name
         self._on_rename = on_rename
-        self._click_timer = QTimer()
-        self._click_timer.setSingleShot(True)
-        self._click_timer.setInterval(250)
-        self._click_timer.timeout.connect(self._open_project_via_click)
-        self._pending_open = None
+        self._renaming = False
 
         self.setStyleSheet("background: transparent;")
 
@@ -50,15 +55,20 @@ class ProjectListItem(QWidget):
         self._text_layout.setContentsMargins(0, 0, 0, 0)
         self._text_layout.setSpacing(2)
 
-        self.name_label = QLabel(name)
-        self.name_label.setStyleSheet(f"color: {Theme.TEXT}; font-weight: 600; font-size: 10pt; background: transparent;")
+        self.name_label = ClickableLabel(name)
+        self.name_label.setStyleSheet(
+            f"color: {Theme.TEXT}; font-weight: 600; font-size: 10pt; background: transparent;"
+        )
+        self.name_label.clicked.connect(self.start_rename)
         self._text_layout.addWidget(self.name_label)
 
         date_str = _format_last_modified(last_modified)
         if date_str:
-            date_label = QLabel(date_str)
-            date_label.setStyleSheet("color: #777; font-size: 8pt; background: transparent;")
-            self._text_layout.addWidget(date_label)
+            self.date_label = QLabel(date_str)
+            self.date_label.setStyleSheet("color: #777; font-size: 8pt; background: transparent;")
+            self._text_layout.addWidget(self.date_label)
+        else:
+            self.date_label = None
 
         self.name_editor = QLineEdit(name)
         self.name_editor.setStyleSheet(f"""
@@ -75,6 +85,7 @@ class ProjectListItem(QWidget):
         self.name_editor.setVisible(False)
         self.name_editor.returnPressed.connect(self._commit_rename)
         self.name_editor.editingFinished.connect(self._commit_rename)
+        self.name_editor.textChanged.connect(self._resize_rename)
         self.name_editor.installEventFilter(self)
         self._text_layout.insertWidget(0, self.name_editor)
 
@@ -107,20 +118,41 @@ class ProjectListItem(QWidget):
         layout.addWidget(delete_btn)
 
     def start_rename(self):
+        if self._renaming:
+            return
+
+        self._renaming = True
+        self.name_editor.setText(self._name)
+        self._resize_rename(self._name)
         self.name_label.setVisible(False)
         self.name_editor.setVisible(True)
-        self.name_editor.setText(self._name)
         self.name_editor.selectAll()
         self.name_editor.setFocus()
-        self._renaming = True
 
-    def _commit_rename(self):
-        if not getattr(self, "_renaming", False):
+    def _resize_rename(self, text):
+        metrics = self.name_editor.fontMetrics()
+        width = metrics.horizontalAdvance(text + " ") + 20
+        width = max(60, min(width, 400))
+        self.name_editor.setFixedWidth(width)
+
+    def cancel_rename(self):
+        if not self._renaming:
             return
         self._renaming = False
-        new_name = self.name_editor.text().strip()
         self.name_editor.setVisible(False)
         self.name_label.setVisible(True)
+        self.name_editor.setText(self._name)
+
+    def _commit_rename(self):
+        if not self._renaming:
+            return
+
+        self._renaming = False
+        new_name = self.name_editor.text().strip()
+
+        self.name_editor.setVisible(False)
+        self.name_label.setVisible(True)
+
         if new_name and new_name != self._name:
             self._name = new_name
             self.name_label.setText(new_name)
@@ -130,18 +162,9 @@ class ProjectListItem(QWidget):
         from PySide6.QtCore import QEvent
         if obj is self.name_editor and event.type() == QEvent.KeyPress:
             if event.key() == Qt.Key_Escape:
-                self._renaming = False
-                self.name_editor.setVisible(False)
-                self.name_label.setVisible(True)
+                self.cancel_rename()
                 return True
         return super().eventFilter(obj, event)
-
-    def _open_project_via_click(self):
-        if self._pending_open:
-            self._pending_open()
-
-    def set_pending_open(self, callback):
-        self._pending_open = callback
 
 
 class WelcomeScreen(QDialog):
@@ -215,7 +238,6 @@ class WelcomeScreen(QDialog):
         self.recent_list.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.recent_list.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.recent_list.setVerticalScrollMode(QAbstractItemView.ScrollPerPixel)
-        self.recent_list.itemClicked.connect(self._on_item_single_click)
         self.recent_list.itemDoubleClicked.connect(self._on_item_double_click)
         main_layout.addWidget(self.recent_list)
 
@@ -252,6 +274,9 @@ class WelcomeScreen(QDialog):
             shortcut = QShortcut(QKeySequence(key), self)
             shortcut.activated.connect(self._handle_enter)
 
+        rename_shortcut = QShortcut(QKeySequence(Qt.Key_F2), self)
+        rename_shortcut.activated.connect(self._handle_rename)
+
         if self.recent_list.count() > 0:
             self.recent_list.setCurrentRow(0)
             self.recent_list.setFocus()
@@ -261,17 +286,29 @@ class WelcomeScreen(QDialog):
     def _handle_enter(self):
         focused = self.focusWidget()
 
+        if isinstance(focused, QLineEdit):
+            focused.editingFinished.emit()
+            return
+
         if self.recent_list.count() > 0 and self.recent_list.currentItem() is not None:
-            if focused is self.recent_list or focused is self or focused is None:
-                self.open_recent(self.recent_list.currentItem())
-                return
+            self.open_recent(self.recent_list.currentItem())
+            return
 
         if focused is self.new_btn:
             self.new_btn.click()
         elif focused is self.open_btn:
             self.open_btn.click()
-        elif self.recent_list.count() > 0:
-            self.open_recent(self.recent_list.currentItem())
+
+    def _handle_rename(self):
+        item = self.recent_list.currentItem()
+        if item is None or item.flags() == Qt.NoItemFlags:
+            return
+
+        widget = self._get_widget(item)
+        if widget is None:
+            return
+
+        widget.start_rename()
 
     def _get_widget(self, item: QListWidgetItem) -> ProjectListItem | None:
         return self.recent_list.itemWidget(item)
@@ -282,20 +319,9 @@ class WelcomeScreen(QDialog):
             return
         if getattr(widget, "_renaming", False):
             return
-        widget.set_pending_open(lambda: self.open_recent(item))
-        widget._click_timer.start()
 
     def _on_item_double_click(self, item: QListWidgetItem):
-        widget = self._get_widget(item)
-        if widget is None:
-            return
-        widget._click_timer.stop()
-        widget._pending_open = None
-
-        if item is self.recent_list.currentItem():
-            widget.start_rename()
-        else:
-            self.open_recent(item)
+        self.open_recent(item)
 
     def populate_recent_projects(self):
         self.recent_list.clear()
@@ -375,7 +401,7 @@ class WelcomeScreen(QDialog):
             self.recent_list.setFocus()
         else:
             self.new_btn.setFocus()
-        
+
         self.project_manager.remove_project(Path(path_str))
 
     def create_project(self):
