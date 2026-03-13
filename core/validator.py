@@ -13,7 +13,7 @@ class GraphValidator:
         if a.is_input == b.is_input:
             return False
 
-        if a.port.port_type != b.port.port_type:
+        if not a.port.can_connect_to(b.port):
             return False
 
         if a.port.direction == PortDirection.OUTPUT:

@@ -56,7 +56,7 @@ class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo")
         self.add_input("Exec", PortType.EXEC, "Control flow input")
-        self.add_input("Text", PortType.VARIABLE, "Things to print")
+        self.add_input("Text", PortType.ANY, "Things to print")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["text"] = "Hello"
         

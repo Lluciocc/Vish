@@ -14,12 +14,17 @@ class Port:
         self.value: Any = None
         self.connected_edges: List['Edge'] = []
         self.tooltip = tooltip
-    
+        
     def can_connect_to(self, other: 'Port') -> bool:
         if self.direction == other.direction:
             return False
-        if self.port_type == PortType.EXEC and other.port_type == PortType.EXEC:
+
+        if self.port_type == PortType.EXEC or other.port_type == PortType.EXEC:
+            return self.port_type == PortType.EXEC and other.port_type == PortType.EXEC
+
+        if self.port_type == PortType.ANY or other.port_type == PortType.ANY:
             return True
+
         return self.port_type == other.port_type
     
     def is_connected(self) -> bool:
