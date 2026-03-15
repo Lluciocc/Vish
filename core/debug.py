@@ -8,6 +8,7 @@ from core.logger import Logger
 
 class Debug:
     _parent = None
+    init_error = False
 
     @staticmethod
     def init(parent):
@@ -16,7 +17,10 @@ class Debug:
     @staticmethod
     def _show(message: str, level: str):
         if not Debug._parent:
-            print(f"[{level.upper()}] {message}")
+            from core.config import Config 
+            if Config.DEBUG:
+                Logger.LogError("Debug not initialized with parent widget, using console for output")
+                Debug.init_error = True
             return
 
         toast = MessageWidget(Debug._parent, message, level)
@@ -27,7 +31,7 @@ class Debug:
         Debug._show(message, "error")
 
         from core.config import Config # importing here to avoid circular import
-        if Config.DEBUG:
+        if Config.DEBUG or Debug.init_error:
             Logger.LogError(message)
 
     @staticmethod
@@ -35,14 +39,14 @@ class Debug:
         Debug._show(message, "warn")
 
         from core.config import Config
-        if Config.DEBUG:
+        if Config.DEBUG or Debug.init_error:
             Logger.LogWarning(message)
 
     @staticmethod
     def Log(message: str):
         Debug._show(message, "info")
         from core.config import Config
-        if Config.DEBUG:
+        if Config.DEBUG or Debug.init_error:
             Logger.LogMessage(message)
 
 class Info:

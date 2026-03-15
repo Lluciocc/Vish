@@ -3,6 +3,8 @@ if TYPE_CHECKING:
     from core.bash_context import BashContext
 from uuid import uuid4
 from core.port_types import PortType, PortDirection
+from core.logger import Logger
+from core.config import Config
 
 class Port:
     def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node', tooltip=""):
@@ -133,8 +135,9 @@ class Graph:
         visited = set()
         ordered = []
         start = None
-        for node in self.nodes.values():
-            print(node.title)
+        if Config.DEBUG:
+            for node in self.nodes.values():
+                Logger.LogMessage(node.title)
         for node in self.nodes.values():
             if node.node_type == "start":
                 start = node

@@ -34,6 +34,7 @@ from core.highlights import BashHighlighter
 from core.ansi_to_html import ansi_to_html
 from core.config import Config, ConfigManager
 from core.debug import Info, Debug
+from core.logger import Logger
 from core.traduction import Traduction
 from core.node_color import NodeColor
 from core.projects import ProjectManager
@@ -196,7 +197,8 @@ class VisualBashEditor(QMainWindow):
     def generate_bash(self):
         if not self.graph.nodes:
             Debug.Warn(Traduction.get_trad("warn_generating_empty_graph", "Generating an empty graph."))
-        print(f"EDGES: {len(self.graph.edges)}")
+        if Config.DEBUG:
+            Logger.LogMessage(f"EDGES: {len(self.graph.edges)}")
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)

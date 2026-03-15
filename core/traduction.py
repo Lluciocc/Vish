@@ -1,5 +1,5 @@
 import json
-from core.debug import Info
+from core.debug import Info, Debug
 
 class Traduction:
     model = {}
@@ -11,7 +11,7 @@ class Traduction:
             with open(trad_file, encoding='utf-8') as data:
                 Traduction.model = json.load(data)
         except FileNotFoundError:
-            print(f"Cannot find language model for {lang}")
+            Debug.Error(f"Cannot find language model for {lang}")
 
     @staticmethod
     def get_trad(msgid, fallback="", **kwargs):

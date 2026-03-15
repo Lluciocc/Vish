@@ -56,7 +56,8 @@ class PortItem(QGraphicsPathItem):
         return self.mapToScene(self.boundingRect().center())
 
     def mousePressEvent(self, event):
-        print("PORT CLICK")
+        # print("PORT CLICK")
+        pass
 
     
     def hoverEnterEvent(self, event):

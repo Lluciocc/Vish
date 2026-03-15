@@ -1,5 +1,5 @@
 import json
-from core.debug import Info
+from core.debug import Info, Debug
 
 class NodeColor:
     node_colors = {}
@@ -12,7 +12,7 @@ class NodeColor:
             with open(color_file) as data:
                 NodeColor.node_colors = json.load(data)
         except FileNotFoundError:
-            print(f"Cannot find file '{filename}'.")
+            Debug.Error(f"Cannot find file '{filename}'.")
 
     @staticmethod
     def get_color(node_type):
