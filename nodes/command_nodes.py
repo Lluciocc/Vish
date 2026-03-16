@@ -28,8 +28,8 @@ class PipeNode(BaseNode):
     def __init__(self):
         super().__init__("pipe", "Pipe")
         self.add_input("Exec", PortType.EXEC, "Execution Input")
-        self.add_input("Command 1", PortType.STRING, "Left command")
-        self.add_input("Command 2", PortType.STRING, "Right command")
+        self.add_input("Command 1", PortType.ANY, "Left command")
+        self.add_input("Command 2", PortType.ANY, "Right command")
         self.add_output("Exec", PortType.EXEC, "Execution Output")
         self.add_output("Output", PortType.STRING, "Output of piped command")
         self.properties["Command 1"] = "ls"
@@ -71,6 +71,10 @@ class EchoNode(BaseNode):
             value = source_node.emit_bash_value(context)
             if value is not None:
                 text = value
+
+        # if the text looks like a variable reference, command substitution, or is already quoted, don't add extra quotes
+        if text.isdigit() or text.startswith("$") or text.startswith('"') or text.startswith("'") or text.startswith('`'):
+            return f'echo {text}'
 
         return f'echo "{text}"'
 
