@@ -221,41 +221,39 @@ class GraphView(QGraphicsView):
 
         self._sync_zoom_from_transform()
 
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MiddleButton:
-            self._previous_drag_mode = self.dragMode()
-            self.setDragMode(QGraphicsView.ScrollHandDrag)
 
-            fake = QMouseEvent(
-                QEvent.MouseButtonPress,
-                event.position(),
-                Qt.LeftButton,
-                Qt.LeftButton,
-                event.modifiers()
-            )
-            super().mousePressEvent(fake)
-            event.accept()
-            return
+    def viewportEvent(self, event):
+        if isinstance(event, QMouseEvent):
+            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton:
+                self._previous_drag_mode = self.dragMode()
+                self.setDragMode(QGraphicsView.ScrollHandDrag)
+                self.setInteractive(False)
 
-        super().mousePressEvent(event)
+                fake = QMouseEvent(
+                    QEvent.MouseButtonPress,
+                    event.position(),
+                    Qt.LeftButton,
+                    Qt.LeftButton,
+                    event.modifiers()
+                )
+                super().mousePressEvent(fake)
+                return True
 
+            elif event.type() == QEvent.MouseButtonRelease and event.button() == Qt.MiddleButton:
+                self.setInteractive(True)
+                fake = QMouseEvent(
+                    QEvent.MouseButtonRelease,
+                    event.position(),
+                    Qt.LeftButton,
+                    Qt.NoButton,
+                    event.modifiers()
+                )
+                super().mouseReleaseEvent(fake)
 
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MiddleButton:
-            fake = QMouseEvent(
-                QEvent.MouseButtonRelease,
-                event.position(),
-                Qt.LeftButton,
-                Qt.NoButton,
-                event.modifiers()
-            )
-            super().mouseReleaseEvent(fake)
+                self.setDragMode(self._previous_drag_mode)
+                return True
 
-            self.setDragMode(self._previous_drag_mode) # restore whatever it was before
-            event.accept()
-            return
-
-        super().mouseReleaseEvent(event)
+        return super().viewportEvent(event)
 
     def keyPressEvent(self, event):
         focus_item = self.scene().focusItem()
