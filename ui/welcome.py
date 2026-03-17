@@ -13,6 +13,7 @@ from PySide6.QtGui import QFont, QKeySequence, QColor, QShortcut
 from ui.menu_style import apply_btn_style
 from core.traduction import Traduction
 from core.projects import ProjectManager
+from core.debug import Info
 from theme.theme import Theme
 
 
@@ -214,7 +215,7 @@ class WelcomeScreen(QDialog):
         main_layout.setSpacing(16)
         main_layout.setContentsMargins(40, 32, 40, 32)
 
-        title = QLabel(Traduction.get_trad("welcome_title", "Welcome"))
+        title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user()}")
         title_font = QFont()
         title_font.setPointSize(20)
         title_font.setBold(True)

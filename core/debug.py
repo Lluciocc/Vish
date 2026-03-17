@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import platform
 import sys
+import getpass
 from ui.info import MessageWidget
 from PySide6.QtCore import QStandardPaths
 from core.logger import Logger
@@ -73,3 +74,7 @@ class Info:
         else:
             base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(base_path, relative_path)
+
+    @staticmethod
+    def get_user():
+         return getpass.getuser()
