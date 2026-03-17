@@ -196,30 +196,30 @@ class GraphView(QGraphicsView):
 
     def wheelEvent(self, event):
         zoom_step = 1.15
+        min_scale = 0.2
+        max_scale = 3.0
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-
+        current_scale = self.transform().m11()
         if event.angleDelta().y() > 0:
             zoom_factor = zoom_step
         else:
             zoom_factor = 1 / zoom_step
 
-        new_scale = self.scale_factor * zoom_factor
-        new_scale = max(0.2, min(3.0, new_scale))
+        proposed_scale = current_scale * zoom_factor
 
-        zoom_factor = new_scale / self.scale_factor
+        if min_scale <= current_scale <= max_scale:
+            proposed_scale = max(min_scale, min(max_scale, proposed_scale))
+        else:
+            if current_scale > max_scale and proposed_scale > current_scale:
+                return
+            if current_scale < min_scale and proposed_scale < current_scale:
+                return
 
-        self.scale(zoom_factor, zoom_factor)
+        applied_factor = proposed_scale / current_scale
+        self.scale(applied_factor, applied_factor)
 
-        self.scale_factor = new_scale
-
-        percent = int(self.scale_factor * 100)
-        self.zoom_label.setText(f"{percent}%")
-
-        self.zoom_slider.blockSignals(True)
-        self.zoom_slider.setValue(percent)
-        self.zoom_slider.blockSignals(False)
-
+        self._sync_zoom_from_transform()
 
     def mousePressEvent(self, event):
         if event.button() == Qt.MiddleButton:
@@ -265,7 +265,7 @@ class GraphView(QGraphicsView):
         if event.matches(QKeySequence.Copy): # Ctrl+C
             self.copy_selection()
             return
-        if event.key() == Qt.Key_Space and event.modifiers() & Qt.ControlModifier:
+        if event.key() == Qt.Key_Space and event.modifiers() & Qt.ControlModifier: # Ctrl+Space
             selected = self.get_selected_node_items()
             if len(selected) == 1:
                 self._open_palette_from_selected(selected[0])
@@ -342,6 +342,7 @@ class GraphView(QGraphicsView):
             return
         rect = rect.adjusted(-200, -200, 200, 200)
         self.fitInView(rect, Qt.KeepAspectRatio)
+        self._sync_zoom_from_transform()
 
 
     def remove_node_item(self, node_id):
@@ -572,6 +573,19 @@ class GraphView(QGraphicsView):
 
         self.zoom_widget.move(10, self.height() - 42)
         self.zoom_widget.show()
+
+    def _sync_zoom_from_transform(self):
+        actual_scale = self.transform().m11() # assuming uniform scaling, m11() is enough: https://doc.qt.io/qtforpython-6.5/PySide6/QtGui/QTransform.html
+
+        self.scale_factor = actual_scale
+
+        percent = int(actual_scale * 100)
+        self.zoom_label.setText(f"{percent}%")
+
+        slider_value = max(self.zoom_slider.minimum(), min(self.zoom_slider.maximum(), percent))
+        self.zoom_slider.blockSignals(True)
+        self.zoom_slider.setValue(slider_value)
+        self.zoom_slider.blockSignals(False)
 
     def _open_palette_from_selected(self, node_item):
         scene_pos = node_item.sceneBoundingRect().center()
