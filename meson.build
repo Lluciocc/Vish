@@ -22,6 +22,6 @@ install_data(
   install_dir: get_option('datadir') / 'metainfo'
 )
 install_data(
-  'data/io.github.lluciocc.Vish.png',
-  install_dir: get_option('datadir') / 'icons/hicolor/256x256/apps'
+  'data/io.github.lluciocc.Vish.svg',
+  install_dir: get_option('datadir') / 'icons/hicolor/scalable/apps'
 )
