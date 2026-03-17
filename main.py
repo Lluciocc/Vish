@@ -547,7 +547,7 @@ def main():
     app = QApplication(sys.argv)
     app.setOrganizationName("Lluciocc")
     app.setApplicationName("Vish")
-    app.setWindowIcon(QIcon(Info.resource_path("assets/icons/icon.png")))
+    app.setWindowIcon(QIcon("assets/icons/Vish.svg"))
     editor = VisualBashEditor()
 
     Debug.init(editor)
@@ -556,7 +556,7 @@ def main():
     editor.open_welcome_screen()
 
     sys.exit(app.exec())
-
+    
 if __name__ == "__main__":
     try:
         main()
