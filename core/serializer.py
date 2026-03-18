@@ -5,8 +5,9 @@ from .graph import Graph, Node, Port
 
 
 class Serializer:
-    VERSION = open('VERSION').read().strip()
-
+    #VERSION = open('VERSION').read().strip()
+    VERSION = "v1.0.14"
+    
     def __init__(self, graph: Graph):
         self.graph = graph
 
