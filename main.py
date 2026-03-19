@@ -547,7 +547,8 @@ def main():
     app = QApplication(sys.argv)
     app.setOrganizationName("Lluciocc")
     app.setApplicationName("Vish")
-    app.setWindowIcon(QIcon("assets/icons/Vish.svg"))
+    icon_path = Info.resource_path(f"assets/icons/Vish.svg")
+    app.setWindowIcon(QIcon(icon_path))
     editor = VisualBashEditor()
 
     Debug.init(editor)
