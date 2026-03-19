@@ -12,7 +12,7 @@ class Logger:
 
     @staticmethod
     def LogWarning(message: str):
-        print(f"{Colors.YELLOW}[WARN]{message} {Colors.RESET}")
+        print(f"{Colors.YELLOW}[WARN] {message} {Colors.RESET}")
 
     @staticmethod
     def LogError(message: str):
