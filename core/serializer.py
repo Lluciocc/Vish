@@ -5,7 +5,7 @@ from .graph import Graph, Node, Port
 
 
 class Serializer:
-    version_path = Info.resource_path(f"/home/half/Git/VishTest/Vish/VERSION")
+    version_path = Info.resource_path(f"VERSION")
     VERSION = open(version_path).read().strip()
     
     def __init__(self, graph: Graph):
