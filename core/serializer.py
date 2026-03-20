@@ -10,7 +10,10 @@ class Serializer:
         version_path = Info.resource_path(f"VERSION")
         VERSION = open(version_path).read().strip()
     except:
-        Logger.LogWarning("Could not load VERSION file")
+        from core.config import Config
+        if Config.DEBUG:
+            Logger.LogWarning("Could not load VERSION file")
+        VERSION = "???"
     
     def __init__(self, graph: Graph):
         self.graph = graph
