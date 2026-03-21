@@ -6,6 +6,7 @@ class Theme:
     BACKGROUND = None
     PANEL = None
     TEXT = None
+    TEXT_INV = None
     BUTTON = None
     BUTTON_HOVER = None
     BUTTON_PRESSED = None
@@ -18,6 +19,7 @@ def set_dark_theme():
     Theme.BACKGROUND = "#1e1e1e"
     Theme.PANEL = "#252526"
     Theme.TEXT = "#d4d4d4"
+    Theme.TEXT_INV = "#2b2b2b"
     Theme.BUTTON = "#2d2d2d"
     Theme.BUTTON_HOVER = "#3a3a3a"
     Theme.BUTTON_PRESSED = "#444444"
@@ -64,6 +66,7 @@ def set_white_theme():
     Theme.BACKGROUND = "#f5f5f5"
     Theme.PANEL = "#ffffff"
     Theme.TEXT = "#1e1e1e"
+    Theme.TEXT_INV = "#e0e0e0"
     Theme.BUTTON = "#e0e0e0"
     Theme.BUTTON_HOVER = "#d5d5d5"
     Theme.BUTTON_PRESSED = "#c8c8c8"
@@ -110,6 +113,7 @@ def set_purple_theme():
     Theme.BACKGROUND = "#2b1b3f"
     Theme.PANEL = "#35204f"
     Theme.TEXT = "#e6d9ff"
+    Theme.TEXT_INV = "#0c0024"
     Theme.BUTTON = "#4b2c72"
     Theme.BUTTON_HOVER = "#5a3690"
     Theme.BUTTON_PRESSED = "#6a41b0"
@@ -156,6 +160,7 @@ def set_breeze_dark_theme():
     Theme.BACKGROUND = "#141618"
     Theme.PANEL = "#292C30"
     Theme.TEXT = "#FCFCFC"
+    Theme.TEXT_INV = "#030303"
     Theme.BUTTON = "#57595C"
     Theme.BUTTON_HOVER = "#3584E4"
     Theme.BUTTON_PRESSED = "#034D7A"
