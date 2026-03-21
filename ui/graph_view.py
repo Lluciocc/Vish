@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
 from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property, QTimer
-from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack, QIcon
+from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack
 from core.graph import Port
 from core.port_types import PortType
 from ui.palette import NodePalette
@@ -15,6 +15,7 @@ from nodes.registry import create_node
 from core.debug import Debug, Info
 from commands.undo_commands import *
 from core.layout import GraphLayoutEngine
+from core.icons import Icon
 import os
 
 class ZoomLabel(QLabel):
@@ -659,12 +660,8 @@ class GraphView(QGraphicsView):
         self.frame_btn = QPushButton(self)
         self.frame_btn.setFixedSize(36, 36)
         self.frame_btn.setCursor(Qt.PointingHandCursor)
-
-        try:
-            self.frame_btn.setIcon(self.get_icon("frame"))
-            self.frame_btn.setIconSize(self.frame_btn.size() * 0.6)
-        except Exception:
-            self.frame_btn.setText("◻")
+        self.frame_btn.setIcon(self.get_icon("frame"))
+        self.frame_btn.setIconSize(self.frame_btn.size() * 0.6)
 
         self.frame_btn.setStyleSheet(f"""
             QPushButton {{
@@ -689,8 +686,5 @@ class GraphView(QGraphicsView):
         self.frame_btn.move(x, y)
 
     def get_icon(self, name):
-        theme = Theme.type
-        path = Info.resource_path(f"assets/icons/{theme}/menu/{name.lower().replace(' ', '_')}.png")
-        if os.path.exists(path):
-            return QIcon(path)
-        return None
+        icon = Icon.load_icon("main", name)
+        return icon
