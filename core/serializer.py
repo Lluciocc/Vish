@@ -1,12 +1,19 @@
 import json
 from typing import Any, Dict
-
+from core.debug import Info
+from core.logger import Logger
 from .graph import Graph, Node, Port
 
 
 class Serializer:
-    #VERSION = open('VERSION').read().strip()
-    VERSION = "v1.0.14"
+    try:
+        version_path = Info.resource_path(f"VERSION")
+        VERSION = open(version_path).read().strip()
+    except:
+        from core.config import Config
+        if Config.DEBUG:
+            Logger.LogWarning("Could not load VERSION file")
+        VERSION = "???"
     
     def __init__(self, graph: Graph):
         self.graph = graph
