@@ -1,13 +1,11 @@
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLineEdit, QTreeWidget, QTreeWidgetItem
-)
+from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QTreeWidget, QTreeWidgetItem
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QIcon
 from nodes.registry import NODE_REGISTRY
 from theme.theme import Theme
-import os
 from core.traduction import Traduction
 from core.debug import Info
+from core.icons import Icon
+import os
 
 links = {}
 
@@ -95,9 +93,8 @@ class NodePalette(QWidget):
             cat_item = QTreeWidgetItem([category])
             cat_item.setFlags(cat_item.flags() & ~Qt.ItemIsSelectable)
             cat_item.setExpanded(True)
-            ico = self.get_icon(links[category])
-            if ico:
-                cat_item.setIcon(0, ico)
+            icon = self.get_icon(links[category])
+            cat_item.setIcon(0, icon)
 
             for label, node_type, description in sorted(categories[category]):
                 item = QTreeWidgetItem([Traduction.get_trad(f"{node_type}_label", label)])
@@ -189,9 +186,6 @@ class NodePalette(QWidget):
                     scene._cancel_drag_edge()
         super().closeEvent(event)
 
-    def get_icon(self, category):
-        theme = Theme.type
-        path = Info.resource_path(f"assets/icons/{theme}/{category.lower().replace(' ', '_')}.png")
-        if os.path.exists(path):
-            return QIcon(path)
-        return None
+    def get_icon(self, name):
+        icon = Icon.load_icon("menu_graph", name)
+        return icon

@@ -106,7 +106,7 @@ class VisualBashEditor(QMainWindow):
         toolbar.addWidget(self.copy_btn)
 
         self.more_btn = QToolButton()
-        self.more_btn.setText("⋮")
+        self.more_btn.setText("☰")
         self.more_btn.setPopupMode(QToolButton.InstantPopup)
         apply_btn_style(self.more_btn)
 
@@ -547,7 +547,7 @@ def main():
     app = QApplication(sys.argv)
     app.setOrganizationName("Lluciocc")
     app.setApplicationName("Vish")
-    icon_path = Info.resource_path(f"assets/icons/Vish.svg")
+    icon_path = Info.resource_path("assets/icons/Vish.svg")
     app.setWindowIcon(QIcon(icon_path))
     editor = VisualBashEditor()
 

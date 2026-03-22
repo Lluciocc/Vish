@@ -1,12 +1,13 @@
 from unicodedata import category
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem, QGraphicsPixmapItem
 from PySide6.QtCore import QRectF, Qt, QPointF
-from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath, QIcon, QPixmap
+from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath
 from core.graph import Node
 from theme.theme import Theme
 from ui.port_item import PortItem
 from nodes.registry import NODE_REGISTRY
 from core.traduction import Traduction
+from core.icons import Icon
 import os
 
 class NodeItem(QGraphicsItem):
@@ -59,19 +60,19 @@ class NodeItem(QGraphicsItem):
         
         path = QPainterPath()
         path.addRoundedRect(self.boundingRect(), 8, 8)
-        
+
         if self.isSelected():
             painter.setPen(QPen(QColor("#3498DB"), 3))
         else:
             painter.setPen(QPen(QColor("#2C3E50"), 2))
-        
+
         painter.setBrush(QBrush(QColor("#34495E")))
         painter.drawPath(path)
-        
+
         header_rect = QRectF(0, 0, self.WIDTH, self.HEADER_HEIGHT)
         header_path = QPainterPath()
         header_path.addRoundedRect(header_rect, 8, 8)
-        
+
         painter.setBrush(QBrush(QColor(self.node.color)))
         painter.setPen(Qt.NoPen)
         painter.drawPath(header_path)
@@ -108,43 +109,6 @@ class NodeItem(QGraphicsItem):
                 scene._z_counter += 1
 
         super().mousePressEvent(event)
-
-    def get_icon_node(self, item: Node):
-        node = NODE_REGISTRY.get(item.title.lower().replace(" ", "_"))
-        if node is not None:
-            category = node["category"]
-            path = "assets/icons/nodes/{}/{}.png".format(
-                    category.lower().replace(" ", "_"),
-                    item.title.lower().replace(" ", "_")
-                )
-            if os.path.exists(path):
-                return QIcon(path)
-            else:
-                return QIcon("assets/icons/nodes/{}/default.png".format(category))
-            
-    def setup_icon(self):
-        icon = self.get_icon_node(self.node)
-        padding = 8
-        spacing = 6
-        icon_size = 18
-        x = padding
-
-        if icon and not icon.isNull():
-            pixmap = icon.pixmap(
-                icon_size,
-                icon_size,
-                QIcon.Normal,
-                QIcon.On
-            )
-            self.icon_item = QGraphicsPixmapItem(pixmap, self)
-            self.icon_item.setTransformationMode(Qt.SmoothTransformation)
-            icon_y = (self.HEADER_HEIGHT - icon_size) / 2
-            self.icon_item.setPos(x, icon_y)
-            x += icon_size + spacing
-
-        text_rect = self.title_item.boundingRect()
-        text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2
-        self.title_item.setPos(x, text_y)
 
     def rebuild_ports(self):
         scene = self.scene()
@@ -197,22 +161,18 @@ class NodeItem(QGraphicsItem):
             scene.update_edges_for_node(self)
 
         self.update()
-            
-    # def setup_icon(self):
-    #     svg_path = self.get_icon_node(self.node)
-    #     padding = 8
-    #     spacing = 6
-    #     icon_size = 18
-    #     x = padding
+        
+    def get_icon_node(self, item: Node, icon_size, padding):
+        node = NODE_REGISTRY.get(item.title.lower().replace(" ", "_"))
+        if node is not None:
+            icon = Icon.load_item(self, f"nodes/{node["category"]}", item.title, icon_size, padding)
 
-    #     if svg_path:
-    #         self.icon_item = QGraphicsSvgItem(svg_path, self)
-    #         bounds = self.icon_item.boundingRect()
-    #         scale = icon_size / max(bounds.width(), bounds.height())
-    #         self.icon_item.setScale(scale)
-    #         icon_y = (self.HEADER_HEIGHT - bounds.height() * scale) / 2
-    #         self.icon_item.setPos(x, icon_y)
-    #         x += icon_size + spacing
-    #     text_rect = self.title_item.boundingRect()
-    #     text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2
-    #     self.title_item.setPos(x, text_y)
+    def setup_icon(self):
+        icon_size = 24
+        padding = 6
+        self.get_icon_node(self.node, icon_size, padding)
+
+        text_x = icon_size + padding
+        text_rect = self.title_item.boundingRect()
+        text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2
+        self.title_item.setPos(text_x, text_y)

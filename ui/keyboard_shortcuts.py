@@ -1,80 +1,107 @@
 import os
 from PySide6.QtWidgets import QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel
-from PySide6.QtGui import QPixmap
+from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt
 from core.traduction import Traduction
 from theme.theme import Theme
 from core.debug import Info
+from core.icons import Icon
 
 
 SHORTCUTS = {
     "general": {
         "title": ("general", "General"),
         "items": [
-            (["ctrl", "s"], "shortcut_save_graph"),
-            (["ctrl", "o"], "shortcut_load_graph"),
-            (["ctrl", "g"], "shortcut_generate_bash"),
-            (["ctrl", "r"], "shortcut_run_bash"),
+            (["Ctrl", "S"], "shortcut_save_graph"),
+            (["Ctrl", "O"], "shortcut_load_graph"),
+            (["Ctrl", "G"], "shortcut_generate_bash"),
+            (["Ctrl", "R"], "shortcut_run_bash"),
         ],
     },
     "edition": {
         "title": ("edition", "Edition"),
         "items": [
-            (["ctrl", "c"], "shortcut_copy_selection"),
-            (["ctrl", "v"], "shortcut_paste"),
-            (["ctrl", "x"], "shortcut_cut_selection"),
-            (["ctrl", "z"], "shortcut_undo"),
-            (["ctrl", "shift", "z"], "shortcut_redo_1"),
-            (["ctrl", "y"], "shortcut_redo_2"),
-            (["ctrl", "a"], "shortcut_select_all"),
-            (["ctrl", "d"], "shortcut_duplicate"),
-            (["del"], "shortcut_delete"),
-            (["ctrl", "space"], "shortcut_node_palette"),
+            (["Ctrl", "C"], "shortcut_copy_selection"),
+            (["Ctrl", "V"], "shortcut_paste"),
+            (["Ctrl", "X"], "shortcut_cut_selection"),
+            (["Ctrl", "Z"], "shortcut_undo"),
+            (["Ctrl", "Shift", "Z"], "shortcut_redo_1"),
+            (["Ctrl", "Y"], "shortcut_redo_2"),
+            (["Ctrl", "A"], "shortcut_select_all"),
+            (["Ctrl", "D"], "shortcut_duplicate"),
+            (["Del"], "shortcut_delete"),
+            (["Ctrl", "Space"], "shortcut_node_palette"),
         ],
     },
     "graph": {
         "title": ("graph", "Graph"),
         "items": [
-            (["c"], "shortcut_comment_box"),
-            (["f"], "shortcut_auto_layout"),
-            (["r"], "shortcut_rebuild_graph"),
-            (["h"], "shortcut_frame_all")
+            (["C"], "shortcut_comment_box"),
+            (["F"], "shortcut_auto_layout"),
+            (["R"], "shortcut_rebuild_graph"),
+            (["H"], "shortcut_frame_all")
         ],
     },
 }
 
 
-class KeyImage(QLabel):
-    def __init__(self, key):
+class KeyImage(QSvgWidget):
+    def __init__(self, key, size):
         super().__init__()
-        path = Info.resource_path(f"assets/icons/keyboard/{key}.png")
-        if not os.path.exists(path):
-            path = Info.resource_path(f"assets/icons/keyboard/unknown.png")
-        pix = QPixmap(path)
-        pix.setDevicePixelRatio(2)
-        # pix = pix.scaled(40, 40, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        self.setPixmap(pix)
-        self.setFixedSize(40, 40)
-        self.setAlignment(Qt.AlignCenter)
+        if key == "Ctrl" or key == "Shift" or key == "Space":
+            width = 2 * size
+            icon = "keycap_large"
+        else:
+            width = size
+            icon = "keycap_common"
+
+        icon = Icon.load_widget(self, "shortcuts", icon, width, size)
         self.setStyleSheet("background: transparent;")
+        self.setMaximumSize(width, size)
+        self.setMinimumSize(width, size)
 
 
 class ShortcutRow(QWidget):
-    def __init__(self, keys, label):
+    def __init__(self, keys, label, category):
         super().__init__()
+        key_size = 24
+        spacing = 6
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 4, 0, 4)
-        layout.setSpacing(6)
+        layout.setSpacing(spacing)
+
+        if category == ("general", "General"):
+            spaceCount = 1
+        elif category == ("edition", "Edition"):
+            spaceCount = 2
+        elif category == ("graph", "Graph"):
+            spaceCount = 0
 
         for i, key in enumerate(keys):
-            layout.addWidget(KeyImage(key))
-            if i < len(keys) - 1:
-                plus = QLabel("+")
-                plus.setStyleSheet(f"color: {Theme.TEXT}; font-size: 15px; background: transparent;")
-                layout.addWidget(plus)
+            key_label = QLabel(key)
+            key_label.setAlignment(Qt.AlignCenter)
+            key_label.setStyleSheet(f"background: transparent; color: {Theme.TEXT_INV};")
 
-        layout.addSpacing(16)
+            if key == "Ctrl" or key == "Shift" or key == "Space":
+                layout.addWidget(KeyImage(key, key_size))
+                key_label.setFixedWidth(key_size * 2)
+                layout.addSpacing((key_size * 2 + spacing) * -1)
+                layout.addWidget(key_label)
+            elif spaceCount == i:
+                layout.addWidget(KeyImage(key, key_size))
+                key_label.setFixedWidth(key_size)
+                layout.addSpacing((key_size + spacing) * -1)
+                layout.addWidget(key_label)
+                layout.addSpacing(key_size)
+            else:
+                layout.addSpacing(key_size / 2)
+                layout.addWidget(KeyImage(key, key_size))
+                key_label.setFixedWidth(key_size)
+                layout.addSpacing((key_size + spacing) * -1)
+                layout.addWidget(key_label)
+                layout.addSpacing(key_size / 2)
 
+        layout.addSpacing((spaceCount - i) * 54 - 12)
         text = QLabel(Traduction.get_trad(label, label))
         text.setStyleSheet(f"font-size: 15px; color: {Theme.TEXT}; background: transparent;")
         layout.addWidget(text)
@@ -125,7 +152,7 @@ class KeyboardShortcutsDialog(QDialog):
         for section in SHORTCUTS.values():
             col = ShortcutColumn(Traduction.get_trad(*section["title"]))
             for keys, text in section["items"]:
-                col.layout.addWidget(ShortcutRow(keys, text))
+                col.layout.addWidget(ShortcutRow(keys, text, section["title"]))
             col.layout.addStretch()
             content.addWidget(col)
 
