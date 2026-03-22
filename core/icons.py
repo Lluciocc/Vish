@@ -19,7 +19,7 @@ class Path:
                 if not os.path.exists(icon_path):
                     icon_path = Info.resource_path(f"assets/icons/{category}/{contrast}/{icon_name}_placeholder.svg")
                     if not os.path.exists(icon_path):
-                        icon_path = Info.resource_path(f"assets/icons/placeholder.svg")
+                        icon_path = Info.resource_path("assets/icons/placeholder.svg")
         return icon_path
 
 
