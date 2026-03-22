@@ -5,7 +5,7 @@
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
   };
 
-  outputs = { nixpkgs, ... } @ inputs:
+  outputs = { self, nixpkgs, ... } @ inputs:
   let
     supportedSystems = [
       "aarch64-darwin"
@@ -86,6 +86,11 @@
       }
     );
   in
+  {
+    overlays.default = final: prev: {
+      vish = self.packages.${prev.stdenv.hostPlatform.system}.vish;
+    };
+  } //
   forAllSystems supportedSystems (
     { pkgs, ... }:
     let
