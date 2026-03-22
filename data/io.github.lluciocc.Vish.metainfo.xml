@@ -44,6 +44,11 @@
   </screenshots>
 
   <releases>
+    <release version="1.1.0" date="2026-03-22">
+      <description>
+        <p>Improve UI/UX and stablity</p>
+      </description>
+    </release>
     <release version="1.0.4" date="2026-03-17">
       <description>
         <p>Improve UI/UX and stablity</p>
