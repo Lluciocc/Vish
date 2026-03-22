@@ -8,6 +8,7 @@ from ui.port_item import PortItem
 from nodes.registry import NODE_REGISTRY
 from core.traduction import Traduction
 from core.icons import Icon
+from core.logger import Logger
 import os
 
 class NodeItem(QGraphicsItem):
@@ -163,7 +164,7 @@ class NodeItem(QGraphicsItem):
         self.update()
         
     def get_icon_node(self, item: Node, icon_size, padding):
-        node = NODE_REGISTRY.get(item.title.lower().replace(" ", "_"))
+        node = NODE_REGISTRY.get(item.node_type)
         if node is not None:
             icon = Icon.load_item(self, f"nodes/{node["category"]}", item.title, icon_size, padding)
 
