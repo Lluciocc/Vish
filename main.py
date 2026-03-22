@@ -312,7 +312,7 @@ class VisualBashEditor(QMainWindow):
         except ValueError as e:
             # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
             msg_box = QMessageBox()
-            msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
+            msg_box.setText(Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
             msg_box.setIcon(QMessageBox.Icon.Critical)
             msg_box.exec()
             raise
@@ -439,7 +439,7 @@ class VisualBashEditor(QMainWindow):
         )
 
         if result.stderr:
-            return f"\x1b[1;31mError:\x1b[0m\n{result.stderr}"
+            return \x1b[1;31mError:\x1b[0m\n{result.stderr}"
 
         return result.stdout
 
@@ -455,7 +455,7 @@ class VisualBashEditor(QMainWindow):
             Debug.Warn(Traduction.get_trad("no_bash_script", "No bash script found to run the graph."))
             return
 
-        temp_script_path = f"temp_script_{int(time.time())}.sh"
+        temp_script_path = temp_script_{int(time.time())}.sh"
         with open(temp_script_path, "w") as f:
             f.write(bash_script)
 
@@ -547,7 +547,7 @@ def main():
     app = QApplication(sys.argv)
     app.setOrganizationName("Lluciocc")
     app.setApplicationName("Vish")
-    icon_path = Info.resource_path(f"assets/icons/Vish.svg")
+    icon_path = Info.resource_path("assets/icons/Vish.svg")
     app.setWindowIcon(QIcon(icon_path))
     editor = VisualBashEditor()
 
