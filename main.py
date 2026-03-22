@@ -106,7 +106,7 @@ class VisualBashEditor(QMainWindow):
         toolbar.addWidget(self.copy_btn)
 
         self.more_btn = QToolButton()
-        self.more_btn.setText("⋮")
+        self.more_btn.setText("☰")
         self.more_btn.setPopupMode(QToolButton.InstantPopup)
         apply_btn_style(self.more_btn)
 
