@@ -5,7 +5,8 @@ from core.debug import Info
 import os
 
 
-class Path:
+class Path:  
+    @staticmethod
     def get_path(category, icon_name):
         category = category.lower().replace(" ", "_")
         icon_name = icon_name.lower().replace(" ", "_")
@@ -24,11 +25,13 @@ class Path:
 
 
 class Icon:
+    @staticmethod
     def load_icon(category, name):
         icon_path = Path.get_path(category, name)
         icon = QIcon(icon_path)
         return icon
 
+    @staticmethod
     def load_item(self, category, name, size, padding):
         icon_path = Path.get_path(category, name)
         icon = QGraphicsSvgItem(icon_path, self)
@@ -39,6 +42,7 @@ class Icon:
         icon_y = (self.HEADER_HEIGHT - bounds.height() * scale) / 2
         icon.setPos(padding, icon_y)
 
+    @staticmethod
     def load_widget(self, category, name, width, height):
         icon_path = Path.get_path(category, name)
         icon = QSvgWidget(icon_path, self)
