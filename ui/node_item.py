@@ -165,7 +165,7 @@ class NodeItem(QGraphicsItem):
     def get_icon_node(self, item: Node, icon_size, padding):
         node = NODE_REGISTRY.get(item.title.lower().replace(" ", "_"))
         if node is not None:
-            icon = Icon.load_item(self, "nodes/"+node["category"], item.title, icon_size, padding)
+            icon = Icon.load_item(self, f"nodes/{node["category"]}", item.title, icon_size, padding)
 
     def setup_icon(self):
         icon_size = 24
