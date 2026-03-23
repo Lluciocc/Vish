@@ -13,7 +13,8 @@ class BashEmitter:
         header = [
             "#!/bin/bash/env bash",
             "",
-            "# Generated from Visual Bash Editor",
+            "# Generated with Visual Bash Editor",
+            "",
             ""
         ]
         if Config.CUSTOM_SHEBANG:
