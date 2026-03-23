@@ -52,7 +52,6 @@ class Serializer:
         for item in graph_view.graph_scene.items():
             if item.__class__.__name__ == "CommentBoxItem":
                 r = item.rect()
-                c = item.brush().color()
                 data["comments"].append(
                     {
                         "x": item.pos().x(),
@@ -60,7 +59,7 @@ class Serializer:
                         "w": r.width(),
                         "h": r.height(),
                         "title": item.title_item.toPlainText(),
-                        "color": [c.red(), c.green(), c.blue(), c.alpha()],
+                        "color_index": item._accent_index,
                         "locked": item.locked,
                     }
                 )

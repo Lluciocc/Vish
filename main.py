@@ -348,8 +348,8 @@ class VisualBashEditor(QMainWindow):
                 title=comment["title"]
             )
             box.setPos(comment["x"], comment["y"])
-            box.setBrush(QColor(*comment["color"]))
             box.set_locked(comment.get("locked", False))
+            box._accent_index = comment.get("color_index", 0)
             self.graph_view.scene().addItem(box)
 
 
