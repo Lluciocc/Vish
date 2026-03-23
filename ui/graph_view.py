@@ -16,7 +16,7 @@ from core.debug import Debug, Info
 from commands.undo_commands import *
 from core.layout import GraphLayoutEngine
 from core.icons import Icon
-import os
+from core.config import Config
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
@@ -282,6 +282,8 @@ class GraphView(QGraphicsView):
             return
         if event.matches(QKeySequence.Undo): # Ctrl+Z
             self.undo_stack.undo()
+            if Config.SYNC_NODES_AND_GEN:
+                self.graph_scene.graph_changed.emit()
             return
 
         if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
@@ -292,6 +294,8 @@ class GraphView(QGraphicsView):
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     item.setSelected(True)
+            if Config.SYNC_NODES_AND_GEN:
+                self.graph_scene.graph_changed.emit()
             return
         if event.matches(QKeySequence.Cut): # Ctrl+X
             self.copy_selection()
@@ -313,6 +317,8 @@ class GraphView(QGraphicsView):
                 for it in node_items:
                     self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
                 self.undo_stack.endMacro()
+            if Config.SYNC_NODES_AND_GEN:
+                self.graph_scene.graph_changed.emit()
             event.accept()
             return
         if event.key() == Qt.Key_F: # F
