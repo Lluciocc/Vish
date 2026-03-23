@@ -24,8 +24,12 @@
   <launchable type="desktop-id">io.github.lluciocc.Vish.desktop</launchable>
 
   <url type="homepage">https://github.com/Lluciocc/Vish</url>
+  <url type="bugtracker">https://github.com/Lluciocc/Vish/issues</url>
   <url type="vcs-browser">https://github.com/Lluciocc/Vish</url>
-
+  <url type="contribute">https://github.com/Lluciocc/Vish/wiki/Contributing</url>
+  <url type="translate">https://github.com/Lluciocc/Vish/wiki/Contributing#translating</url>
+  <url type="donation">https://github.com/Lluciocc/Vish?sponsor=1</url>
+  
   <developer id="io.github.lluciocc">
     <name>Lluciocc</name>
   </developer>
