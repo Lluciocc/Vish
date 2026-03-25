@@ -310,17 +310,29 @@ class GraphView(QGraphicsView):
             self.copy_selection()
             self.paste()
             return
-        if event.matches(QKeySequence.Delete): # Ctrl+Delete
-            node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
-            if node_items:
-                self.undo_stack.beginMacro("Delete")
+        if event.matches(QKeySequence.Delete):
+            selected_items = self.scene().selectedItems()
+
+            node_items = [it for it in selected_items if isinstance(it, NodeItem)]
+            comment_items = [it for it in selected_items if isinstance(it, CommentBoxItem)]
+
+            if node_items or comment_items:
+                self.undo_stack.beginMacro("Delete") # both macro in the same key seq
+
                 for it in node_items:
                     self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
+
+                for it in comment_items:
+                    self.undo_stack.push(RemoveCommentCommand(self, it))
+
                 self.undo_stack.endMacro()
-            if Config.SYNC_NODES_AND_GEN:
-                self.graph_scene.graph_changed.emit()
-            event.accept()
-            return
+
+                if Config.SYNC_NODES_AND_GEN:
+                    self.graph_scene.graph_changed.emit()
+
+                event.accept()
+                return
+            
         if event.key() == Qt.Key_F: # F
             self.auto_layout()
             return
@@ -339,7 +351,7 @@ class GraphView(QGraphicsView):
 
         box = CommentBoxItem(title="Comment")
         box.setPos(scene_pos)
-        self.scene().addItem(box)
+        self.undo_stack.push(AddCommentCommand(self, box))
 
     def frame_all(self):
         rect = self.scene().itemsBoundingRect()

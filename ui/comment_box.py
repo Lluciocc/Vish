@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
+from commands.undo_commands import *
 from core.logger import Logger
 
 
@@ -309,3 +310,9 @@ class CommentBoxItem(QGraphicsRectItem):
     def setRect(self, rect: QRectF):
         super().setRect(rect)
         self._update_title_position()
+
+    def _delete_self(self):
+        if self.scene() and self.scene().views():
+            view = self.scene().views()[0]
+            if hasattr(view, "undo_stack"):
+                view.undo_stack.push(RemoveCommentCommand(view, self))

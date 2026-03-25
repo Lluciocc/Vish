@@ -183,3 +183,34 @@ class PasteCommand(QUndoCommand):
             self.view.remove_node_item(nid)
         self.created_node_ids.clear()
         self._id_map.clear()
+
+class AddCommentCommand(QUndoCommand):
+    def __init__(self, view, comment_item):
+        super().__init__("Add Comment")
+        self.view = view
+        self.scene = view.scene()
+        self.comment = comment_item
+
+    def redo(self):
+        if self.comment.scene() is None:
+            self.scene.addItem(self.comment)
+
+    def undo(self):
+        if self.comment.scene() is self.scene:
+            self.scene.removeItem(self.comment)
+
+class RemoveCommentCommand(QUndoCommand):
+    def __init__(self, view, comment_item):
+        super().__init__("Remove Comment")
+        self.view = view
+        self.scene = view.scene()
+        self.comment = comment_item
+        self.pos = comment_item.pos()
+
+    def redo(self):
+        if self.comment.scene() is self.scene:
+            self.scene.removeItem(self.comment)
+
+    def undo(self):
+        self.comment.setPos(self.pos)
+        self.scene.addItem(self.comment)
