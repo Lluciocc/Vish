@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
+from core.logger import Logger
 
 
 ACCENT_COLORS = [
@@ -200,6 +201,10 @@ class CommentBoxItem(QGraphicsRectItem):
         super().hoverMoveEvent(event)
 
     def contextMenuEvent(self, event):
+        if not self._in_header(event.pos()):
+            event.ignore()
+            return
+
         menu = QMenu()
         lock_action = menu.addAction("Unlock" if self.locked else "Lock")
         menu.addSeparator()
@@ -228,24 +233,26 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def mousePressEvent(self, event):
         if self.locked:
-            super().mousePressEvent(event)
+            event.ignore()
             return
 
-        if self.title_item.isUnderMouse():
-            event.accept()
+        corner = self._get_resize_corner(event.pos())
+        in_header = self._in_header(event.pos())
+
+        if not corner and not in_header and not self.title_item.isUnderMouse():
+            event.ignore()
             return
 
-        self.resize_corner = self._get_resize_corner(event.pos())
-        self.resizing = self.resize_corner is not None
+        self.resize_corner = corner
+        self.resizing = corner is not None
+
         self.drag_start_pos = event.screenPos()
         self.original_rect = QRectF(self.rect())
         self.original_item_pos = self.pos()
 
-        in_header = self._in_header(event.pos())
-        self._dragging_header = in_header and not self.resizing
-        self.setFlag(QGraphicsItem.ItemIsMovable, self._dragging_header or self.resizing)
-
-        if self._dragging_header:
+        if in_header and not self.resizing:
+            self._dragging_header = True
+            self.setFlag(QGraphicsItem.ItemIsMovable, True)
             self.setCursor(Qt.ClosedHandCursor)
 
         super().mousePressEvent(event)
