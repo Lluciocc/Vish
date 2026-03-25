@@ -202,7 +202,13 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def contextMenuEvent(self, event):
         if not self._in_header(event.pos()):
-            event.ignore()
+            if self.scene() and self.scene().views():
+                view = self.scene().views()[0]
+
+                scene_pos = event.scenePos()
+                view.show_node_palette(scene_pos)
+
+            event.accept()
             return
 
         menu = QMenu()
