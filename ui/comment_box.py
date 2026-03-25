@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
-from PySide6.QtGui import QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
+from PySide6.QtGui import QCursor, QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
 from commands.undo_commands import *
 from core.logger import Logger
 
@@ -98,10 +98,6 @@ class CommentBoxItem(QGraphicsRectItem):
     def _in_header(self, pos: QPointF) -> bool:
         r = self.rect()
         return QRectF(r.x(), r.y(), r.width(), HEADER_H).contains(pos)
-
-    def _delete_self(self):
-        if self.scene():
-            self.scene().removeItem(self)
 
     def set_locked(self, locked: bool):
         self.locked = locked
@@ -234,7 +230,8 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def keyPressEvent(self, event):
         if event.matches(QKeySequence.Delete):
-            self._delete_self()
+            if self._in_header(self.mapFromScene(self.scene().views()[0].mapToScene(self.scene().views()[0].mapFromGlobal(QCursor.pos())))):
+                self._delete_self()
             return
         super().keyPressEvent(event)
 
