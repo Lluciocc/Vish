@@ -127,6 +127,9 @@ class SettingsDialog(QDialog):
         self.lang_combo.addItem(
             "Deutsch", "de"
         )
+        self.lang_combo.addItem(
+            "Português (Brasil)", "ptbr"
+        )
 
         self.lang_combo.setCurrentIndex(
             self.lang_combo.findData(Config.lang)
