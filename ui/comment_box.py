@@ -25,7 +25,6 @@ HEADER_H = 36
 # TODO: add options for font, opacity, etc. (maybe in a future update)
 # TODO: Fix Z order
 # TODO: Move node inside comment box when dragging the box
-# TODO: Custom colors
 # TODO: Works with Config.AUTO_SAVE
 
 class CommentBoxItem(QGraphicsRectItem):
@@ -47,6 +46,10 @@ class CommentBoxItem(QGraphicsRectItem):
         self._hover = False
         self._accent_index = accent_index % len(ACCENT_COLORS)
         self._dragging_header = False
+        self.move_children = True
+        self._pin_hover = False
+
+        self._captured_nodes = []
 
         self.setPen(Qt.NoPen)
         self.setBrush(Qt.NoBrush)
@@ -121,6 +124,15 @@ class CommentBoxItem(QGraphicsRectItem):
         self._accent_index = index % len(ACCENT_COLORS)
         self.update()
 
+    def itemChange(self, change, value):
+        if change == QGraphicsItem.ItemPositionChange and self._dragging_header and self.move_children:
+            delta = value - self.pos()
+
+            for node in self._captured_nodes:
+                node.setPos(node.pos() + delta)
+
+        return super().itemChange(change, value)
+
     def paint(self, painter: QPainter, option, widget=None):
         painter.setRenderHint(QPainter.Antialiasing)
         r = self.rect()
@@ -129,8 +141,7 @@ class CommentBoxItem(QGraphicsRectItem):
         body_path.addRoundedRect(r, RADIUS, RADIUS)
         painter.setPen(Qt.NoPen)
         base_bg = QColor(18, 20, 28, 185)
-        tinted_bg = self.blend_colors(base_bg, self.accent, 0.12) 
-
+        tinted_bg = self.blend_colors(base_bg, self.accent, 0.12)
         painter.setBrush(QBrush(tinted_bg))
         painter.drawPath(body_path)
 
@@ -150,6 +161,61 @@ class CommentBoxItem(QGraphicsRectItem):
             QPointF(r.x() + RADIUS, r.y() + HEADER_H),
             QPointF(r.right() - RADIUS, r.y() + HEADER_H),
         )
+
+        pin_size = 16
+        pin_rect = QRectF(
+            r.right() - 26,
+            r.y() + (HEADER_H - pin_size) / 2,
+            pin_size,
+            pin_size
+        )
+        self._pin_rect = pin_rect
+        center = pin_rect.center()
+        cx = center.x()
+        cy = center.y()
+
+        is_active = self.move_children
+
+        pin_bg = QColor(255, 255, 255, 35 if self._pin_hover else 18)
+        painter.setBrush(QBrush(pin_bg))
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(pin_rect, 4, 4)
+
+        if is_active:
+            icon_color = QColor(self.accent)
+            icon_color.setAlpha(220)
+        else:
+            icon_color = QColor(160, 160, 170, 110)
+
+        pen = QPen(icon_color, 1.3, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin)
+        painter.setPen(pen)
+        painter.setBrush(Qt.NoBrush)
+
+        head_rect = QRectF(cx - 3.5, cy - 6, 7, 4.5)
+        painter.setBrush(QBrush(icon_color))
+        painter.setPen(Qt.NoPen)
+        painter.drawRoundedRect(head_rect, 2, 2)
+
+        tip_path = QPainterPath()
+        tip_path.moveTo(cx - 3, cy - 1)
+        tip_path.lineTo(cx + 3, cy - 1)
+        tip_path.lineTo(cx, cy + 4)
+        tip_path.closeSubpath()
+        painter.setBrush(QBrush(icon_color))
+        painter.drawPath(tip_path)
+
+        stem_color = QColor(icon_color)
+        stem_color.setAlpha(icon_color.alpha() // 2)
+        painter.setPen(QPen(stem_color, 1.1, Qt.SolidLine, Qt.RoundCap))
+        painter.drawLine(QPointF(cx, cy - 1.0), QPointF(cx, cy - 1.2))
+
+        if not is_active:
+            slash_color = QColor(200, 100, 100, 120)
+            painter.setPen(QPen(slash_color, 1.0, Qt.SolidLine, Qt.RoundCap))
+            painter.drawLine(
+                QPointF(pin_rect.left() + 2.5, pin_rect.bottom() - 2.5),
+                QPointF(pin_rect.right() - 2.5, pin_rect.top() + 2.5),
+            )
 
         a = self.accent
         transparent = QColor(a.red(), a.green(), a.blue(), 0)
@@ -188,6 +254,7 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def hoverLeaveEvent(self, event):
         self._hover = False
+        self._pin_hover = False
         self.setCursor(Qt.ArrowCursor)
         self.update()
         super().hoverLeaveEvent(event)
@@ -200,12 +267,20 @@ class CommentBoxItem(QGraphicsRectItem):
             "tr": Qt.SizeBDiagCursor,
             "bl": Qt.SizeBDiagCursor,
         }
-        if corner:
+        if hasattr(self, "_pin_rect") and self._pin_rect.contains(event.pos()):
+            self._pin_hover = True
+            self.setCursor(Qt.PointingHandCursor)
+            self.update()
+        elif corner:
+            self._pin_hover = False
             self.setCursor(cursors[corner])
         elif self._in_header(event.pos()):
+            self._pin_hover = False
             self.setCursor(Qt.OpenHandCursor)
         else:
+            self._pin_hover = False
             self.setCursor(Qt.ArrowCursor)
+        self.update()
         super().hoverMoveEvent(event)
 
     def contextMenuEvent(self, event):
@@ -251,6 +326,18 @@ class CommentBoxItem(QGraphicsRectItem):
             event.ignore()
             return
 
+        if hasattr(self, "_pin_rect") and self._pin_rect.contains(event.pos()):
+            self.move_children = not self.move_children
+            self.update()
+
+            self.setCursor(Qt.PointingHandCursor)
+            event.accept()
+            return
+        else:
+            if self._pin_hover:
+                self._pin_hover = False
+                self.update()
+
         corner = self._get_resize_corner(event.pos())
         in_header = self._in_header(event.pos())
 
@@ -269,6 +356,9 @@ class CommentBoxItem(QGraphicsRectItem):
             self._dragging_header = True
             self.setFlag(QGraphicsItem.ItemIsMovable, True)
             self.setCursor(Qt.ClosedHandCursor)
+
+            if self.move_children:
+                self._capture_nodes()
 
         super().mousePressEvent(event)
 
@@ -306,6 +396,7 @@ class CommentBoxItem(QGraphicsRectItem):
         self._update_title_position()
 
     def mouseReleaseEvent(self, event):
+        self._captured_nodes = []
         self.resizing = False
         self.resize_corner = None
         self._dragging_header = False
@@ -324,3 +415,20 @@ class CommentBoxItem(QGraphicsRectItem):
             view = self.scene().views()[0]
             if hasattr(view, "undo_stack"):
                 view.undo_stack.push(RemoveCommentCommand(view, self))
+
+    def _capture_nodes(self):
+        self._captured_nodes = []
+
+        if not self.scene():
+            return
+
+        from ui.node_item import NodeItem
+
+        rect = self.sceneBoundingRect()
+
+        for item in self.scene().items():
+            if isinstance(item, NodeItem):
+                center = item.sceneBoundingRect().center()
+
+                if rect.contains(center):
+                    self._captured_nodes.append(item)
