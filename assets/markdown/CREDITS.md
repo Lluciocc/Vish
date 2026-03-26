@@ -4,12 +4,14 @@
 [kernbyte](https://github.com/kernbyte)            
 [mahaveergurjar](https://github.com/mahaveergurjar)                       
 [EmiyaSyahriel](https://github.com/EmiyaSyahriel)
+[Claudiney-Santos](https://github.com/Claudiney-Santos)
 
 ### Translation Contributor
 
 [bonaccolto90](https://github.com/bonaccolto90) for Italian translation         
 [kernbyte](https://github.com/kernbyte) for Arabian translation                      
-[SpurGetreide54](https://github.com/SpurGetreide54) for German translation                             
+[SpurGetreide54](https://github.com/SpurGetreide54) for German translation     
+[Claudiney-Santos](https://github.com/Claudiney-Santos) for Brazilian (Portuguese) translation                                  
 
 ### Acknowledgements
 
