@@ -67,6 +67,14 @@ class CommentBoxItem(QGraphicsRectItem):
     def accent(self) -> QColor:
         return ACCENT_COLORS[self._accent_index]
 
+    # https://noobtomaster.com/computer-graphics/color-blending-and-color-interpolation/
+    def blend_colors(self, c1: QColor, c2: QColor, ratio: float) -> QColor: # Blends two colors together by a given ratio (0.0 - 1.0)
+        r = c1.red()   * (1 - ratio) + c2.red()   * ratio
+        g = c1.green() * (1 - ratio) + c2.green() * ratio
+        b = c1.blue()  * (1 - ratio) + c2.blue()  * ratio
+        a = c1.alpha() * (1 - ratio) + c2.alpha() * ratio
+        return QColor(int(r), int(g), int(b), int(a))
+
     def _update_title_position(self):
         self.title_item.setTextWidth(-1)
         fm_h = self.title_item.boundingRect().height()
@@ -120,7 +128,10 @@ class CommentBoxItem(QGraphicsRectItem):
         body_path = QPainterPath()
         body_path.addRoundedRect(r, RADIUS, RADIUS)
         painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(COLOR_BG))
+        base_bg = QColor(18, 20, 28, 185)
+        tinted_bg = self.blend_colors(base_bg, self.accent, 0.12) 
+
+        painter.setBrush(QBrush(tinted_bg))
         painter.drawPath(body_path)
 
         header_rect = QRectF(r.x(), r.y(), r.width(), HEADER_H)
