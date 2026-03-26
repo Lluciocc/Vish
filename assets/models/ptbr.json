@@ -137,7 +137,7 @@
 
     "return": "Retornar",
     "return_label": "Retornar",
-    "return_desc": "Retorna um valor de uma função.",
+    "return_desc": "Retorna o valor de uma função.",
     "return_tooltip": "Retorna um valor e finaliza a execução da função.",
 
     "number_constant": "Constante numérica",
@@ -190,18 +190,18 @@
     "equals_desc": "Verifica se dois valores são iguais.",
     "equals_tooltip": "Testa igualdade entre dois valores.",
 
-    "logical_and": "AND",
-    "logical_and_label": "AND",
+    "logical_and": "Operador AND",
+    "logical_and_label": "Operador AND",
     "logical_and_desc": "Retorna verdadeiro se ambas condições são verdadeiras.",
     "logical_and_tooltip": "Operador lógico AND.",
 
-    "logical_or": "OR",
-    "logical_or_label": "OR",
+    "logical_or": "Operador OR",
+    "logical_or_label": "Operador OR",
     "logical_or_desc": "Retorna verdadeiro se pelo menos uma das condições é verdadeira.",
     "logical_or_tooltip": "Operador lógico OR.",
 
-    "logical_not": "NOT",
-    "logical_not_label": "NOT",
+    "logical_not": "Operador NOT",
+    "logical_not_label": "Operador NOT",
     "logical_not_desc": "Inverte o resultado de uma condição.",
     "logical_not_tooltip": "Inverte uma condição lógica.",
 
@@ -212,7 +212,7 @@
 
     "get_variable": "Acessar variável",
     "get_variable_label": "Acessar variável",
-    "get_variable_desc": "Recuperar o valor de uma variável.",
+    "get_variable_desc": "Recupera o valor de uma variável.",
     "get_variable_tooltip": "Acessa o valor de uma variável existente.",
 
     "file_exists": "Arquivo existe",
