@@ -47,7 +47,7 @@
 
     "about": "Sobre",
     "app_name": "Editor Visual de Bash",
-    "app_tagline": "Uma maneira visual de construir script Bash",
+    "app_tagline": "Uma maneira visual de construir scripts Bash",
 
     "about_website": "Website",
     "about_report": "Reportar um problema",
@@ -122,13 +122,13 @@
 
     "while": "Laço WHILE",
     "while_label": "Laço WHILE",
-    "while_desc": "Repete a execução enquanto uma condição é verdade.",
+    "while_desc": "Repete a execução enquanto a condição é verdadeira.",
     "while_tooltip": "Continua a execução enquanto a condição é satisfeita.",
 
     "function": "Função",
     "function_label": "Função",
     "function_desc": "Define uma função bash reutilizável.",
-    "function_tooltip": "Permite encapsular instruções dentre de uma função.",
+    "function_tooltip": "Permite encapsular instruções dentro de uma função.",
 
     "call": "Chamar função",
     "call_label": "Chamar função",
