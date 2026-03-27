@@ -20,7 +20,7 @@ class Debug:
         if not Debug._parent:
             from core.config import Config 
             if Config.DEBUG:
-                Logger.LogError("Debug not initialized with parent widget, using console for output")
+                Logger.LogError("Debug not initialized with parent widget, using console for output.")
                 Debug.init_error = True
             return
 
