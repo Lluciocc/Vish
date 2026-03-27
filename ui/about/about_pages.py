@@ -165,6 +165,11 @@ class AboutMainPage(QWidget):
 
         g2 = AboutGroup()
         g2.add_row(AboutRow(
+            Traduction.get_trad("about_theme_repo", "Themes Collection Repository"),
+            "↗",
+            lambda: webbrowser.open("https://github.com/Lluciocc/vish-theme-collection")
+        ))
+        g2.add_row(AboutRow(
             Traduction.get_trad("about_questions", "Frequently Asked Questions"),
             "↗",
             lambda: webbrowser.open("https://github.com/Lluciocc/Vish/wiki#faqs")
