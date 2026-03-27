@@ -9,7 +9,7 @@ Vish is a graphical editor for creating and managing Bash scripts using a node-b
 - Run generated Bash scripts directly from the editor
 - Project system to create and manage multiple projects
 - Various user friendly features to enhance the scripting experience
-- Themes support (Light/Dark/Purple/Breeze Dark)
+- Custom themes and built in theme (Dark, White, Purple)
 - Multi-language support
 - Settings to customize the editor behavior and appearance
 - Partial Windows support (some features may be limited or unavailable on Windows)
@@ -38,6 +38,10 @@ You can download the latest AppImage from the [releases page](https://github.com
 chmod +x Vish-*.AppImage
 ./Vish-*.AppImage
 ```
+
+## Custom theme by the community
+A separate repository is available for community-made and custom themes.
+https://github.com/Lluciocc/vish-theme-collection/
 
 ## Credits
 You can find the list of contributors and acknowledgements in the [CREDITS file](assets/markdown/CREDITS.md).
