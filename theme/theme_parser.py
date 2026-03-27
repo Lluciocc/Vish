@@ -136,8 +136,17 @@ def load_theme(filepath: str) -> type:
 
     theme_path = _resolve_theme_path(filepath)
 
-    with open(theme_path, "r", encoding="utf-8") as f:
-        data = parse_yaml(f.read())
+    try:
+        with open(theme_path, "r", encoding="utf-8") as f:
+            data = parse_yaml(f.read())
+    except FileNotFoundError:
+        Debug.Error(f"Theme file not found: {theme_path}")
+        load_theme("dark")  # Fallback to dark theme
+        return Theme
+    except Exception as e:
+        Debug.Error(f"Failed to load theme from {theme_path}: {e}")
+        load_theme("dark")
+        return Theme
 
     _populate_theme(data)
     _apply_stylesheet()
