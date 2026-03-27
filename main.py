@@ -39,7 +39,7 @@ from core.traduction import Traduction
 from core.node_color import NodeColor
 from core.projects import ProjectManager
 from ui.welcome import WelcomeScreen
-from theme.theme import Theme, set_dark_theme, set_purple_theme, set_white_theme, set_breeze_dark_theme
+from theme.theme_parser import load_theme, load_every_theme
 
 class NodeFactory:
     @staticmethod
@@ -63,14 +63,6 @@ class VisualBashEditor(QMainWindow):
         self.create_initial_graph()
     
     def setup_ui(self):
-        if Config.theme == "dark":
-            set_dark_theme()
-        elif Config.theme == "purple":
-            set_purple_theme()
-        elif Config.theme == "white":
-            set_white_theme()
-        elif Config.theme == "breeze_dark":
-            set_breeze_dark_theme()
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
@@ -540,17 +532,19 @@ class VisualBashEditor(QMainWindow):
 
 def main():
     ConfigManager.load_config() # Load config before setting theme and language
-    # TODO: add user configuration from settings
     NodeColor.set_node_colors()
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)
+
+    load_theme(Config.theme)
     app.setOrganizationName("Lluciocc")
     app.setApplicationName("Vish")
     icon_path = Info.resource_path("assets/icons/Vish.svg")
     app.setWindowIcon(QIcon(icon_path))
     editor = VisualBashEditor()
 
+    load_every_theme()
     Debug.init(editor)
     editor.show()
 

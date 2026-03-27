@@ -1,0 +1,12 @@
+name: BreezeDark
+description: Breeze Dark theme inspired from KDE Breeze dark palette.
+
+theme:
+  TYPE: "dark"
+  BACKGROUND: "#141618"
+  PANEL: "#292C30"
+  TEXT: "#FCFCFC"
+  TEXT_INV: "#030303"
+  BUTTON: "#57595C"
+  BUTTON_HOVER: "#3584E4"
+  BUTTON_PRESSED: "#034D7A"
