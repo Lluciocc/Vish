@@ -1,4 +1,5 @@
-<svg viewBox="0 0 256 256"><defs
+<svg viewBox="0 0 256 256"
+     xmlns="http://www.w3.org/2000/svg"><defs
      id="defs1"><linearGradient
        id="0"><stop
          style="stop-color:#d34242"
@@ -60,7 +61,7 @@
          offset="0.547"/><stop
          style="stop-color:#14abcc"
          offset="0.595"/></linearGradient><linearGradient
-       xlink:href="#9"
+       href="#9"
        id="10"
        x1="23.5"
        y1="3"
@@ -68,7 +69,7 @@
        y2="14.5"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(8,0,0,8,-31.5,-26.5)" /><linearGradient
-       xlink:href="#8"
+       href="#8"
        id="11"
        gradientUnits="userSpaceOnUse"
        x1="23.5"
@@ -76,7 +77,7 @@
        x2="23.5"
        y2="3"
        gradientTransform="matrix(8,0,0,8,-31.5,-41.5)" /><linearGradient
-       xlink:href="#6"
+       href="#6"
        id="12"
        gradientUnits="userSpaceOnUse"
        x1="23.5"
@@ -84,7 +85,7 @@
        x2="23.5"
        y2="14.5"
        gradientTransform="matrix(8,0,0,8,23.5,41.5)" /><linearGradient
-       xlink:href="#7"
+       href="#7"
        id="13"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(8,0,0,8,23,25.5)"
@@ -92,7 +93,7 @@
        y1="14.5"
        x2="23.5"
        y2="3" /><linearGradient
-       xlink:href="#4"
+       href="#4"
        id="14"
        gradientUnits="userSpaceOnUse"
        x1="23.5"
@@ -100,7 +101,7 @@
        x2="23.5"
        y2="14.5"
        gradientTransform="matrix(8,0,0,8,16.5,100.5)" /><linearGradient
-       xlink:href="#5"
+       href="#5"
        id="15"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(8,0,0,8,16,84.5)"
@@ -108,7 +109,7 @@
        y1="14.5"
        x2="23.5"
        y2="3" /><linearGradient
-       xlink:href="#2"
+       href="#2"
        id="16"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(20,0,0,20,-353.5,-39)"
@@ -116,7 +117,7 @@
        y1="3"
        x2="23.5"
        y2="14.5" /><linearGradient
-       xlink:href="#3"
+       href="#3"
        id="17"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(20,0,0,20,-353.5,-75)"
@@ -124,7 +125,7 @@
        y1="14.5"
        x2="23.5"
        y2="3" /><linearGradient
-       xlink:href="#0"
+       href="#0"
        id="18"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(8,0,0,8,-44.5,159.5)"
@@ -132,7 +133,7 @@
        y1="3"
        x2="23.5"
        y2="14.5" /><linearGradient
-       xlink:href="#1"
+       href="#1"
        id="19"
        gradientUnits="userSpaceOnUse"
        gradientTransform="matrix(8,0,0,8,-44.5,144.5)"
