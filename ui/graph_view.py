@@ -679,7 +679,7 @@ class GraphView(QGraphicsView):
         self.frame_btn.setFixedSize(36, 36)
         self.frame_btn.setCursor(Qt.PointingHandCursor)
         self.frame_btn.setIcon(self.get_icon("frame"))
-        self.frame_btn.setIconSize(self.frame_btn.size() * 0.6)
+        self.frame_btn.setIconSize(self.frame_btn.size() * 0.8125)
 
         self.frame_btn.setStyleSheet(f"""
             QPushButton {{
