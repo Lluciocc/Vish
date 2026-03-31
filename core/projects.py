@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 import json
 from core.debug import Info
+from core.logger import Logger
 
 class Project:
     NAME = ""
@@ -121,3 +122,53 @@ class ProjectManager:
         recents = recents[:self.MAX_RECENTS]
 
         self.recents_file.write_text(json.dumps(recents, indent=4))
+
+    def rename_project(self, old_path: Path, new_name: str) -> Path:
+        old_path = old_path.resolve()
+        new_path = old_path.parent / new_name
+
+        if not old_path.exists():
+            raise FileNotFoundError("Project folder not found")
+
+        if new_path.exists():
+            raise FileExistsError("A project with this name already exists")
+
+        if any(c in new_name for c in r'<>:"/\|?*'):
+            raise ValueError("Invalid project name")
+
+        if self.current_project_path and self.current_project_path.resolve() == old_path:
+            raise RuntimeError("Cannot rename currently opened project")
+
+        renamed = False
+
+        try:
+            old_path.rename(new_path) # Rename the folder
+            renamed = True
+
+            # Update in project.json 
+            project_file = new_path / "project.json"
+            if project_file.exists():
+                data = json.loads(project_file.read_text())
+                data["name"] = new_name
+                project_file.write_text(json.dumps(data, indent=4))
+
+            # Update in recents
+            if self.recents_file.exists():
+                recents = json.loads(self.recents_file.read_text())
+            else:
+                recents = []
+            recents = [str(new_path) if p == str(old_path) else p for p in recents]
+            self.recents_file.write_text(json.dumps(recents, indent=4))
+
+            return new_path
+
+        except Exception as e: # were trying to rename but something went wrong, attempt to rollback if we already renamed
+            if renamed:
+                try:
+                    new_path.rename(old_path)
+                except Exception:
+                    Logger.LogError(f"Failed to rollback project rename from {new_path} to {old_path} after an error occurred: {e}")
+                    raise RuntimeError(
+                        f"Rename failed and rollback also failed.\nOriginal error: {e}"
+                    )
+            raise e

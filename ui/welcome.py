@@ -367,13 +367,10 @@ class WelcomeScreen(QDialog):
             self.recent_list.addItem(placeholder)
 
     def _rename_project(self, path_str: str, new_name: str):
-        project_file = Path(path_str) / "project.json"
-        if not project_file.exists():
-            return
         try:
-            data = json.loads(project_file.read_text())
-            data["name"] = new_name
-            project_file.write_text(json.dumps(data, indent=4))
+            self.project_manager.rename_project(Path(path_str), new_name)
+            self.populate_recent_projects()
+
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
 
