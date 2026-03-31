@@ -215,7 +215,7 @@ class WelcomeScreen(QDialog):
         main_layout.setSpacing(16)
         main_layout.setContentsMargins(40, 32, 40, 32)
 
-        title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user()}")
+        title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user().capitalize()}")
         title_font = QFont()
         title_font.setPointSize(20)
         title_font.setBold(True)
