@@ -34,6 +34,7 @@ class ZoomLabel(QLabel):
 
 class GraphView(QGraphicsView):
     connection_request = Signal(Port, Port)
+    clear_property_panel_request = Signal()
 
     def __init__(self, graph, editor):
         super().__init__()
@@ -282,12 +283,15 @@ class GraphView(QGraphicsView):
             return
         if event.matches(QKeySequence.Undo): # Ctrl+Z
             self.undo_stack.undo()
+            self.clear_property_panel_request.emit()
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
             return
 
         if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
             self.undo_stack.redo()
+            self.clear_property_panel_request.emit()
+
             return
         if event.matches(QKeySequence.SelectAll): # Ctrl+A
             self.scene().clearSelection()
@@ -311,6 +315,7 @@ class GraphView(QGraphicsView):
             self.paste()
             return
         if event.matches(QKeySequence.Delete):
+            self.clear_property_panel_request.emit()
             selected_items = self.scene().selectedItems()
 
             node_items = [it for it in selected_items if isinstance(it, NodeItem)]

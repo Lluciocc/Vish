@@ -177,6 +177,7 @@ class VisualBashEditor(QMainWindow):
         start_node.y = 100
         self.graph.add_node(start_node)
         self.graph_view.add_node_item(start_node)
+        self.property_panel.set_node(start_node)
     
     def add_node(self, node_type: str):
         node = self.node_factory.create_node(node_type)
@@ -324,6 +325,7 @@ class VisualBashEditor(QMainWindow):
 
         self._connect_signals()
         self.property_panel.graph_view = self.graph_view
+        self.clear_property_panel()
 
         for node in self.graph.nodes.values():
             self.graph_view.add_node_item(node)
@@ -346,6 +348,8 @@ class VisualBashEditor(QMainWindow):
             box._accent_index = comment.get("color_index", 0)
             self.graph_view.scene().addItem(box)
 
+    def clear_property_panel(self):
+        self.property_panel.clear()
 
     def auto_save(self):
         if Config.AUTO_SAVE:
@@ -355,6 +359,7 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.graph_scene.graph_changed.connect(self.generate_bash)
         self.graph_view.graph_scene.graph_changed.connect(self.auto_save)
         self.graph_view.graph_scene.node_selected.connect(self.property_panel.set_node)
+        self.graph_view.clear_property_panel_request.connect(self.clear_property_panel)
 
     def run_pty(self, script_path: str) -> str:
         master_fd, slave_fd = pty.openpty()
