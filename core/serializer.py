@@ -20,7 +20,10 @@ class Serializer:
 
     @staticmethod
     def serialize(graph: Graph, graph_view) -> str:
-        data = {"version": Serializer.VERSION, "nodes": [], "edges": [], "comments": []}
+        # Viewport
+        center = graph_view.mapToScene(graph_view.viewport().rect().center())
+
+        data = {"version": Serializer.VERSION, "nodes": [], "edges": [], "comments": [], "viewport_pos": {"x": center.x(), "y": center.y(), "zoom": graph_view.scale_factor}}
 
         for node in graph.nodes.values():
             node_data = {
@@ -99,7 +102,7 @@ class Serializer:
             target = port_map.get(edge_data["target"])
             if source and target:
                 graph.add_edge(source, target)
-        return graph, data.get("comments", [])
+        return graph, data.get("comments", []), data.get("viewport_pos", {"x": 0, "y": 0, "zoom": 1.0})
 
     def serialize_node(self, node):
         return {

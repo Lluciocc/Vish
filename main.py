@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QVBoxLayout,
                                QWidget, QPushButton, QHBoxLayout, QTextEdit,
                                QSplitter, QFileDialog, QToolButton, QMenu, QDialog,
                                QMessageBox)
-from PySide6.QtCore import Qt, QRectF
+from PySide6.QtCore import QPointF, QTimer, Qt, QRectF
 from PySide6.QtGui import QColor, QKeySequence, QIcon
 from core.graph import Graph
 from core.bash_emitter import BashEmitter
@@ -303,7 +303,7 @@ class VisualBashEditor(QMainWindow):
             json_data = f.read()
 
         try:
-            self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
+            self.graph, comments, viewport = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
             # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
             msg_box = QMessageBox()
@@ -312,6 +312,8 @@ class VisualBashEditor(QMainWindow):
             msg_box.exec()
             raise
 
+        if Config.DEBUG:
+            Logger.LogMessage(f"Loaded project from {graph_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
@@ -336,7 +338,17 @@ class VisualBashEditor(QMainWindow):
         for comment in comments:
             self.load_comment(comment)
 
+        # Restore viewport
+        if Config.DEBUG:
+            Logger.LogMessage(f"Restoring viewport position: x={viewport.get('x', 0)}, y={viewport.get('y', 0)}, zoom={viewport.get('zoom', 1.0)}")
+        QTimer.singleShot(0, lambda: self._restore_viewport(viewport))
+
         splitter.setSizes([900, 300, 400])
+
+    def _restore_viewport(self, viewport):
+        center = QPointF(viewport.get("x", 0), viewport.get("y", 0))
+        self.graph_view.set_zoom(viewport.get("zoom", 1.0))
+        self.graph_view.centerOn(center)
 
     def load_comment(self, comment):
             box = CommentBoxItem(
