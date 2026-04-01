@@ -1,4 +1,5 @@
 ### Code Contributor
+[Lluciocc](https://github.com/Lluciocc)
 [Half-and-Xat](https://github.com/Half-and-Xat)                             
 [GamerXD8991](https://github.com/GamerXD8991)                                   
 [kernbyte](https://github.com/kernbyte)            
@@ -15,10 +16,11 @@
 
 ### Acknowledgements
 
-Inspired by Unreal Engine's Blueprint system    
-Every icon are from [Pictogrammers](https://pictogrammers.com/library/mdi/)      
-ANSI to HTML conversion code inspired from [ansi-to-html](https://github.com/pycontribs/ansi2html)    
-Some style inspired from TheGnomeProject's Adwaita theme      
-Thanks to the PySide6 documentation [https://doc.qt.io/qtforpython/](https://doc.qt.io/qtforpython/)       
-Thanks [Alan Bork](mailto:alanbork@gmail.com) for his help for founding the icons      
-Xelu's assets for [keyboard icons](https://thoseawesomeguys.com/prompts)           
+Inspired by Unreal Engine's Blueprint system.    
+All icons are made by [Half-and-Xat](https://github.com/Half-and-Xat).  
+Special thanks to [Pictogrammers](https://pictogrammers.com/library/mdi/) for their icon inspiration.    
+ANSI to HTML conversion code inspired by [ansi-to-html](https://github.com/pycontribs/ansi2html).      
+Some style inspired by TheGnomeProject's Adwaita theme.      
+Thanks to the PySide6 documentation [https://doc.qt.io/qtforpython/](https://doc.qt.io/qtforpython/).       
+Thanks to [Alan Bork](mailto:alanbork@gmail.com) for his help in finding the icons.      
+Xelu's assets for [keyboard icons](https://thoseawesomeguys.com/prompts).           
