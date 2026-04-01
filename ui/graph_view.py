@@ -231,6 +231,8 @@ class GraphView(QGraphicsView):
                 applied_factor = 1 / current_scale
                 self.scale(applied_factor, applied_factor)
                 self._sync_zoom_from_transform()
+                return
+
             elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton: # MB begin
                 self._previous_drag_mode = self.dragMode()
                 self.setDragMode(QGraphicsView.ScrollHandDrag)
@@ -365,10 +367,12 @@ class GraphView(QGraphicsView):
                 zoom_factor = 1 / (1 - 1 / divisor)
                 proposed_scale = current_scale * zoom_factor
                 self.set_zoom(proposed_scale, animated=True)
+                return
             elif event.key() == Qt.Key_Minus: # Num-
                 zoom_factor = 1 / (1 + 1 / (divisor - 1))
                 proposed_scale = current_scale * zoom_factor
                 self.set_zoom(proposed_scale, animated=True)
+                return
 
         super().keyPressEvent(event)
 
