@@ -198,7 +198,7 @@ class VisualBashEditor(QMainWindow):
 
     def open_settings(self):
         dialog = SettingsDialog(self)
-        dialog.traduction_changed.connect(self.graph_view.rebuild_graph)
+        dialog.traduction_changed.connect(self.graph_view.update_language)
         dialog.exec()
 
     def open_about(self):

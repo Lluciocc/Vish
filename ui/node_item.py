@@ -16,7 +16,7 @@ class NodeItem(QGraphicsItem):
     HEADER_HEIGHT = 35
     PORT_SPACING = 25
     PORT_OFFSET = 15
-    
+
     def __init__(self, node: Node):
         super().__init__()
         self.node = node
@@ -26,39 +26,43 @@ class NodeItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, True)
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
-        
+
         self.title_item = QGraphicsTextItem(Traduction.get_trad(node.node_type, node.title), self)
         self.title_item.setDefaultTextColor(QColor("#ECF0F1"))
         self.title_item.setPos(10, 8)
         self.setZValue(1)
-        
+
         self.setup_icon()
         self.setup_ports()
-        
+
         self.height = self.HEADER_HEIGHT + max(
             len(node.inputs) * self.PORT_SPACING,
             len(node.outputs) * self.PORT_SPACING
         ) + 20
-    
+
+    def update_traduction(item: Node, language):
+        Traduction.set_translate_model(language)
+        item.title_item.setPlainText(Traduction.get_trad(item.node.node_type, item.node.title))
+
     def setup_ports(self):
         for i, port in enumerate(self.node.inputs):
             port_item = PortItem(port, self, is_input=True)
             y_pos = self.HEADER_HEIGHT + self.PORT_OFFSET + i * self.PORT_SPACING
             port_item.setPos(0, y_pos)
             self.port_items[port.id] = port_item
-        
+
         for i, port in enumerate(self.node.outputs):
             port_item = PortItem(port, self, is_input=False)
             y_pos = self.HEADER_HEIGHT + self.PORT_OFFSET + i * self.PORT_SPACING
             port_item.setPos(self.WIDTH, y_pos)
             self.port_items[port.id] = port_item
-    
+
     def boundingRect(self):
         return QRectF(0, 0, self.WIDTH, self.height)
-    
+
     def paint(self, painter, option, widget):
         painter.setRenderHint(QPainter.Antialiasing)
-        
+
         path = QPainterPath()
         path.addRoundedRect(self.boundingRect(), 8, 8)
 
@@ -93,7 +97,7 @@ class NodeItem(QGraphicsItem):
                 scene._z_counter += 1
 
         return super().itemChange(change, value)
- 
+
     def get_port_scene_pos(self, port_id: str) -> QPointF:
         if port_id in self.port_items:
             port_item = self.port_items[port_id]
@@ -162,7 +166,7 @@ class NodeItem(QGraphicsItem):
             scene.update_edges_for_node(self)
 
         self.update()
-        
+
     def get_icon_node(self, item: Node, icon_size, padding):
         node = NODE_REGISTRY.get(item.node_type)
         if node is not None:

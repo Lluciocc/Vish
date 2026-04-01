@@ -347,8 +347,20 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_H:
             self.frame_all()
             return
+        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
+            for item in self.scene().items():
+                if isinstance(item, NodeItem):
+                    NodeItem.update_traduction(item, "en")
 
         super().keyPressEvent(event)
+
+    def keyReleaseEvent(self, event):
+        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
+            for item in self.scene().items():
+                if isinstance(item, NodeItem):
+                    NodeItem.update_traduction(item, Config.lang)
+
+        super().keyReleaseEvent(event)
 
     def create_comment_box(self):
         view_pos = self.mapFromGlobal(QCursor.pos())
@@ -678,6 +690,11 @@ class GraphView(QGraphicsView):
         self.paste_offset = (0, 0)
         self.paste(message=False)
         self.paste_offset = (30, 30)
+
+    def update_language(self):
+        for item in self.scene().items():
+            if isinstance(item, NodeItem):
+                NodeItem.update_traduction(item, Config.lang)
 
     def _init_frame_button(self):
         self.frame_btn = QPushButton(self)
