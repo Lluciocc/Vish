@@ -231,7 +231,7 @@ class GraphView(QGraphicsView):
                 applied_factor = 1 / current_scale
                 self.scale(applied_factor, applied_factor)
                 self._sync_zoom_from_transform()
-                return
+                return True
 
             elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton: # MB begin
                 self._previous_drag_mode = self.dragMode()
@@ -351,7 +351,7 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_R: # R
             self.rebuild_graph()
             return
-        if event.key() == Qt.Key_H:
+        if event.key() == Qt.Key_H: # H
             self.frame_all()
             return
 
