@@ -347,7 +347,7 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_H:
             self.frame_all()
             return
-        if event.key() == Qt.Key_Alt: # Alt
+        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, "en")
@@ -355,7 +355,7 @@ class GraphView(QGraphicsView):
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Alt: # Alt
+        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, Config.lang)
