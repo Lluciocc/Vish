@@ -226,7 +226,14 @@ class GraphView(QGraphicsView):
 
     def viewportEvent(self, event):
         if isinstance(event, QMouseEvent):
-            if event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton:
+            if event.button() == Qt.MiddleButton and event.modifiers() == Qt.ControlModifier: # Ctrl + MB
+                current_scale = self.transform().m11()
+                applied_factor = 1 / current_scale
+                self.scale(applied_factor, applied_factor)
+                self._sync_zoom_from_transform()
+                return
+
+            elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton: # MB begin
                 self._previous_drag_mode = self.dragMode()
                 self.setDragMode(QGraphicsView.ScrollHandDrag)
                 self.setInteractive(False)
@@ -241,7 +248,7 @@ class GraphView(QGraphicsView):
                 super().mousePressEvent(fake)
                 return True
 
-            elif event.type() == QEvent.MouseButtonRelease and event.button() == Qt.MiddleButton:
+            elif event.type() == QEvent.MouseButtonRelease and event.button() == Qt.MiddleButton: # MB end
                 self.setInteractive(True)
                 fake = QMouseEvent(
                     QEvent.MouseButtonRelease,
@@ -347,10 +354,25 @@ class GraphView(QGraphicsView):
         if event.key() == Qt.Key_H:
             self.frame_all()
             return
+
         if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, "en")
+
+        if event.modifiers() == Qt.KeypadModifier:
+            current_scale = self.transform().m11()
+            divisor = 4
+            if event.key() == Qt.Key_Plus: # Num+
+                zoom_factor = 1 / (1 - 1 / divisor)
+                proposed_scale = current_scale * zoom_factor
+                self.set_zoom(proposed_scale, animated=True)
+                return
+            elif event.key() == Qt.Key_Minus: # Num-
+                zoom_factor = 1 / (1 + 1 / (divisor - 1))
+                proposed_scale = current_scale * zoom_factor
+                self.set_zoom(proposed_scale, animated=True)
+                return
 
         super().keyPressEvent(event)
 
