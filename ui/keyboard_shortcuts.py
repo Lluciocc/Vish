@@ -18,7 +18,7 @@ SHORTCUTS = {
             (["Ctrl", "R"], "shortcut_run_bash"),
             (["Ctrl", "W"], "shortcut_welcome_window"),
             (["F11"], "shortcut_toggle_fullscreen"),
-            (("F9"), "shortcut_open_settings"),
+            (["F9"], "shortcut_open_settings"),
         ],
     },
     "edition": {
@@ -41,6 +41,7 @@ SHORTCUTS = {
         "items": [
             (["Ctrl", "LB"], "shortcut_reconnection_mode"),
             (["Alt", "LB"], "shortcut_removing_mode"),
+            (["Ctrl", "MB"], "shortcut_reset_zoom"),
             (["C"], "shortcut_comment_box"),
             (["F"], "shortcut_auto_layout"),
             (["R"], "shortcut_rebuild_graph"),
@@ -56,7 +57,7 @@ SHORTCUTS = {
 class KeyImage(QSvgWidget):
     def __init__(self, key, size):
         super().__init__()
-        if key == "Ctrl" or key == "Shift" or key == "Space":
+        if key == "Ctrl" or key == "Shift" or key == "Space" or key == "Alt" or key == "Num+" or key == "Num-":
             width = 2 * size
             icon = "keycap_large"
         else:
@@ -83,14 +84,14 @@ class ShortcutRow(QWidget):
         elif category == ("edition", "Edition"):
             spaceCount = 2
         elif category == ("graph", "Graph"):
-            spaceCount = 2
+            spaceCount = 1
 
         for i, key in enumerate(keys):
             key_label = QLabel(key)
             key_label.setAlignment(Qt.AlignCenter)
             key_label.setStyleSheet(f"background: transparent; color: {Theme.TEXT_INV};")
 
-            if key == "Ctrl" or key == "Shift" or key == "Space":
+            if key == "Ctrl" or key == "Shift" or key == "Space" or key == "Alt" or key == "Num+" or key == "Num-":
                 layout.addWidget(KeyImage(key, key_size))
                 key_label.setFixedWidth(key_size * 2)
                 layout.addSpacing((key_size * 2 + spacing) * -1)
