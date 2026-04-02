@@ -41,6 +41,7 @@ SHORTCUTS = {
         "items": [
             (["Ctrl", "LB"], "shortcut_reconnection_mode"),
             (["Alt", "LB"], "shortcut_removing_mode"),
+            (["Ctrl", "MB"], "shortcut_reset_zoom"),
             (["C"], "shortcut_comment_box"),
             (["F"], "shortcut_auto_layout"),
             (["R"], "shortcut_rebuild_graph"),
