@@ -4,6 +4,7 @@
     "error_cannot_save_empty_graph": "Cannot save an empty graph.",
     "graph_saved_successfully": "Graph saved to {file_path} with {node_count} nodes and {edge_count} edges.",
     "graph_loaded_successfully": "Graph loaded from {file_path} with {node_count} nodes and {edge_count} edges.",
+    "file_dialog_open": "Open Graph",
     "running_windows": "It is not possible to run the script on Windows.",
     "no_bash_script": "No bash script found to run the graph.",
     "running_generated_bash_script": "Running generated bash script...",
@@ -19,6 +20,7 @@
     "theme_purple": "Purple",
     "theme_white": "White",
     "theme_breeze_dark": "Breeze Dark",
+    "more_options": "More options",
 
     "never_modified": "Never saved",
     "remove_recent": "Remove from recents",
@@ -56,6 +58,7 @@
     "about_whats_new": "What's new?",
     "about_questions": "FAQs",
     "about_support": "Support the project",
+    "about_theme_repo": "Themes Collection Repository",
 
     "keyboard_shortcuts": "Keyboard Shortcuts",
     "general": "General",
@@ -79,6 +82,14 @@
     "shortcut_auto_layout": "Auto layout graph",
     "shortcut_rebuild_graph": "Rebuild graph",
     "shortcut_frame_all": "Frame all",
+    "shortcut_welcome_window": "Open welcome window",
+    "shortcut_toggle_fullscreen": "Toggle full screen",
+    "shortcut_open_settings": "Open settings",
+    "shortcut_temporary_translation": "Temporary translation (hold Alt)",
+    "shortcut_zoom_in": "Zoom in",
+    "shortcut_zoom_out": "Zoom out",
+    "shortcut_reconnection_mode": "Reconnection mode",
+    "shortcut_removing_mode": "Removing mode",
 
     "Commands": "Commands",
     "Flow": "Flow",

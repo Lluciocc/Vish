@@ -16,6 +16,9 @@ SHORTCUTS = {
             (["Ctrl", "O"], "shortcut_load_graph"),
             (["Ctrl", "G"], "shortcut_generate_bash"),
             (["Ctrl", "R"], "shortcut_run_bash"),
+            (["Ctrl", "W"], "shortcut_welcome_window"),
+            (["F11"], "shortcut_toggle_fullscreen"),
+            (("F9"), "shortcut_open_settings"),
         ],
     },
     "edition": {
@@ -36,10 +39,15 @@ SHORTCUTS = {
     "graph": {
         "title": ("graph", "Graph"),
         "items": [
+            (["Ctrl", "LB"], "shortcut_reconnection_mode"),
+            (["Alt", "LB"], "shortcut_removing_mode"),
             (["C"], "shortcut_comment_box"),
             (["F"], "shortcut_auto_layout"),
             (["R"], "shortcut_rebuild_graph"),
-            (["H"], "shortcut_frame_all")
+            (["H"], "shortcut_frame_all"),
+            (["Alt"], "shortcut_temporary_translation"),
+            (["Num+"], "shortcut_zoom_in"),
+            (["Num-"], "shortcut_zoom_out"),
         ],
     },
 }
@@ -75,7 +83,7 @@ class ShortcutRow(QWidget):
         elif category == ("edition", "Edition"):
             spaceCount = 2
         elif category == ("graph", "Graph"):
-            spaceCount = 0
+            spaceCount = 2
 
         for i, key in enumerate(keys):
             key_label = QLabel(key)
