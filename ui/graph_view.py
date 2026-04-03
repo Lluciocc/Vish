@@ -94,7 +94,8 @@ class GraphView(QGraphicsView):
         if items:
             super().contextMenuEvent(event)
             return
-        
+            
+        self.setDragMode(QGraphicsView.NoDrag)
         self.show_node_palette(scene_pos)
         event.accept()
 
@@ -384,6 +385,22 @@ class GraphView(QGraphicsView):
                     NodeItem.update_traduction(item, Config.lang)
 
         super().keyReleaseEvent(event)
+
+    def mousePressEvent(self, event):
+        if self._palette and self._palette.isVisible():
+            self.close_node_palette()
+            event.accept()
+            return
+        item = self.itemAt(event.pos())
+        if isinstance(item, NodeItem): # can't drag if click on node
+            self.setDragMode(QGraphicsView.NoDrag)
+        else:
+            self.setDragMode(QGraphicsView.RubberBandDrag)
+        super().mousePressEvent(event)
+
+    def mouseReleaseEvent(self, event): # restore drag mode after dragging
+        self.setDragMode(QGraphicsView.RubberBandDrag)
+        super().mouseReleaseEvent(event)
 
     def create_comment_box(self):
         view_pos = self.mapFromGlobal(QCursor.pos())
