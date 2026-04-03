@@ -45,9 +45,18 @@
       <caption>Node scripting workflow (2)</caption>
       <image>https://raw.githubusercontent.com/Lluciocc/vish-utils/main/screenshots/screenshots2.png</image>
     </screenshot>
+    <screenshot>
+      <caption>Node scripting workflow (3)</caption>
+      <image>https://raw.githubusercontent.com/Lluciocc/vish-utils/main/screenshots/screenshots3.png</image>
+    </screenshot>
   </screenshots>
 
   <releases>
+    <release version="1.1.2" date="2026-04-03">
+      <description>
+        <p>Fix bugs and improve performance</p>
+      </description>
+    </release>
     <release version="1.1.1" date="2026-03-30">
       <description>
         <p>Improve icons, Adding custom themes and fix bugs</p>
