@@ -160,6 +160,7 @@ class GraphView(QGraphicsView):
     def add_node_item(self, node):
         node_item = NodeItem(node)
         node_item.setPos(node.x, node.y)
+        node_item.setZValue(node.z)
         self.graph_scene.addItem(node_item)
         self.node_items[node.id] = node_item
         return node_item

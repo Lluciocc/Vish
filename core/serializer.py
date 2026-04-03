@@ -32,6 +32,7 @@ class Serializer:
                 "title": node.title,
                 "x": node.x,
                 "y": node.y,
+                "z": node.z,
                 "properties": node.properties,
                 "inputs": [
                     {"id": p.id, "name": p.name, "type": p.port_type.value}
@@ -86,6 +87,7 @@ class Serializer:
             node.title = node_data["title"]
             node.x = node_data["x"]
             node.y = node_data["y"]
+            node.z = node_data.get("z", 0) # using get for backward compatibility
             node.properties = node_data.get("properties", {})
             graph.add_node(node)
 

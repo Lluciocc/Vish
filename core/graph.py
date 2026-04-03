@@ -46,6 +46,7 @@ class Node:
         self.outputs: List[Port] = []
         self.x = 0.0
         self.y = 0.0
+        self.z = 0.0
         self.properties: Dict[str, Any] = {}
     
     def add_input(self, name: str, port_type: PortType, tooltip="") -> Port:

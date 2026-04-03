@@ -246,53 +246,33 @@ class VisualBashEditor(QMainWindow):
         if msg:
             Debug.Log("Project saved.")
 
-    
     def load_graph(self):
         file_path, _ = QFileDialog.getOpenFileName(
-            self, Traduction.get_trad("file_dialog_open", "Load Graph"), "", "JSON Files (*.json)"
+            self,
+            Traduction.get_trad("file_dialog_open", "Load Graph"),
+            "",
+            "JSON Files (*.json)"
         )
+
         if not file_path:
             Debug.Error(Traduction.get_trad("error_no_file_selected", "No file selected."))
             return
 
         with open(file_path, "r") as f:
             json_data = f.read()
-        
-        try:
-            self.graph, comments = Serializer.deserialize(json_data, self.node_factory)
-        except ValueError as e:
-            # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
-            msg_box = QMessageBox()
-            msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
-            msg_box.setIcon(QMessageBox.Icon.Critical)
-            msg_box.exec()
-            raise
 
-        splitter = self.graph_view.parent()
-        old_view = self.graph_view
+        self._load_graph_data(json_data)
 
-        self.graph_view = GraphView(self.graph, self)
-        splitter.insertWidget(0, self.graph_view)
-
-        old_view.setParent(None)
-        old_view.deleteLater()
-
-        self.property_panel.graph_view = self.graph_view
-        
-        for node in self.graph.nodes.values():
-            self.graph_view.add_node_item(node)
-
-        for edge in self.graph.edges.values():
-            self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
-        
-        for comment in comments:
-            self.load_comment(comment)
-
-        self._connect_signals()
-        splitter.setSizes([900, 300, 400])
-
-        Debug.Log(Traduction.get_trad("graph_loaded_successfully", f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.", file_path=file_path, node_count=len(self.graph.nodes), edge_count=len(self.graph.edges)))
-
+        Debug.Log(
+            Traduction.get_trad(
+                "graph_loaded_successfully",
+                f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.",
+                file_path=file_path,
+                node_count=len(self.graph.nodes),
+                edge_count=len(self.graph.edges)
+            )
+        )
+    
     def load_current_project(self):
         graph_path = self.project_manager.get_graph_path()
 
@@ -302,30 +282,35 @@ class VisualBashEditor(QMainWindow):
         with open(graph_path, "r") as f:
             json_data = f.read()
 
+        self._load_graph_data(json_data)
+
+        if Config.DEBUG:
+            Logger.LogMessage(
+                f"Loaded project from {graph_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges."
+            )
+
+    def _load_graph_data(self, json_data):
         try:
             self.graph, comments, viewport = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
-            # TODO: CustomExeception Class to not rely on generic class with code base specific behaviour (e.g. "e.args[0][1]")
             msg_box = QMessageBox()
-            msg_box.setText(f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available.")
+            msg_box.setText(
+                f"Project contains unknown node type: '{e.args[0][1]}'\n"
+                "Please check if a newer version of this tool is available."
+            )
             msg_box.setIcon(QMessageBox.Icon.Critical)
             msg_box.exec()
             raise
-
-        if Config.DEBUG:
-            Logger.LogMessage(f"Loaded project from {graph_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.")
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
 
         self.graph_view = GraphView(self.graph, self)
         splitter.insertWidget(0, self.graph_view)
-        
 
         old_view.setParent(None)
         old_view.deleteLater()
 
-        self._connect_signals()
         self.property_panel.graph_view = self.graph_view
         self.clear_property_panel()
 
@@ -338,13 +323,19 @@ class VisualBashEditor(QMainWindow):
         for comment in comments:
             self.load_comment(comment)
 
-        # Restore viewport
-        if Config.DEBUG:
-            Logger.LogMessage(f"Restoring viewport position: x={viewport.get('x', 0)}, y={viewport.get('y', 0)}, zoom={viewport.get('zoom', 1.0)}")
-        QTimer.singleShot(0, lambda: self._restore_viewport(viewport))
+        # Reset z counter based on loaded nodes to ensure new nodes are on top
+        max_z = max((node.z for node in self.graph.nodes.values()), default=0)
+        self.graph_view.graph_scene._z_counter = max_z + 1
 
+        # Restore viewport after loading graph to ensure it's centered on the correct position
+        if viewport:
+            if Config.DEBUG:
+                Logger.LogMessage(f"Restoring viewport position: x={viewport.get('x', 0)}, y={viewport.get('y', 0)}, zoom={viewport.get('zoom', 1.0)}")
+            QTimer.singleShot(0, lambda: self._restore_viewport(viewport))
+
+        self._connect_signals()
         splitter.setSizes([900, 300, 400])
-
+    
     def _restore_viewport(self, viewport):
         center = QPointF(viewport.get("x", 0), viewport.get("y", 0))
         self.graph_view.set_zoom(viewport.get("zoom", 1.0))

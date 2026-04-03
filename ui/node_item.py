@@ -94,6 +94,7 @@ class NodeItem(QGraphicsItem):
             scene = self.scene()
             if scene and hasattr(scene, "_z_counter"):
                 self.setZValue(scene._z_counter)
+                self.node.z = scene._z_counter
                 scene._z_counter += 1
 
         return super().itemChange(change, value)
@@ -111,6 +112,7 @@ class NodeItem(QGraphicsItem):
 
             if hasattr(scene, "_z_counter"):
                 self.setZValue(scene._z_counter)
+                self.node.z = scene._z_counter
                 scene._z_counter += 1
 
         super().mousePressEvent(event)
