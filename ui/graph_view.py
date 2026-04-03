@@ -52,6 +52,7 @@ class GraphView(QGraphicsView):
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
 
+        self.alt_lang = False
         self.node_items = {}
         self.edge_items = {}
         self.scale_factor = 1.0
@@ -358,6 +359,7 @@ class GraphView(QGraphicsView):
             return
 
         if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
+            self.alt_lang = True
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, "en")
@@ -379,12 +381,22 @@ class GraphView(QGraphicsView):
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
-        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
+        if self.alt_lang:
+            self.alt_lang = False
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, Config.lang)
 
         super().keyReleaseEvent(event)
+
+    def focusOutEvent(self, event):
+        if self.alt_lang:
+            self.alt_lang = False
+            for item in self.scene().items():
+                if isinstance(item, NodeItem):
+                    NodeItem.update_traduction(item, Config.lang)
+
+        super().focusOutEvent(event)
 
     def mousePressEvent(self, event):
         if self._palette and self._palette.isVisible():
