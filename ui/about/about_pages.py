@@ -129,16 +129,16 @@ class AboutMainPage(QWidget):
 
         version = QLabel(Serializer.VERSION)
         version.setAlignment(Qt.AlignCenter)
-        version.setStyleSheet("""
-            QLabel {
+        version.setStyleSheet(f"""
+            QLabel {{
                 padding: 4px 14px;
                 min-height: 28px;
                 border-radius: 9px;
-                background-color: #2c3e50;
-                color: #8cc2ff;
+                background-color: {Theme.ACCENT};
+                color: {Theme.TEXT if Theme.type == 'dark' else Theme.TEXT_INV}; /*ensure good contrast*/
                 font-size: 13px;
                 font-weight: 600;
-            }
+            }}
         """)
 
         vrow = QHBoxLayout()

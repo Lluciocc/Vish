@@ -3,6 +3,7 @@ from PySide6.QtWidgets import QApplication
 class Theme:
     selected_theme = "dark"
     type = "dark"
+    ACCENT = None
     BACKGROUND = None
     PANEL = None
     TEXT = None
@@ -23,6 +24,7 @@ def set_dark_theme():
     Theme.BUTTON = "#2d2d2d"
     Theme.BUTTON_HOVER = "#3a3a3a"
     Theme.BUTTON_PRESSED = "#444444"
+    Theme.ACCENT = "#007acc"
 
     app.setStyleSheet(f"""
         QWidget {{
@@ -70,6 +72,7 @@ def set_white_theme():
     Theme.BUTTON = "#e0e0e0"
     Theme.BUTTON_HOVER = "#d5d5d5"
     Theme.BUTTON_PRESSED = "#c8c8c8"
+    Theme.ACCENT = "#007acc"
 
     app.setStyleSheet(f"""
         QWidget {{
@@ -117,6 +120,7 @@ def set_purple_theme():
     Theme.BUTTON = "#4b2c72"
     Theme.BUTTON_HOVER = "#5a3690"
     Theme.BUTTON_PRESSED = "#6a41b0"
+    Theme.ACCENT = "#9b59b6"
 
     app.setStyleSheet(f"""
         QWidget {{

@@ -562,6 +562,30 @@ class GraphView(QGraphicsView):
                 background-color: {Theme.BUTTON_HOVER};
             }}
         """)
+        self.zoom_slider.setStyleSheet(f"""
+            QSlider::groove:horizontal {{
+                height: 6px;
+                background: {Theme.ACCENT};
+                border-radius: 3px;
+            }}
+
+            QSlider::sub-page:horizontal {{
+                background: {Theme.ACCENT};
+                border-radius: 3px;
+            }}
+
+            QSlider::add-page:horizontal {{
+                background: {Theme.PANEL};
+                border-radius: 3px;
+            }}
+
+            QSlider::handle:horizontal {{
+                background: {Theme.ACCENT};
+                width: 14px;
+                margin: -4px 0;
+                border-radius: 7px;
+            }}
+        """)
         self.frame_btn.setIcon(self.get_icon("frame"))
         self.viewport().update()
 
@@ -647,6 +671,30 @@ class GraphView(QGraphicsView):
 
         self.zoom_slider.setRange(20, 300)
         self.zoom_slider.setValue(100)
+        self.zoom_slider.setStyleSheet(f"""
+            QSlider::groove:horizontal {{
+                height: 6px;
+                background: {Theme.ACCENT};
+                border-radius: 3px;
+            }}
+
+            QSlider::sub-page:horizontal {{
+                background: {Theme.ACCENT};
+                border-radius: 3px;
+            }}
+
+            QSlider::add-page:horizontal {{
+                background: {Theme.PANEL};
+                border-radius: 3px;
+            }}
+
+            QSlider::handle:horizontal {{
+                background: {Theme.ACCENT};
+                width: 14px;
+                margin: -4px 0;
+                border-radius: 7px;
+            }}
+        """)
 
         self.zoom_out_btn.clicked.connect(lambda: self._step_zoom(-1))
         self.zoom_in_btn.clicked.connect(lambda: self._step_zoom(1))
