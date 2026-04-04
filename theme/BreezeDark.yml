@@ -3,6 +3,7 @@ description: Breeze Dark theme inspired from KDE Breeze dark palette.
 
 theme:
   TYPE: "dark"
+  ACCENT: "#3584E4"
   BACKGROUND: "#141618"
   PANEL: "#292C30"
   TEXT: "#FCFCFC"
