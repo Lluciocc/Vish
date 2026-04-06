@@ -89,7 +89,7 @@ class Info:
         physical_height = screen.size().height() / dpi
         physical_diagonal = (physical_width ** 2 + physical_height ** 2) ** 0.5
 
-        if physical_diagonal <= 7:
+        if physical_diagonal <= 7.5:
             device_type = "phone"
         else:
             device_type = "desktop"
