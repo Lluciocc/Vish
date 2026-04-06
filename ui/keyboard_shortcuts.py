@@ -136,7 +136,10 @@ class KeyboardShortcutsDialog(QDialog):
 
         self.setWindowTitle(Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts"))
         self.setModal(True)
-        self.resize(980, 560)
+        if Info.get_device_type() == "phone":
+            self.showMaximized()
+        else:
+            self.resize(980, 560)
 
         self.setStyleSheet(f"""
             QDialog {{
