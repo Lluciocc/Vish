@@ -381,22 +381,19 @@ class GraphView(QGraphicsView):
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event):
-        if self.alt_lang:
-            self.alt_lang = False
-            for item in self.scene().items():
-                if isinstance(item, NodeItem):
-                    NodeItem.update_traduction(item, Config.lang)
-
+        self.revert_language()
         super().keyReleaseEvent(event)
 
     def focusOutEvent(self, event):
+        self.revert_language()
+        super().focusOutEvent(event)
+
+    def revert_language(self):
         if self.alt_lang:
             self.alt_lang = False
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     NodeItem.update_traduction(item, Config.lang)
-
-        super().focusOutEvent(event)
 
     def mousePressEvent(self, event):
         if self._palette and self._palette.isVisible():
