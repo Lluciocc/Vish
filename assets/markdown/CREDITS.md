@@ -13,6 +13,7 @@
 [kernbyte](https://github.com/kernbyte) for Arabian translation                      
 [SpurGetreide54](https://github.com/SpurGetreide54) for German translation     
 [Claudiney-Santos](https://github.com/Claudiney-Santos) for Brazilian (Portuguese) translation                                  
+[zen0bit](https://github.com/zen0bit) for Czech translation
 
 ### Acknowledgements
 
