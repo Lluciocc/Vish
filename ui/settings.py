@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
 from PySide6.QtGui import QPainter, QColor
 from core.config import Config, ConfigManager
 from core.traduction import Traduction
-from theme.theme import set_dark_theme, set_purple_theme, set_white_theme
+from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, Theme
 from theme.theme_parser import load_theme, import_theme, delete_theme, theme_list, BUILTIN_THEMES, _themes_dir, parse_yaml
 from ui.menu_style import apply_menu_style, apply_btn_style
 from core.debug import Debug
@@ -120,6 +120,7 @@ class SettingsDialog(QDialog):
         self.layout.addLayout(row)
 
     def _build_advanced_section(self):
+        self._switches = []
         self.advanced_title = self.make_section_title("advanced", "Advanced")
         self.layout.addWidget(self.advanced_title)
 
@@ -140,6 +141,8 @@ class SettingsDialog(QDialog):
             ("auto_save", "Auto Save", "AUTO_SAVE"),
         ]:
             row, label = create_switch_row(key, fallback, attr)
+            switch = row.itemAt(row.count() - 1).widget()  #  get the switch we just created
+            self._switches.append(switch)
             setattr(self, f"{attr.lower()}_row",   row)
             setattr(self, f"{attr.lower()}_label", label)
             self.layout.addLayout(row)
@@ -265,6 +268,10 @@ class SettingsDialog(QDialog):
             apply_btn_style(p.more_btn)
             p.refresh_ui_texts()
 
+        # Update switches
+        for switch in getattr(self, "_switches", []):
+            switch.update()
+
     def refresh_ui_texts(self):
         self.setWindowTitle(Traduction.get_trad("settings", "Settings"))
 
@@ -324,7 +331,7 @@ class Switch(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor("#3584e4" if self._checked else "#b0b0b0"))
+        painter.setBrush(QColor(Theme.ACCENT) if self._checked else QColor("#b0b0b0"))
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(0, 0, 42, 22, 11, 11)
         painter.setBrush(Qt.white)

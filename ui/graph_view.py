@@ -578,6 +578,7 @@ class GraphView(QGraphicsView):
 
             QSlider::handle:horizontal {{
                 background: {Theme.ACCENT};
+                border: 1px solid {Theme.BACKGROUND};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
@@ -687,6 +688,7 @@ class GraphView(QGraphicsView):
 
             QSlider::handle:horizontal {{
                 background: {Theme.ACCENT};
+                border: 1px solid {Theme.BACKGROUND};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
