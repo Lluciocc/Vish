@@ -537,6 +537,9 @@ class VisualBashEditor(QMainWindow):
         elif event.key() == Qt.Key_Escape: # Esc
             if self.windowState() & Qt.WindowState.WindowFullScreen:
                 self.setWindowState(Qt.WindowState.WindowNoState)
+        elif event.key() == Qt.Key_L and event.modifiers() & Qt.ControlModifier and event.modifiers() & Qt.AltModifier: # Ctrl+Shift+L
+            Debug.Warn("Log file saved with current logs.")
+            Logger.save_logged_messages()
 
         super().keyPressEvent(event)
 
@@ -566,6 +569,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("Application interrupted by user.")
+        Logger.LogWarning("Application interrupted by user.")
     except Exception as e:
-        print(f"Fatal error: {e}")
+        Logger.LogError(f"Fatal error: {e}")
+        Logger.save_logged_messages(str(e))

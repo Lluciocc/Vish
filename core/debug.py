@@ -31,25 +31,17 @@ class Debug:
     @staticmethod
     def Error(message: str):
         Debug._show(message, "error")
-
-        from core.config import Config # importing here to avoid circular import
-        if Config.DEBUG or Debug.init_error:
-            Logger.LogError(message)
+        Logger.LogError(message)
 
     @staticmethod
     def Warn(message: str):
         Debug._show(message, "warn")
-
-        from core.config import Config
-        if Config.DEBUG or Debug.init_error:
-            Logger.LogWarning(message)
+        Logger.LogWarning(message)
 
     @staticmethod
     def Log(message: str):
         Debug._show(message, "info")
-        from core.config import Config
-        if Config.DEBUG or Debug.init_error:
-            Logger.LogMessage(message)
+        Logger.LogMessage(message)
 
 class Info:
     CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish", "config.json")
