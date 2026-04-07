@@ -178,7 +178,10 @@ class WelcomeScreen(QDialog):
         self.setWindowTitle("  ")
         self.setModal(True)
         self.setMinimumSize(360, 294)
-        self.setFixedSize(620, 480)
+        if Info.get_device_type() == "phone":
+            self.showMaximized()
+        else:
+            self.setFixedSize(620, 480)
 
         self.setStyleSheet(f"""
             QDialog {{

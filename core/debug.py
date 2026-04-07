@@ -1,11 +1,12 @@
-import os
+from core.logger import Logger
 from pathlib import Path
+from PySide6.QtCore import QStandardPaths
+from PySide6.QtGui import QGuiApplication
+from ui.info import MessageWidget
+import getpass
+import os
 import platform
 import sys
-import getpass
-from ui.info import MessageWidget
-from PySide6.QtCore import QStandardPaths
-from core.logger import Logger
 
 class Debug:
     _parent = None
@@ -78,3 +79,18 @@ class Info:
     @staticmethod
     def get_user():
          return getpass.getuser()
+
+    @staticmethod
+    def get_device_type():
+        screen = QGuiApplication.primaryScreen()
+        dpi = screen.physicalDotsPerInch()
+
+        physical_width = screen.size().width() / dpi
+        physical_height = screen.size().height() / dpi
+        physical_diagonal = (physical_width ** 2 + physical_height ** 2) ** 0.5
+
+        if physical_diagonal <= 7.5:
+            device_type = "phone"
+        else:
+            device_type = "desktop"
+        return device_type

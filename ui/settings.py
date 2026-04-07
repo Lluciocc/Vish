@@ -11,7 +11,7 @@ from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, Theme
 from theme.theme_parser import load_theme, import_theme, delete_theme, theme_list, BUILTIN_THEMES, _themes_dir, parse_yaml
 from ui.menu_style import apply_menu_style, apply_btn_style
-from core.debug import Debug
+from core.debug import Debug, Info
 
 def set_config_bool(attr_name: str, value: bool) -> None:
     if not hasattr(Config, attr_name):
@@ -47,7 +47,10 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setModal(True)
-        self.setFixedWidth(380)
+        if Info.get_device_type() == "phone":
+            self.showMaximized()
+        else:
+            self.setFixedWidth(380)
 
         self.layout = QVBoxLayout(self)
         self.layout.setSpacing(12)

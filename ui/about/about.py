@@ -1,13 +1,9 @@
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout,
-    QPushButton, QStackedWidget, QGraphicsOpacityEffect
-)
-from PySide6.QtCore import (
-    Qt, QPoint, QPropertyAnimation, QEasingCurve
-)
-from theme.theme import Theme
-from core.traduction import Traduction
 from core.config import MarkdownLoader
+from core.debug import Info
+from core.traduction import Traduction
+from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt
+from PySide6.QtWidgets import QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton, QStackedWidget, QVBoxLayout
+from theme.theme import Theme
 from ui.about.about_pages import AboutMainPage, AboutTextPage
 
 class AboutDialog(QDialog):
@@ -15,7 +11,10 @@ class AboutDialog(QDialog):
         super().__init__(parent)
 
         self.setModal(True)
-        self.resize(440, 520)
+        if Info.get_device_type() == "phone":
+            self.showMaximized()
+        else:
+            self.resize(440, 520)
         self.setWindowTitle(Traduction.get_trad("about", "About"))
 
         self.current_index = 0
