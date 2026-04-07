@@ -104,7 +104,7 @@ class SettingsDialog(QDialog):
         for label, code in [
             ("English", "en"), ("Francais", "fr"), ("Español", "es"),
             ("العربية", "ar"), ("Italiano", "it"), ("Deutsch", "de"),
-            ("Português (Brasil)", "ptbr"),
+            ("Português (Brasil)", "ptbr"), ("čeština", "cs"),
         ]:
             self.lang_combo.addItem(label, code)
 
