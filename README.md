@@ -32,13 +32,6 @@ For more detailed information about Vish, including contribution instructions, u
 You can install Vish directly from Flathub:
 https://flathub.org/apps/io.github.lluciocc.Vish
 
-### From AppImage
-You can download the latest AppImage from the [releases page](https://github.com/lluciocc/vish/releases/latest). After downloading, make the AppImage executable and run it:
-```bash
-chmod +x Vish-*.AppImage
-./Vish-*.AppImage
-```
-
 ## Custom theme by the community
 A separate repository is available for community-made and custom themes.
 https://github.com/Lluciocc/vish-theme-collection/
