@@ -46,6 +46,8 @@
     "custom_shebang": "Custom Shebang",
     "full_screen": "Full Screen",
     "close": "Close",
+    "import_theme": "Import...",
+    "delete_theme": "Delete",
 
     "about": "About",
     "app_name": "Visual Bash Editor",
@@ -90,6 +92,7 @@
     "shortcut_zoom_out": "Zoom out",
     "shortcut_reconnection_mode": "Reconnection mode",
     "shortcut_removing_mode": "Removing mode",
+    "shortcut_save_log_file": "Save log file",
 
     "Commands": "Commands",
     "Flow": "Flow",

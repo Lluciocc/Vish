@@ -19,6 +19,7 @@ SHORTCUTS = {
             (["Ctrl", "W"], "shortcut_welcome_window"),
             (["F11"], "shortcut_toggle_fullscreen"),
             (["F9"], "shortcut_open_settings"),
+            (["Ctrl", "Alt", "L"], "shortcut_save_log_file"),
         ],
     },
     "edition": {
