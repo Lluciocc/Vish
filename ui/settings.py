@@ -12,10 +12,13 @@ from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, Theme
 from theme.theme_parser import load_theme, import_theme, delete_theme, theme_list, BUILTIN_THEMES, _themes_dir, parse_yaml
 from ui.menu_style import apply_menu_style, apply_btn_style
 from core.debug import Debug, Info
+from core.logger import Logger
 
 def set_config_bool(attr_name: str, value: bool) -> None:
     if not hasattr(Config, attr_name):
-        raise AttributeError(f"Config has no attribute '{attr_name}'")
+        msg = f"Config has no attribute '{attr_name}'"
+        Logger.LogError(msg)
+        raise AttributeError(msg)
     setattr(Config, attr_name, bool(value))
     ConfigManager.save_config()
 
@@ -185,6 +188,8 @@ class SettingsDialog(QDialog):
         Config.theme = theme
         ConfigManager.save_config()
 
+        Logger.LogMessage(f"Theme changed to: {theme}")
+
         setter = _BUILTIN_SETTERS.get(theme)
         if setter:
             setter()
@@ -232,6 +237,7 @@ class SettingsDialog(QDialog):
         delete_theme(name)
         self._populate_theme_combo()
         self.theme_combo.setCurrentIndex(self.theme_combo.findData(Config.theme))
+        Logger.LogMessage(f"Theme deleted: {name}")
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
@@ -242,6 +248,7 @@ class SettingsDialog(QDialog):
         ConfigManager.save_config()
         self.traduction_changed.emit()
         self.refresh_ui_texts()
+        Logger.LogMessage(f"Language changed to: {lang}")
 
     def on_shebang_changed(self):
         new_value = self.shebang_input.text().strip()
@@ -259,9 +266,11 @@ class SettingsDialog(QDialog):
         )
         if reply == QMessageBox.No:
             self.shebang_input.setText(Config.CUSTOM_SHEBANG)
+            Logger.LogWarning(f"Custom shebang change cancelled.")
             return
         Config.CUSTOM_SHEBANG = new_value
         ConfigManager.save_config()
+        Logger.LogMessage(f"Custom shebang changed to: {new_value}")
 
     def _propagate_theme_change(self):
         p = self.parent()
