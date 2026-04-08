@@ -349,6 +349,7 @@ class VisualBashEditor(QMainWindow):
             box.setPos(comment["x"], comment["y"])
             box.set_locked(comment.get("locked", False))
             box._accent_index = comment.get("color_index", 0)
+            box.move_children = comment.get("move_children", True)
             self.graph_view.scene().addItem(box)
 
     def clear_property_panel(self):
@@ -362,6 +363,7 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.graph_scene.graph_changed.connect(self.generate_bash)
         self.graph_view.graph_scene.graph_changed.connect(self.auto_save)
         self.graph_view.graph_scene.node_selected.connect(self.property_panel.set_node)
+        self.graph_view.graph_scene.auto_save_triggered.connect(self.auto_save)
         self.graph_view.clear_property_panel_request.connect(self.clear_property_panel)
 
     def run_pty(self, script_path: str) -> str:

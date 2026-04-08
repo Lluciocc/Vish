@@ -17,6 +17,7 @@ from commands.undo_commands import *
 from core.layout import GraphLayoutEngine
 from core.icons import Icon
 from core.config import Config
+from core.logger import Logger
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
@@ -289,6 +290,9 @@ class GraphView(QGraphicsView):
             return
         if event.key() == Qt.Key_C: # C 
             self.create_comment_box()
+            self.clear_property_panel_request.emit()
+            self.graph_scene.auto_save_triggered.emit()
+            Logger.LogMessage("Comment box created")
             event.accept()
             return
         if event.matches(QKeySequence.Undo): # Ctrl+Z
@@ -296,6 +300,7 @@ class GraphView(QGraphicsView):
             self.clear_property_panel_request.emit()
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
+                self.graph_scene.auto_save_triggered.emit()
             return
 
         if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
@@ -308,8 +313,6 @@ class GraphView(QGraphicsView):
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     item.setSelected(True)
-            if Config.SYNC_NODES_AND_GEN:
-                self.graph_scene.graph_changed.emit()
             return
         if event.matches(QKeySequence.Cut): # Ctrl+X
             self.copy_selection()
@@ -338,12 +341,16 @@ class GraphView(QGraphicsView):
                     self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
 
                 for it in comment_items:
-                    self.undo_stack.push(RemoveCommentCommand(self, it))
+                    if isinstance(it, CommentBoxItem):
+                        if it._in_header(it.mapFromScene(self.scene().views()[0].mapToScene(self.scene().views()[0].mapFromGlobal(QCursor.pos())))):
+                            it._delete_self()
 
                 self.undo_stack.endMacro()
 
                 if Config.SYNC_NODES_AND_GEN:
                     self.graph_scene.graph_changed.emit()
+                if Config.AUTO_SAVE:
+                    self.graph_scene.auto_save_triggered.emit()
 
                 event.accept()
                 return

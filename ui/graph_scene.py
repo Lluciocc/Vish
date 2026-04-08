@@ -13,6 +13,7 @@ class GraphScene(QGraphicsScene):
     node_selected = Signal(object)
     connection_created = Signal(object, object)
     graph_changed = Signal() 
+    auto_save_triggered = Signal()
 
     def __init__(self, graph):
         super().__init__()

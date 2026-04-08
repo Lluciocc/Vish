@@ -65,6 +65,7 @@ class Serializer:
                         "title": item.title_item.toPlainText(),
                         "color_index": item._accent_index,
                         "locked": item.locked,
+                        "move_children": item.move_children
                     }
                 )
 

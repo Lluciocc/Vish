@@ -87,6 +87,7 @@ class NodeItem(QGraphicsItem):
             scene = self.scene()
             if scene:
                 scene.update_edges_for_node(self)
+                self.scene().auto_save_triggered.emit()
             self.node.x = value.x()
             self.node.y = value.y()
 

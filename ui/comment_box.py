@@ -20,12 +20,8 @@ COLOR_BORDER_SEL = QColor(255, 255, 255, 90) # selected border
 COLOR_TITLE = QColor(230, 230, 240)         # title text
 
 RADIUS = 10
-HEADER_H = 36
 
 # TODO: add options for font, opacity, etc. (maybe in a future update)
-# TODO: Fix Z order
-# TODO: Move node inside comment box when dragging the box
-# TODO: Works with Config.AUTO_SAVE
 
 class CommentBoxItem(QGraphicsRectItem):
     def __init__(self, rect: QRectF = QRectF(0, 0, 320, 200), title: str = "Comment", accent_index: int = 0):
@@ -40,6 +36,7 @@ class CommentBoxItem(QGraphicsRectItem):
         self.setZValue(-10_000)
 
         self.resize_margin = 12
+        self.header_height = 36
         self.resizing = False
         self.resize_corner = None
         self.locked = False
@@ -80,17 +77,34 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def _update_title_position(self):
         self.title_item.setTextWidth(-1)
-        fm_h = self.title_item.boundingRect().height()
-        y_off = (HEADER_H - fm_h) / 2
+        text_rect = self.title_item.boundingRect()
+        padding = 12 
+
+        self.header_height = max(36, text_rect.height() + padding)
+
+        y_off = (self.header_height - text_rect.height()) / 2
         self.title_item.setPos(12, y_off)
 
     def _on_title_changed(self):
         self.title_item.setTextWidth(-1)
-        text_w = self.title_item.boundingRect().width()
+
+        # force recalculation of bounding rect
+        doc = self.title_item.document()
+        doc.adjustSize()
+        text_rect = self.title_item.boundingRect()
+        padding = 12
+        self.header_height = max(36, text_rect.height() + padding)
+
+        y_off = (self.header_height - text_rect.height()) / 2
+        self.title_item.setPos(12, y_off)
+
+        text_w = text_rect.width()
         r = self.rect()
         min_w = max(160.0, text_w + 24)
         if r.width() < min_w:
             self.setRect(QRectF(0, 0, min_w, r.height()))
+
+        self.update()
 
     def _get_resize_corner(self, pos: QPointF) -> str | None:
         r = self.rect()
@@ -108,7 +122,7 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def _in_header(self, pos: QPointF) -> bool:
         r = self.rect()
-        return QRectF(r.x(), r.y(), r.width(), HEADER_H).contains(pos)
+        return QRectF(r.x(), r.y(), r.width(), self.header_height).contains(pos)
 
     def set_locked(self, locked: bool):
         self.locked = locked
@@ -130,6 +144,8 @@ class CommentBoxItem(QGraphicsRectItem):
 
             for node in self._captured_nodes:
                 node.setPos(node.pos() + delta)
+        if change == QGraphicsItem.ItemPositionHasChanged:
+            self._call_auto_save()
 
         return super().itemChange(change, value)
 
@@ -145,11 +161,11 @@ class CommentBoxItem(QGraphicsRectItem):
         painter.setBrush(QBrush(tinted_bg))
         painter.drawPath(body_path)
 
-        header_rect = QRectF(r.x(), r.y(), r.width(), HEADER_H)
+        header_rect = QRectF(r.x(), r.y(), r.width(), self.header_height)
         header_path = QPainterPath()
         header_path.addRoundedRect(header_rect, RADIUS, RADIUS)
         clip = QPainterPath()
-        clip.addRect(QRectF(r.x(), r.y() + RADIUS, r.width(), HEADER_H - RADIUS))
+        clip.addRect(QRectF(r.x(), r.y() + RADIUS, r.width(), self.header_height - RADIUS))
         header_path = header_path.united(clip)
         painter.setBrush(QBrush(COLOR_HEADER_BG))
         painter.drawPath(header_path)
@@ -158,14 +174,14 @@ class CommentBoxItem(QGraphicsRectItem):
         sep_color.setAlpha(60)
         painter.setPen(QPen(sep_color, 1))
         painter.drawLine(
-            QPointF(r.x() + RADIUS, r.y() + HEADER_H),
-            QPointF(r.right() - RADIUS, r.y() + HEADER_H),
+            QPointF(r.x() + RADIUS, r.y() + self.header_height),
+            QPointF(r.right() - RADIUS, r.y() + self.header_height),
         )
 
         pin_size = 16
         pin_rect = QRectF(
             r.right() - 26,
-            r.y() + (HEADER_H - pin_size) / 2,
+            r.y() + (self.header_height - pin_size) / 2,
             pin_size,
             pin_size
         )
@@ -306,20 +322,22 @@ class CommentBoxItem(QGraphicsRectItem):
         menu.addSeparator()
         delete_action = menu.addAction("Delete")
         action = menu.exec(event.screenPos())
-        if action == lock_action:
-            self.set_locked(not self.locked)
-        elif action in color_actions:
-            self.set_accent(color_actions.index(action))
-        elif action == delete_action:
-            self._delete_self()
+        try:
+            if action == lock_action:
+                self.set_locked(not self.locked)
+            elif action in color_actions:
+                self.set_accent(color_actions.index(action))
+            elif action == delete_action:
+                self._delete_self()
+        finally: # always call graph_changed after context menu actions
+            self._call_auto_save()
+    
         event.accept()
 
-    def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Delete):
-            if self._in_header(self.mapFromScene(self.scene().views()[0].mapToScene(self.scene().views()[0].mapFromGlobal(QCursor.pos())))):
-                self._delete_self()
-            return
-        super().keyPressEvent(event)
+    def _call_auto_save(self):
+        if self.scene() and self.scene().views():
+            view = self.scene().views()[0]
+            view.graph_scene.auto_save_triggered.emit()
 
     def mousePressEvent(self, event):
         if self.locked:
@@ -329,6 +347,7 @@ class CommentBoxItem(QGraphicsRectItem):
         if hasattr(self, "_pin_rect") and self._pin_rect.contains(event.pos()):
             self.move_children = not self.move_children
             self.update()
+            self._call_auto_save()
 
             self.setCursor(Qt.PointingHandCursor)
             event.accept()
@@ -394,6 +413,7 @@ class CommentBoxItem(QGraphicsRectItem):
             self.setRect(QRectF(0, 0, w, h))
 
         self._update_title_position()
+        self._call_auto_save()
 
     def mouseReleaseEvent(self, event):
         self._captured_nodes = []
@@ -415,6 +435,7 @@ class CommentBoxItem(QGraphicsRectItem):
             view = self.scene().views()[0]
             if hasattr(view, "undo_stack"):
                 view.undo_stack.push(RemoveCommentCommand(view, self))
+            Logger.LogMessage("Comment box deleted")
 
     def _capture_nodes(self):
         self._captured_nodes = []
