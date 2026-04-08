@@ -300,6 +300,7 @@ class GraphView(QGraphicsView):
             self.clear_property_panel_request.emit()
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
+            if Config.AUTO_SAVE:
                 self.graph_scene.auto_save_triggered.emit()
             return
 

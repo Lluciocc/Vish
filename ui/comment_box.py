@@ -3,6 +3,7 @@ from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QCursor, QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
 from commands.undo_commands import *
 from core.logger import Logger
+from core.config import Config
 
 
 ACCENT_COLORS = [
@@ -335,7 +336,7 @@ class CommentBoxItem(QGraphicsRectItem):
         event.accept()
 
     def _call_auto_save(self):
-        if self.scene() and self.scene().views():
+        if self.scene() and self.scene().views() and Config.AUTO_SAVE:
             view = self.scene().views()[0]
             view.graph_scene.auto_save_triggered.emit()
 
