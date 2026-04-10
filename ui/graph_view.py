@@ -757,8 +757,6 @@ class GraphView(QGraphicsView):
         node.y = source_rect.center().y()
 
         self.undo_stack.push(AddNodeCommand(self, node))
-        self.undo_stack.undo()
-        self.undo_stack.redo()
 
         new_node_item = self.node_items.get(node.id)
         if not new_node_item:
