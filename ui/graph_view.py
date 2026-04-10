@@ -134,8 +134,6 @@ class GraphView(QGraphicsView):
         node.y = scene_pos.y()
 
         self.undo_stack.push(AddNodeCommand(self, node))
-        self.undo_stack.undo()
-        self.undo_stack.redo()
         node_item = self.node_items.get(node.id)
 
 
