@@ -1,8 +1,9 @@
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
-from PySide6.QtCore import QRectF, Qt
-from PySide6.QtGui import QBrush, QPainterPath, QPen, QColor
 from core.graph import Port
-from core.port_types import PORT_STYLES, PortStyle, PortType
+from core.port_types import PortStyle, PORT_STYLES, PortType
+from PySide6.QtCore import QRectF, Qt
+from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
+
 
 class PortItem(QGraphicsPathItem):
     def __init__(self, port: Port, parent=None, is_input=False):
@@ -12,6 +13,7 @@ class PortItem(QGraphicsPathItem):
 
         self.port = port
         self.is_input = is_input
+        self.edges = []
 
         self.setBrush(QBrush(QColor(style.color)))
         self.setPen(QPen(QColor("#2C3E50"), 2))
@@ -24,7 +26,7 @@ class PortItem(QGraphicsPathItem):
         self.setToolTip(self.port.tooltip)
 
         self.highlight = False
-    
+
     def get_color(self) -> QColor:
         port_type = getattr(self.port, "type", None) or getattr(self.port, "port_type", None)
         style = PORT_STYLES.get(port_type)
@@ -59,12 +61,12 @@ class PortItem(QGraphicsPathItem):
         # print("PORT CLICK")
         pass
 
-    
+
     def hoverEnterEvent(self, event):
         self.highlight = True
         self.setPen(QPen(QColor("#ECF0F1"), 3))
         super().hoverEnterEvent(event)
-    
+
     def hoverLeaveEvent(self, event):
         self.highlight = False
         self.setPen(QPen(QColor("#2C3E50"), 2))
