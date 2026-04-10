@@ -26,6 +26,7 @@ class RemoveNodeCommand(QUndoCommand):
     def __init__(self, view, node_id: str):
         super().__init__("Remove Node")
         self.view = view
+        self.scene = view.scene()
         self.graph = view.graph
         self.node_id = node_id
         self.node = self.graph.nodes.get(node_id)
@@ -52,29 +53,30 @@ class RemoveNodeCommand(QUndoCommand):
         self.view._suspend_edge_undo = True
         self.graph.add_node(self.node)
         self.view.add_node_item(self.node)
-        for src_port, tgt_port in self.edge_port_pairs:
-            edge = self.graph.add_edge(src_port, tgt_port)
+        for source_port, target_port in self.edge_port_pairs:
+            edge = self.graph.add_edge(source_port, target_port)
             if edge:
-                self.view.add_edge_item(edge)
+                self.scene.add_core_edge(edge, self.view.node_items)
         self.view._suspend_edge_undo = False
 
 
 class AddEdgeCommand(QUndoCommand):
-    def __init__(self, view, src_port, tgt_port):
+    def __init__(self, view, source_port, target_port):
         super().__init__("Add Connection")
         self.view = view
+        self.scene = view.scene()
         self.graph = view.graph
-        self.src_port = src_port
-        self.tgt_port = tgt_port
+        self.source_port = source_port
+        self.target_port = target_port
         self.edge_id = None
 
     def redo(self):
-        edge = self.graph.add_edge(self.src_port, self.tgt_port)
+        edge = self.graph.add_edge(self.source_port, self.target_port)
         if not edge:
             self.edge_id = None
             return
         self.edge_id = edge.id
-        self.view.add_edge_item(edge)
+        self.scene.add_core_edge(edge, self.node_items)
 
     def undo(self):
         if not self.edge_id:
@@ -82,6 +84,7 @@ class AddEdgeCommand(QUndoCommand):
         self.graph.remove_edge(self.edge_id)
         self.view.remove_edge_item(self.edge_id)
         self.edge_id = None
+
 
 class MoveNodeCommand(QUndoCommand):
     def __init__(self, view, node_id: str, old_pos, new_pos):
@@ -114,6 +117,7 @@ class PasteCommand(QUndoCommand):
     def __init__(self, view, data: dict, scene_pos=None):
         super().__init__("Paste")
         self.view = view
+        self.scene = view.scene()
         self.graph = view.graph
         self.node_factory = view.node_factory
         self.data = data
@@ -153,24 +157,24 @@ class PasteCommand(QUndoCommand):
             self.created_node_ids.append(node.id)
 
         for ed in self.data.get("edges", []):
-            src_node = self._id_map.get(ed.get("source_node"))
-            tgt_node = self._id_map.get(ed.get("target_node"))
-            if not src_node or not tgt_node:
+            source_node = self._id_map.get(ed.get("source_node"))
+            target_node = self._id_map.get(ed.get("target_node"))
+            if not source_node or not target_node:
                 continue
 
-            src_i = ed.get("source_output_index")
-            tgt_i = ed.get("target_input_index")
-            if src_i is None or tgt_i is None:
+            source_i = ed.get("source_output_index")
+            target_i = ed.get("target_input_index")
+            if source_i is None or target_i is None:
                 continue
-            if src_i >= len(src_node.outputs) or tgt_i >= len(tgt_node.inputs):
+            if source_i >= len(source_node.outputs) or target_i >= len(target_node.inputs):
                 continue
 
-            src_port = src_node.outputs[src_i]
-            tgt_port = tgt_node.inputs[tgt_i]
+            source_port = source_node.outputs[source_i]
+            target_port = target_node.inputs[target_i]
 
-            edge = self.graph.add_edge(src_port, tgt_port)
+            edge = self.graph.add_edge(source_port, target_port)
             if edge:
-                self.view.add_edge_item(edge)
+                self.scene.add_core_edge(edge, self.view.node_items)
                 self.created_edge_ids.append(edge.id)
 
     def undo(self):
@@ -183,6 +187,7 @@ class PasteCommand(QUndoCommand):
             self.view.remove_node_item(nid)
         self.created_node_ids.clear()
         self._id_map.clear()
+
 
 class AddCommentCommand(QUndoCommand):
     def __init__(self, view, comment_item):
@@ -198,6 +203,7 @@ class AddCommentCommand(QUndoCommand):
     def undo(self):
         if self.comment.scene() is self.scene:
             self.scene.removeItem(self.comment)
+
 
 class RemoveCommentCommand(QUndoCommand):
     def __init__(self, view, comment_item):
