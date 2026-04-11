@@ -1,4 +1,4 @@
-from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu
+from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu, QGraphicsView
 from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
 from PySide6.QtGui import QCursor, QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
 from commands.undo_commands import *
@@ -304,7 +304,8 @@ class CommentBoxItem(QGraphicsRectItem):
         if not self._in_header(event.pos()):
             if self.scene() and self.scene().views():
                 view = self.scene().views()[0]
-
+                
+                view.setDragMode(QGraphicsView.NoDrag)
                 scene_pos = event.scenePos()
                 view.show_node_palette(scene_pos)
 
