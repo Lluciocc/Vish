@@ -39,5 +39,8 @@ https://github.com/Lluciocc/vish-theme-collection/
 ## Credits
 You can find the list of contributors and acknowledgements in the [CREDITS file](assets/markdown/CREDITS.md).
 
+## Contact
+If you have any questions, suggestions, or want to contribute to the project, feel free to reach out through the [Matrix room](https://matrix.to/#/%23vish-support%3Amatrix.org) or by opening an issue on the GitHub repository.
+
 ## License
 This project is licensed under the MIT License. See the [LICENSE file](LICENSE) for details

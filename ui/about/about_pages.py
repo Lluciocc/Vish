@@ -198,6 +198,11 @@ class AboutMainPage(QWidget):
             "›",
             lambda: go_to("legal")
         ))
+        g3.add_row(AboutRow(
+            Traduction.get_trad("about_matrix", "Join our Matrix room"),
+            "↗",
+            lambda: webbrowser.open("https://matrix.to/#/%23vish-support%3Amatrix.org")
+        ))
         g3.finalize()
         root.addWidget(g3)
 
