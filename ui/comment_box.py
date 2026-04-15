@@ -14,6 +14,14 @@ ACCENT_COLORS = [
     QColor(240, 101, 101),  # coral
 ]
 
+SIZE_PRESETS = [
+    8.0,   # small
+    10.0,  # medium (base)
+    16.0,  # medium-large
+    28.0,  # large
+    48.0,  # extra large
+]
+
 COLOR_BG = QColor(18, 20, 28, 185)         # dark body background
 COLOR_HEADER_BG = QColor(255, 255, 255, 12) # subtle header tint
 COLOR_BORDER = QColor(255, 255, 255, 30)    # default border
@@ -43,6 +51,8 @@ class CommentBoxItem(QGraphicsRectItem):
         self.locked = False
         self._hover = False
         self._accent_index = accent_index % len(ACCENT_COLORS)
+        self._size_index = 2  # Default to medium size
+
         self._dragging_header = False
         self.move_children = True
         self._pin_hover = False
@@ -137,6 +147,24 @@ class CommentBoxItem(QGraphicsRectItem):
 
     def set_accent(self, index: int):
         self._accent_index = index % len(ACCENT_COLORS)
+        self.update()
+
+    def set_title_size_index(self, index: int):
+        # Store selected preset index (wrap safely)
+        self._size_index = index % len(SIZE_PRESETS)
+
+        # Get the font size from presets
+        font_size = SIZE_PRESETS[self._size_index]
+
+        # Apply it to the title font
+        font = self.title_item.font()
+        font.setPointSizeF(font_size)
+        self.title_item.setFont(font)
+
+        # Recalculate layout since text size changed
+        self._update_title_position()
+
+        # Trigger redraw
         self.update()
 
     def itemChange(self, change, value):
@@ -321,6 +349,13 @@ class CommentBoxItem(QGraphicsRectItem):
             color_menu.addAction(f"{'●' if i == self._accent_index else '○'} {n}")
             for i, n in enumerate(color_names)
         ]
+        size_menu = menu.addMenu("Size")
+        size_names = ["Small", "Medium", "Medium-Large", "Large", "Extra Large"]
+        size_actions = [
+            size_menu.addAction(f"{'●' if i == self._size_index else '○'} {n}")
+            for i, n in enumerate(size_names)
+        ]
+
         menu.addSeparator()
         delete_action = menu.addAction("Delete")
         action = menu.exec(event.screenPos())
@@ -329,6 +364,8 @@ class CommentBoxItem(QGraphicsRectItem):
                 self.set_locked(not self.locked)
             elif action in color_actions:
                 self.set_accent(color_actions.index(action))
+            elif action in size_actions:
+                self.set_title_size_index(size_actions.index(action))
             elif action == delete_action:
                 self._delete_self()
         finally: # always call graph_changed after context menu actions

@@ -64,6 +64,7 @@ class Serializer:
                         "h": r.height(),
                         "title": item.title_item.toPlainText(),
                         "color_index": item._accent_index,
+                        "size_index": item._size_index,
                         "locked": item.locked,
                         "move_children": item.move_children
                     }

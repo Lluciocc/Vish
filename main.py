@@ -349,6 +349,7 @@ class VisualBashEditor(QMainWindow):
             box.setPos(comment["x"], comment["y"])
             box.set_locked(comment.get("locked", False))
             box._accent_index = comment.get("color_index", 0)
+            box.set_title_size_index(comment.get("size_index", 2))
             box.move_children = comment.get("move_children", True)
             self.graph_view.scene().addItem(box)
 
