@@ -1,4 +1,5 @@
 {
+    "language_name": "Čeština",
     "warn_generating_empty_graph": "Generování prázdného grafu.",
     "error_no_file_selected": "Nebyl vybrán žádný soubor.",
     "error_cannot_save_empty_graph": "Nelze uložit prázdný graf.",

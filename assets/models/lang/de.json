@@ -1,4 +1,5 @@
 {
+    "language_name": "Deutsch",
     "warn_generating_empty_graph": "Generiere einen leeren Graphen.",
     "error_no_file_selected": "Keine Datei ausgewählt.",
     "error_cannot_save_empty_graph": "Ein leerer Graph kann nicht gespeichert werden.",
@@ -226,7 +227,7 @@
     "download_file_label": "Datei herunterladen",
     "download_file_desc": "Lädt eine Datei von der angegebenen URL herunter.",
     "download_file_tooltip": "Lädt eine Datei herunter.",
-    
+
     "sleep": "Warten",
     "sleep_label": "Warten",
     "sleep_desc": "Wartet die angebene Zeit in Millisekunden.",
