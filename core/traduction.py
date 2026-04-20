@@ -38,7 +38,7 @@ class Traduction:
         try:
             with open(trad_file, encoding='utf-8') as data:
                 Traduction.model = json.load(data)
-        except Exception:
+        except FileNotFoundError:
             Debug.Error(f"Cannot find language model for {lang}")
 
     @staticmethod
