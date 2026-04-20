@@ -1,4 +1,5 @@
 {
+    "language_name": "Español",
     "warn_generating_empty_graph": "Generación de un grafo vacío.",
     "error_no_file_selected": "Ningún archivo seleccionado.",
     "error_cannot_save_empty_graph": "No se puede guardar un grafo vacío.",
