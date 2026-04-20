@@ -35,7 +35,7 @@ jobs:
       - name: Set variables
         shell: bash
         run: |
-          echo "FILE_PATH=assets/models/${{ steps.cmd.outputs.filename }}" >> $GITHUB_ENV
+          echo "FILE_PATH=assets/models/lang/${{ steps.cmd.outputs.filename }}" >> $GITHUB_ENV
           echo "RUN_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_ENV
 
       - name: Comment started
@@ -116,7 +116,7 @@ jobs:
           fi
 
           set +e
-          python check_trad.py assets/models/en.json translation_to_check.json > result.txt 2>&1
+          python check_trad.py assets/models/lang/en.json translation_to_check.json > result.txt 2>&1
           EXIT_CODE=$?
           echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
           exit 0
