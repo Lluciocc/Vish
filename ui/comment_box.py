@@ -27,13 +27,60 @@ COLOR_HEADER_BG = QColor(255, 255, 255, 12) # subtle header tint
 COLOR_BORDER = QColor(255, 255, 255, 30)    # default border
 COLOR_BORDER_SEL = QColor(255, 255, 255, 90) # selected border
 COLOR_TITLE = QColor(230, 230, 240)         # title text
+COLOR_BODY_TEXT = QColor(215, 218, 230)
 
 RADIUS = 10
+MIN_COMMENT_WIDTH = 160
+MIN_COMMENT_HEIGHT = 80
+COMMENT_Z_BASE = -20_000
+COMMENT_Z_TOP = -2
 
 # TODO: add options for font, opacity, etc. (maybe in a future update)
 
+class CommentTextItem(QGraphicsTextItem):
+    def __init__(self, text: str, owner, section: str):
+        super().__init__(text, owner)
+        self.owner = owner
+        self.section = section
+        self._clip_size = QSizeF()
+
+    def set_clip_size(self, size: QSizeF):
+        self._clip_size = size
+        self.update()
+
+    def paint(self, painter: QPainter, option, widget=None):
+        if self._clip_size.width() > 0 and self._clip_size.height() > 0:
+            painter.save()
+            painter.setClipRect(QRectF(0, 0, self._clip_size.width(), self._clip_size.height()))
+            super().paint(painter, option, widget)
+            painter.restore()
+            return
+
+        super().paint(painter, option, widget)
+
+    def shape(self):
+        if self._clip_size.width() > 0 and self._clip_size.height() > 0:
+            path = QPainterPath()
+            path.addRect(QRectF(0, 0, self._clip_size.width(), self._clip_size.height()))
+            return path
+
+        return super().shape()
+
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        self.owner._finish_text_edit(self)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key_Escape:
+            self.clearFocus()
+            event.accept()
+            return
+
+        super().keyPressEvent(event)
+
+
 class CommentBoxItem(QGraphicsRectItem):
-    def __init__(self, rect: QRectF = QRectF(0, 0, 320, 200), title: str = "Comment", accent_index: int = 0):
+    def __init__(self, rect: QRectF = QRectF(0, 0, 320, 200), title: str = "Comment", body_text: str = "", accent_index: int = 0):
         super().__init__(rect)
 
         self.setFlags(
@@ -42,7 +89,7 @@ class CommentBoxItem(QGraphicsRectItem):
         )
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
-        self.setZValue(-10_000)
+        self.setZValue(COMMENT_Z_BASE)
 
         self.resize_margin = 12
         self.header_height = 36
@@ -58,21 +105,32 @@ class CommentBoxItem(QGraphicsRectItem):
         self._pin_hover = False
 
         self._captured_nodes = []
+        self._editing_item = None
 
         self.setPen(Qt.NoPen)
         self.setBrush(Qt.NoBrush)
 
-        self.title_item = QGraphicsTextItem(title, self)
+        self.title_item = CommentTextItem(title, self, "header")
         font = QFont("Segoe UI", 10, QFont.Medium)
         font.setLetterSpacing(QFont.AbsoluteSpacing, 0.3)
         self.title_item.setFont(font)
         self.title_item.setDefaultTextColor(COLOR_TITLE)
-        self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+        self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
         self.title_item.setFlag(QGraphicsItem.ItemIsFocusable)
-        self.title_item.setAcceptedMouseButtons(Qt.LeftButton)
+        self.title_item.setAcceptedMouseButtons(Qt.NoButton)
         self.title_item.document().contentsChanged.connect(self._on_title_changed)
 
-        self._update_title_position()
+        self.body_item = CommentTextItem(body_text, self, "body")
+        body_font = QFont("Segoe UI", 10)
+        body_font.setLetterSpacing(QFont.AbsoluteSpacing, 0)
+        self.body_item.setFont(body_font)
+        self.body_item.setDefaultTextColor(COLOR_BODY_TEXT)
+        self.body_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        self.body_item.setFlag(QGraphicsItem.ItemIsFocusable)
+        self.body_item.setAcceptedMouseButtons(Qt.NoButton)
+        self.body_item.document().contentsChanged.connect(self._on_body_changed)
+
+        self._update_text_layout()
 
     @property
     def accent(self) -> QColor:
@@ -86,8 +144,71 @@ class CommentBoxItem(QGraphicsRectItem):
         a = c1.alpha() * (1 - ratio) + c2.alpha() * ratio
         return QColor(int(r), int(g), int(b), int(a))
 
+    def _body_rect(self) -> QRectF:
+        r = self.rect()
+        top = self.header_height + 10
+        return QRectF(
+            r.x() + 12,
+            r.y() + top,
+            max(24.0, r.width() - 24),
+            max(24.0, r.height() - top - 10),
+        )
+
+    def _comments_in_scene(self):
+        if not self.scene():
+            return []
+
+        return [
+            item for item in self.scene().items()
+            if isinstance(item, CommentBoxItem)
+        ]
+
+    def normalize_comment_z_order(self):
+        comments = self._comments_in_scene()
+        if not comments:
+            return
+
+        comments.sort(key=lambda item: (item.zValue(), id(item)))
+        start_z = min(COMMENT_Z_BASE, COMMENT_Z_TOP - len(comments) + 1)
+
+        for index, item in enumerate(comments):
+            item.setZValue(start_z + index)
+
+    def bring_to_front_within_comments(self):
+        comments = self._comments_in_scene()
+        if not comments:
+            return
+
+        others = [item for item in comments if item is not self]
+        others.sort(key=lambda item: (item.zValue(), id(item)))
+        ordered = others + [self]
+        start_z = min(COMMENT_Z_BASE, COMMENT_Z_TOP - len(ordered) + 1)
+
+        for index, item in enumerate(ordered):
+            item.setZValue(start_z + index)
+
+    def _comment_under_body_click(self, scene_pos: QPointF):
+        if not self.scene():
+            return None
+
+        for item in self.scene().items(scene_pos):
+            if item is self or not isinstance(item, CommentBoxItem):
+                continue
+
+            local_pos = item.mapFromScene(scene_pos)
+            if item._in_header(local_pos):
+                return item
+
+        return None
+
+    def _update_text_layout(self):
+        self._update_title_position()
+        self._update_body_position()
+
     def _update_title_position(self):
-        self.title_item.setTextWidth(-1)
+        r = self.rect()
+        text_width = max(24.0, r.width() - 52)
+        self.title_item.setTextWidth(text_width)
         text_rect = self.title_item.boundingRect()
         padding = 12 
 
@@ -95,27 +216,44 @@ class CommentBoxItem(QGraphicsRectItem):
 
         y_off = (self.header_height - text_rect.height()) / 2
         self.title_item.setPos(12, y_off)
+        self.title_item.set_clip_size(QSizeF(text_width, self.header_height))
+
+    def _update_body_position(self):
+        body_rect = self._body_rect()
+        self.body_item.setPos(body_rect.topLeft())
+        self.body_item.setTextWidth(body_rect.width())
+        self.body_item.set_clip_size(QSizeF(body_rect.width(), body_rect.height()))
 
     def _on_title_changed(self):
-        self.title_item.setTextWidth(-1)
-
         # force recalculation of bounding rect
         doc = self.title_item.document()
         doc.adjustSize()
-        text_rect = self.title_item.boundingRect()
-        padding = 12
-        self.header_height = max(36, text_rect.height() + padding)
-
-        y_off = (self.header_height - text_rect.height()) / 2
-        self.title_item.setPos(12, y_off)
-
-        text_w = text_rect.width()
-        r = self.rect()
-        min_w = max(160.0, text_w + 24)
-        if r.width() < min_w:
-            self.setRect(QRectF(0, 0, min_w, r.height()))
+        self._update_text_layout()
+        self._adjust_height_to_body()
 
         self.update()
+        self._call_auto_save()
+
+    def _on_body_changed(self):
+        self._adjust_height_to_body()
+        self.update()
+        self._call_auto_save()
+
+    def _adjust_height_to_body(self):
+        if not hasattr(self, "body_item"):
+            return
+
+        doc = self.body_item.document()
+        doc.adjustSize()
+        body_height = doc.size().height()
+        required_height = self.header_height + 20 + body_height
+
+        r = self.rect()
+        new_height = max(MIN_COMMENT_HEIGHT, required_height)
+        if abs(r.height() - new_height) < 0.5:
+            return
+
+        self.setRect(QRectF(r.x(), r.y(), r.width(), new_height))
 
     def _get_resize_corner(self, pos: QPointF) -> str | None:
         r = self.rect()
@@ -139,10 +277,14 @@ class CommentBoxItem(QGraphicsRectItem):
         self.locked = locked
         self.setAcceptHoverEvents(not locked)
         if locked:
-            self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+            self._finish_text_edit(self.title_item)
+            self._finish_text_edit(self.body_item)
             self.setCursor(Qt.ArrowCursor)
         else:
-            self.title_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+            self.title_item.setTextInteractionFlags(Qt.NoTextInteraction)
+            self.title_item.setAcceptedMouseButtons(Qt.NoButton)
+            self.body_item.setTextInteractionFlags(Qt.NoTextInteraction)
+            self.body_item.setAcceptedMouseButtons(Qt.NoButton)
         self.update()
 
     def set_accent(self, index: int):
@@ -162,7 +304,8 @@ class CommentBoxItem(QGraphicsRectItem):
         self.title_item.setFont(font)
 
         # Recalculate layout since text size changed
-        self._update_title_position()
+        self._update_text_layout()
+        self._adjust_height_to_body()
 
         # Trigger redraw
         self.update()
@@ -322,6 +465,9 @@ class CommentBoxItem(QGraphicsRectItem):
         elif self._in_header(event.pos()):
             self._pin_hover = False
             self.setCursor(Qt.OpenHandCursor)
+        elif self._body_rect().contains(event.pos()):
+            self._pin_hover = False
+            self.setCursor(Qt.IBeamCursor)
         else:
             self._pin_hover = False
             self.setCursor(Qt.ArrowCursor)
@@ -398,10 +544,21 @@ class CommentBoxItem(QGraphicsRectItem):
 
         corner = self._get_resize_corner(event.pos())
         in_header = self._in_header(event.pos())
+        in_body = self._body_rect().contains(event.pos())
 
-        if not corner and not in_header and not self.title_item.isUnderMouse():
+        if not corner and not in_header and not in_body:
             event.ignore()
             return
+
+        if in_body and not corner:
+            target_comment = self._comment_under_body_click(event.scenePos())
+            if target_comment:
+                self.scene().clearSelection()
+                target_comment.setSelected(True)
+                target_comment.bring_to_front_within_comments()
+                target_comment._call_auto_save()
+                event.accept()
+                return
 
         self.resize_corner = corner
         self.resizing = corner is not None
@@ -411,6 +568,7 @@ class CommentBoxItem(QGraphicsRectItem):
         self.original_item_pos = self.pos()
 
         if in_header and not self.resizing:
+            self.bring_to_front_within_comments()
             self._dragging_header = True
             self.setFlag(QGraphicsItem.ItemIsMovable, True)
             self.setCursor(Qt.ClosedHandCursor)
@@ -420,13 +578,41 @@ class CommentBoxItem(QGraphicsRectItem):
 
         super().mousePressEvent(event)
 
+    def mouseDoubleClickEvent(self, event):
+        if self.locked:
+            event.ignore()
+            return
+
+        self._dragging_header = False
+        self.setFlag(QGraphicsItem.ItemIsMovable, False)
+
+        if self._get_resize_corner(event.pos()):
+            event.accept()
+            return
+
+        if hasattr(self, "_pin_rect") and self._pin_rect.contains(event.pos()):
+            event.accept()
+            return
+
+        if self._in_header(event.pos()):
+            self._start_text_edit(self.title_item, event.pos())
+            event.accept()
+            return
+
+        if self._body_rect().contains(event.pos()):
+            self._start_text_edit(self.body_item, event.pos())
+            event.accept()
+            return
+
+        super().mouseDoubleClickEvent(event)
+
     def mouseMoveEvent(self, event):
         if not self.resizing:
             super().mouseMoveEvent(event)
             return
 
-        min_w = 160
-        min_h = 80
+        min_w = MIN_COMMENT_WIDTH
+        min_h = MIN_COMMENT_HEIGHT
         delta = event.screenPos() - self.drag_start_pos
         orig = self.original_rect
         orig_pos = self.original_item_pos
@@ -451,7 +637,7 @@ class CommentBoxItem(QGraphicsRectItem):
             self.setPos(orig_pos.x() + orig.width() - w, orig_pos.y() + orig.height() - h)
             self.setRect(QRectF(0, 0, w, h))
 
-        self._update_title_position()
+        self._update_text_layout()
         self._call_auto_save()
 
     def mouseReleaseEvent(self, event):
@@ -462,12 +648,46 @@ class CommentBoxItem(QGraphicsRectItem):
         self.setFlag(QGraphicsItem.ItemIsMovable, False)
         if self._hover:
             pos = event.pos()
-            self.setCursor(Qt.OpenHandCursor if self._in_header(pos) else Qt.ArrowCursor)
+            if self._in_header(pos):
+                self.setCursor(Qt.OpenHandCursor)
+            elif self._body_rect().contains(pos):
+                self.setCursor(Qt.IBeamCursor)
+            else:
+                self.setCursor(Qt.ArrowCursor)
         super().mouseReleaseEvent(event)
 
     def setRect(self, rect: QRectF):
         super().setRect(rect)
-        self._update_title_position()
+        if hasattr(self, "title_item") and hasattr(self, "body_item"):
+            self._update_text_layout()
+
+    def _start_text_edit(self, text_item: CommentTextItem, item_pos: QPointF):
+        if self._editing_item and self._editing_item is not text_item:
+            self._finish_text_edit(self._editing_item)
+
+        self._editing_item = text_item
+        text_item.setTextInteractionFlags(Qt.TextEditorInteraction)
+        text_item.setAcceptedMouseButtons(Qt.LeftButton | Qt.RightButton)
+        if text_item is self.body_item:
+            self._adjust_height_to_body()
+        text_item.setFocus(Qt.MouseFocusReason)
+        self.setCursor(Qt.IBeamCursor)
+
+        doc_pos = text_item.mapFromParent(item_pos)
+        hit_pos = text_item.document().documentLayout().hitTest(doc_pos, Qt.FuzzyHit)
+        cursor = text_item.textCursor()
+        if hit_pos >= 0:
+            cursor.setPosition(hit_pos)
+        else:
+            cursor.movePosition(cursor.End)
+        text_item.setTextCursor(cursor)
+
+    def _finish_text_edit(self, text_item: CommentTextItem):
+        text_item.setTextInteractionFlags(Qt.NoTextInteraction)
+        text_item.setAcceptedMouseButtons(Qt.NoButton)
+        if self._editing_item is text_item:
+            self._editing_item = None
+        self._call_auto_save()
 
     def _delete_self(self):
         if self.scene() and self.scene().views():
