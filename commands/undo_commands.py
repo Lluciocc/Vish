@@ -199,6 +199,8 @@ class AddCommentCommand(QUndoCommand):
     def redo(self):
         if self.comment.scene() is None:
             self.scene.addItem(self.comment)
+        if hasattr(self.comment, "bring_to_front_within_comments"):
+            self.comment.bring_to_front_within_comments()
 
     def undo(self):
         if self.comment.scene() is self.scene:

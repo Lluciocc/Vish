@@ -22,7 +22,7 @@ from nodes.command_nodes import RunCommandNode, EchoNode, ExitNode, PipeNode
 from nodes.variable_nodes import SetVariableNode, GetVariableNode, FileExistsNode
 from nodes.operation_nodes import Addition
 from nodes.utils_node import ToString
-from ui.comment_box import CommentBoxItem
+from ui.comment_box import COMMENT_Z_BASE, CommentBoxItem
 from ui.graph_view import GraphView
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
@@ -320,8 +320,19 @@ class VisualBashEditor(QMainWindow):
         for edge in self.graph.edges.values():
             self.graph_view.graph_scene.add_core_edge(edge, self.graph_view.node_items)
 
-        for comment in comments:
+        comment_count = len(comments)
+        for index, comment in enumerate(comments):
+            if "z" not in comment:
+                comment = dict(comment)
+                comment["z"] = COMMENT_Z_BASE + comment_count - index - 1
             self.load_comment(comment)
+
+        comment_items = [
+            item for item in self.graph_view.scene().items()
+            if isinstance(item, CommentBoxItem)
+        ]
+        if comment_items:
+            comment_items[0].normalize_comment_z_order()
 
         # Reset z counter based on loaded nodes to ensure new nodes are on top
         max_z = max((node.z for node in self.graph.nodes.values()), default=0)
@@ -344,12 +355,16 @@ class VisualBashEditor(QMainWindow):
     def load_comment(self, comment):
             box = CommentBoxItem(
                 rect=QRectF(0, 0, comment["w"], comment["h"]),
-                title=comment["title"]
+                title=comment["title"],
+                body_text=comment.get("body", "")
             )
             box.setPos(comment["x"], comment["y"])
+            box.setZValue(comment.get("z", box.zValue()))
             box.set_locked(comment.get("locked", False))
             box._accent_index = comment.get("color_index", 0)
+            box.set_title_size_index(comment.get("size_index", 2))
             box.move_children = comment.get("move_children", True)
+            box.setRect(QRectF(0, 0, comment["w"], comment["h"]))
             self.graph_view.scene().addItem(box)
 
     def clear_property_panel(self):

@@ -172,6 +172,7 @@ def load_every_theme() -> None:
 def import_theme(filepath: str) -> type | None:
     try:
         _copy_theme_to_config(filepath)
+        Logger.LogMessage(f"Theme imported: {filepath}")
         theme = load_theme(filepath)
         return theme
     except Exception as e:
@@ -185,6 +186,7 @@ def delete_theme(theme_name: str) -> None:
                 file.unlink()
                 if theme_name in theme_list:
                     theme_list.remove(theme_name)
+                Logger.LogMessage(f"Theme deleted: {theme_name}")
                 return
         except Exception as e:
             Debug.Error(f"Failed to delete {file.name}: {e}")

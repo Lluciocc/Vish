@@ -80,7 +80,7 @@ class GraphView(QGraphicsView):
             )
         )
 
-    def _get_zoom_anim_value(self):
+    def get_zoom(self):
         return self.scale_factor
 
     def _set_zoom_anim_value(self, value):
@@ -88,7 +88,7 @@ class GraphView(QGraphicsView):
 
     zoom_anim_value = Property(
         float,
-        _get_zoom_anim_value,
+        get_zoom,
         _set_zoom_anim_value
     )
 

@@ -60,10 +60,13 @@ class Serializer:
                     {
                         "x": item.pos().x(),
                         "y": item.pos().y(),
+                        "z": item.zValue(),
                         "w": r.width(),
                         "h": r.height(),
                         "title": item.title_item.toPlainText(),
+                        "body": item.body_item.toPlainText(),
                         "color_index": item._accent_index,
+                        "size_index": item._size_index,
                         "locked": item.locked,
                         "move_children": item.move_children
                     }

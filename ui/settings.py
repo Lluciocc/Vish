@@ -107,11 +107,7 @@ class SettingsDialog(QDialog):
         self.layout.addWidget(self.language_title)
 
         self.lang_combo = QComboBox()
-        for label, code in [
-            ("English", "en"), ("Francais", "fr"), ("Español", "es"),
-            ("العربية", "ar"), ("Italiano", "it"), ("Deutsch", "de"),
-            ("Português (Brasil)", "ptbr"), ("čeština", "cs"),
-        ]:
+        for label, code in Traduction.get_languages():
             self.lang_combo.addItem(label, code)
 
         self.lang_combo.setCurrentIndex(self.lang_combo.findData(Config.lang))

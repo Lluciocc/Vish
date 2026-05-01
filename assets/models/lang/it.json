@@ -1,4 +1,5 @@
 {
+    "language_name": "Italiano",
     "warn_generating_empty_graph": "Generando un grafico vuoto.",
     "error_no_file_selected": "Nessun file selezionato.",
     "error_cannot_save_empty_graph": "Impossibile salvare un grafico vuoto.",
@@ -61,7 +62,7 @@
     "shortcut_redo_2": "Ripeti (2)",
     "shortcut_select_all": "Seleziona tutti i nodi",
     "shortcut_duplicate": "Duplica selezione",
-    "shortcut_delete": "Elimina nodi selezionati",  
+    "shortcut_delete": "Elimina nodi selezionati",
     "shortcut_node_palette": "Apri paletta dei nodi per selezionare il nodo",
     "shortcut_comment_box": "Crea casella dei commenti",
     "shortcut_auto_layout": "Organizza grafico automaticamente",
