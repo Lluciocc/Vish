@@ -3,7 +3,7 @@ from core.port_types import PortDirection, PortType
 
 class GraphValidator:
     @staticmethod
-    def is_valid_connection(graph, existing_edges, a, b) -> bool:
+    def is_valid_connection(graph, a, b) -> bool:
         if a is b:
             return False
 
@@ -31,15 +31,6 @@ class GraphValidator:
 
 
         is_exec = src.port_type == PortType.EXEC
-
-        for edge in existing_edges:
-
-            if edge.target_port is dst_item:
-                return False
-
-            if is_exec and edge.source_port is src_item:
-                return False
-
         return True
 
     @staticmethod
