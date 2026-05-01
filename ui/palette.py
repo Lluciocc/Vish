@@ -1,13 +1,15 @@
-from PySide6.QtWidgets import QWidget, QVBoxLayout, QLineEdit, QTreeWidget, QTreeWidgetItem
-from PySide6.QtCore import Qt, Signal
-from nodes.registry import NODE_REGISTRY
-from theme.theme import Theme
-from core.traduction import Traduction
 from core.debug import Info
 from core.icons import Icon
+from core.traduction import Traduction
+from nodes.registry import NODE_REGISTRY
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
+from theme.theme import Theme
 import os
 
+
 links = {}
+
 
 class CustomQLineEdit(QLineEdit):
     def __init__(self, parent=None):
@@ -20,7 +22,7 @@ class CustomQLineEdit(QLineEdit):
 
         super().keyPressEvent(event)
 
-        
+
 class CustomQTreeWidget(QTreeWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -42,7 +44,7 @@ class CustomQTreeWidget(QTreeWidget):
                 super().keyPressEvent(event)
                 return
 
-        
+
 class NodePalette(QWidget):
     node_selected = Signal(str)
 
@@ -138,7 +140,7 @@ class NodePalette(QWidget):
         if(not (self.search_input.hasFocus())):
             self.close()
         super().focusOutEvent(event)
-    
+
     def showEvent(self, event):
         super().showEvent(event)
         if not self.tree.currentItem():
@@ -157,7 +159,7 @@ class NodePalette(QWidget):
             if item.isExpanded():
                 item.setExpanded(False)
                 return
-            
+
             if item.childCount() > 0:
                 item.setExpanded(True)
                 if item.childCount() > 0:
@@ -182,8 +184,8 @@ class NodePalette(QWidget):
             view = self.parent()
             if view:
                 scene = view.scene()
-                if scene and scene.drag_edge:
-                    scene._cancel_drag_edge()
+                if scene and scene.drag_edges:
+                    scene.restore_pending_connection()
         super().closeEvent(event)
 
     def get_icon(self, name):
