@@ -123,7 +123,16 @@ class Graph:
             edge = self.edges[edge_id]
             edge.disconnect()
             del self.edges[edge_id]
-    
+
+    def update_edge(self, edge_id: str, source: Port, target: Port):
+        if edge_id in self.edges:
+            edge = self.edges[edge_id]
+            edge.disconnect()
+            del self.edges[edge_id]
+            edge = Edge(source, target)
+            self.edges[edge_id] = edge
+            return edge
+
     def get_start_node(self) -> Optional[Node]:
         for node in self.nodes.values():
             if node.node_type == "start":
