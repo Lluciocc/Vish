@@ -1,27 +1,28 @@
-from PySide6.QtWidgets import QGraphicsView,QGraphicsRectItem, QGraphicsTextItem, QWidget, QHBoxLayout, QSlider, QLabel, QPushButton
-from PySide6.QtCore import Qt, Signal, QRectF, QPointF, QEvent, QPropertyAnimation, QEasingCurve, Property, QTimer
-from PySide6.QtGui import QPainter, QColor, QCursor, QMouseEvent, QKeySequence, QUndoStack
-from core.graph import Port
-from core.port_types import PortType
-from ui.palette import NodePalette
-from ui.graph_scene import GraphScene
-from ui.node_item import NodeItem
-from ui.edge_item import EdgeItem
-from ui.comment_box import CommentBoxItem
-from theme.theme import Theme
+from commands.undo_commands import *
+from core.config import Config
 from core.clipboard import GraphClipboard
+from core.debug import Debug, Info
+from core.graph import Port
+from core.icons import Icon
+from core.layout import GraphLayoutEngine
+from core.port_types import PortType
 from core.serializer import Serializer
 from nodes.registry import create_node
-from core.debug import Debug, Info
-from commands.undo_commands import *
-from core.layout import GraphLayoutEngine
-from core.icons import Icon
-from core.config import Config
-from core.logger import Logger
+from PySide6.QtCore import Property, QEasingCurve, QEvent, QPointF, QPropertyAnimation, QRectF, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QCursor, QKeySequence, QMouseEvent, QPainter, QUndoStack
+from PySide6.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsTextItem, QGraphicsView, QHBoxLayout, QLabel, QPushButton, QSlider, QWidget
+from theme.theme import Theme
+from ui.comment_box import CommentBoxItem
+from ui.edge_item import EdgeItem
+from ui.graph_scene import GraphScene
+from ui.node_item import NodeItem
+from ui.palette import NodePalette
+
 
 class ZoomLabel(QLabel):
     def mouseDoubleClickEvent(self, event):
         self.parent().parent().set_zoom(1.0, animated=True)
+
 
 # class MiniMap(QGraphicsView):
 #     def __init__(self, scene, parent):
@@ -32,6 +33,7 @@ class ZoomLabel(QLabel):
 #         self.setInteractive(False)
 #         self.setStyleSheet("background: rgba(20,20,20,180); border: 1px solid #444;")
 #         self.scale(0.1, 0.1)
+
 
 class GraphView(QGraphicsView):
     connection_request = Signal(Port, Port)
@@ -96,12 +98,15 @@ class GraphView(QGraphicsView):
         if items:
             super().contextMenuEvent(event)
             return
-            
+
         self.setDragMode(QGraphicsView.NoDrag)
         self.show_node_palette(scene_pos)
         event.accept()
 
     def show_node_palette(self, scene_pos):
+        if self.graph_scene.block_input:
+            return
+
         if self._palette and self._palette.isVisible():
             self._palette.close()
 
@@ -114,6 +119,7 @@ class GraphView(QGraphicsView):
 
         view_pos = self.mapFromScene(scene_pos)
         global_pos = self.viewport().mapToGlobal(view_pos)
+        self.gpos = self.mapToScene(self.mapFromGlobal(QCursor.pos()))
 
         palette.move(global_pos)
         palette.show()
@@ -136,23 +142,29 @@ class GraphView(QGraphicsView):
         self.undo_stack.push(AddNodeCommand(self, node))
         node_item = self.node_items.get(node.id)
 
-
         scene = self.scene()
-        if scene.pending_port and scene.drag_edge:
-            from_port_item = scene.pending_port
-            scene.pending_port = None
-            scene.pending_scene_pos = None
+        if scene.drag_edges:
+            source_port = scene.drag_edges[0].source_port
+            valid_port = None
 
-            target_port_item = None
-            want_input = not from_port_item.is_input
+            target_port = None
+            target_is_input = not source_port.is_input
 
-            for p in node_item.port_items.values():
-                if p.is_input == want_input:
-                    target_port_item = p
-                    break
+            for port in node_item.port_items.values():
+                if port.is_input == target_is_input:
+                    target_port = port
+                    valid = scene._is_valid_connection(source_port, target_port)
+                    if valid:
+                        valid_port = target_port
+                        break
 
-            if target_port_item:
-                scene.finalize_connection(from_port_item, target_port_item)
+            if valid_port:
+                for edge in scene.drag_edges:
+                    if target_is_input:
+                        scene.set_edge(edge.source_port, valid_port, edge)
+                    else:
+                        scene.set_edge(valid_port, edge.source_port, edge)
+                scene.drag_edges.clear()
             else:
                 scene._cancel_drag_edge()
 
@@ -165,38 +177,6 @@ class GraphView(QGraphicsView):
         self.graph_scene.addItem(node_item)
         self.node_items[node.id] = node_item
         return node_item
-
-    def add_edge_item(self, edge):
-        source_node_item = self.node_items.get(edge.source.node.id)
-        target_node_item = self.node_items.get(edge.target.node.id)
-        if not source_node_item or not target_node_item:
-            return None
-
-        src_port_item = source_node_item.port_items.get(edge.source.id)
-        tgt_port_item = target_node_item.port_items.get(edge.target.id)
-        if not src_port_item or not tgt_port_item:
-            return None
-
-        edge_item = EdgeItem(source_port=src_port_item, target_port=tgt_port_item)
-        edge_item.edge = edge
-
-        self.graph_scene.addItem(edge_item)
-        edge_item.update_positions()
-
-        self.graph_scene.edges.append(edge_item)
-        self.edge_items[edge.id] = edge_item
-        return edge_item
-    
-    def remove_edge_item(self, edge_id):
-        edge_item = self.edge_items.get(edge_id)
-        if not edge_item:
-            return
-        if edge_item.scene() is self.graph_scene:
-            self.graph_scene.removeItem(edge_item)
-        if edge_item in self.graph_scene.edges:
-            self.graph_scene.edges.remove(edge_item)
-        del self.edge_items[edge_id]
-
 
     def wheelEvent(self, event):
         zoom_step = 1.15
@@ -224,7 +204,6 @@ class GraphView(QGraphicsView):
         self.scale(applied_factor, applied_factor)
 
         self._sync_zoom_from_transform()
-
 
     def viewportEvent(self, event):
         if isinstance(event, QMouseEvent):
@@ -286,11 +265,8 @@ class GraphView(QGraphicsView):
                 scene_pos = self.mapToScene(view_pos)
                 self.undo_stack.push(PasteCommand(self, self.clipboard.get(), scene_pos))
             return
-        if event.key() == Qt.Key_C: # C 
+        if event.key() == Qt.Key_C: # C
             self.create_comment_box()
-            self.clear_property_panel_request.emit()
-            self.graph_scene.auto_save_triggered.emit()
-            Logger.LogMessage("Comment box created")
             event.accept()
             return
         if event.matches(QKeySequence.Undo): # Ctrl+Z
@@ -298,8 +274,6 @@ class GraphView(QGraphicsView):
             self.clear_property_panel_request.emit()
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
-            if Config.AUTO_SAVE:
-                self.graph_scene.auto_save_triggered.emit()
             return
 
         if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
@@ -312,6 +286,8 @@ class GraphView(QGraphicsView):
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
                     item.setSelected(True)
+            if Config.SYNC_NODES_AND_GEN:
+                self.graph_scene.graph_changed.emit()
             return
         if event.matches(QKeySequence.Cut): # Ctrl+X
             self.copy_selection()
@@ -326,7 +302,7 @@ class GraphView(QGraphicsView):
             self.copy_selection()
             self.paste()
             return
-        if event.matches(QKeySequence.Delete):
+        if event.matches(QKeySequence.Delete): # Del
             self.clear_property_panel_request.emit()
             selected_items = self.scene().selectedItems()
 
@@ -340,20 +316,16 @@ class GraphView(QGraphicsView):
                     self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
 
                 for it in comment_items:
-                    if isinstance(it, CommentBoxItem):
-                        if it._in_header(it.mapFromScene(self.scene().views()[0].mapToScene(self.scene().views()[0].mapFromGlobal(QCursor.pos())))):
-                            it._delete_self()
+                    self.undo_stack.push(RemoveCommentCommand(self, it))
 
                 self.undo_stack.endMacro()
 
                 if Config.SYNC_NODES_AND_GEN:
                     self.graph_scene.graph_changed.emit()
-                if Config.AUTO_SAVE:
-                    self.graph_scene.auto_save_triggered.emit()
 
                 event.accept()
                 return
-            
+
         if event.key() == Qt.Key_F: # F
             self.auto_layout()
             return
@@ -414,6 +386,9 @@ class GraphView(QGraphicsView):
         super().mousePressEvent(event)
 
     def mouseReleaseEvent(self, event): # restore drag mode after dragging
+        if event.button() == Qt.LeftButton:
+            self.graph_scene.block_input = False
+
         self.setDragMode(QGraphicsView.RubberBandDrag)
         super().mouseReleaseEvent(event)
 
@@ -433,28 +408,16 @@ class GraphView(QGraphicsView):
         self.fitInView(rect, Qt.KeepAspectRatio)
         self._sync_zoom_from_transform()
 
-
     def remove_node_item(self, node_id):
         if node_id not in self.node_items:
             return
 
         node_item = self.node_items[node_id]
 
-        for edge_item in list(self.graph_scene.edges):
-            if (
-                edge_item.source_port in node_item.port_items.values()
-                or edge_item.target_port in node_item.port_items.values()
-            ):
-                if edge_item.edge:
-                    if edge_item.edge and edge_item.edge.id in self.graph.edges:
-                        self.graph.remove_edge(edge_item.edge.id)
-                    if edge_item.edge.id in self.edge_items:
-                        del self.edge_items[edge_item.edge.id]
-                        self.graph.remove_edge(edge_item.edge.id)
-                if edge_item.scene() is self.graph_scene:
-                    self.graph_scene.removeItem(edge_item)
-
-                self.graph_scene.edges.remove(edge_item)
+        for port in node_item.port_items.values():
+            for edge in port.edges:
+                self.graph_scene.drag_edges.append(edge)
+            self.graph_scene.delete_edges()
 
         self.graph.remove_node(node_id)
 
@@ -471,7 +434,7 @@ class GraphView(QGraphicsView):
 
     def get_selected_nodes(self):
         return [item.node for item in self.get_selected_node_items()]
-    
+
     def copy_selection(self, message=True):
         nodes = self.get_selected_nodes()
         if not nodes:
@@ -515,23 +478,23 @@ class GraphView(QGraphicsView):
             id_map[node_data["id"]] = node
 
         for edge_data in data.get("edges", []):
-            src_node = id_map.get(edge_data["source_node"])
-            tgt_node = id_map.get(edge_data["target_node"])
-            if not src_node or not tgt_node:
+            source_node = id_map.get(edge_data["source_node"])
+            target_node = id_map.get(edge_data["target_node"])
+            if not source_node or not target_node:
                 continue
 
-            src_i = edge_data["source_output_index"]
-            tgt_i = edge_data["target_input_index"]
+            source_i = edge_data["source_output_index"]
+            target_i = edge_data["target_input_index"]
 
-            if src_i >= len(src_node.outputs) or tgt_i >= len(tgt_node.inputs):
+            if source_i >= len(source_node.outputs) or target_i >= len(target_node.inputs):
                 continue
 
-            src_port = src_node.outputs[src_i]
-            tgt_port = tgt_node.inputs[tgt_i]
+            source_port = source_node.outputs[source_i]
+            target_port = target_node.inputs[target_i]
 
-            edge = self.graph.add_edge(src_port, tgt_port)
+            edge = self.graph.add_edge(source_port, target_port)
             if edge:
-                self.add_edge_item(edge)
+                self.graph_scene.add_core_edge(edge, self.node_items)
 
         self.paste_offset = (self.paste_offset[0] + 10, self.paste_offset[1] + 10)
         if message:
@@ -551,7 +514,6 @@ class GraphView(QGraphicsView):
             if item:
                 item.setPos(x, y)
                 self.graph_scene.update_edges_for_node(item)
-
 
     def apply_theme(self):
         self.setBackgroundBrush(QColor(Theme.BACKGROUND))
@@ -584,7 +546,6 @@ class GraphView(QGraphicsView):
 
             QSlider::handle:horizontal {{
                 background: {Theme.ACCENT};
-                border: 1px solid {Theme.BACKGROUND};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
@@ -694,7 +655,6 @@ class GraphView(QGraphicsView):
 
             QSlider::handle:horizontal {{
                 background: {Theme.ACCENT};
-                border: 1px solid {Theme.BACKGROUND};
                 width: 14px;
                 margin: -4px 0;
                 border-radius: 7px;
@@ -776,7 +736,7 @@ class GraphView(QGraphicsView):
                 target_input = p
                 break
 
-        if source_output and target_input:
+        if source_output and target_input:                                      #TODO outdated code
             self.graph_scene.start_connection(source_output)
             self.graph_scene.finalize_connection(source_output, target_input)
 
