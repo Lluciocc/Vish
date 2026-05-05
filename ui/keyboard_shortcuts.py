@@ -1,4 +1,3 @@
-import os
 from PySide6.QtWidgets import QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtCore import Qt
@@ -54,64 +53,103 @@ SHORTCUTS = {
     },
 }
 
+KEY_SIZE = 24
+KEY_SPACING = 6
+DEFAULT_KEY_STYLE = {
+    "icon": "keycap_common",
+    "width": 1,
+    "show_label": True,
+}
+KEY_STYLES = {
+    "Ctrl": {"icon": "keycap_large", "width": 2},
+    "Shift": {"icon": "keycap_large", "width": 2},
+    "Space": {"icon": "keycap_large", "width": 2},
+    "Alt": {"icon": "keycap_large", "width": 2},
+    "Num+": {"icon": "keycap_large", "width": 2},
+    "Num-": {"icon": "keycap_large", "width": 2},
+    "LB": {"icon": "mouse_left", "width": 1, "show_label": False},
+    "MB": {"icon": "mouse_middle", "width": 1, "show_label": False},
+    "RB": {"icon": "mouse_right", "width": 1, "show_label": False},
+    "Mouse": {"icon": "mouse_simple", "width": 1, "show_label": False},
+}
+
+
+def get_key_style(key):
+    return KEY_STYLES.get(key, DEFAULT_KEY_STYLE)
+
+
+def get_key_width(key, size=KEY_SIZE):
+    return int(get_key_style(key)["width"] * size)
+
+
+def get_shortcut_width(keys, size=KEY_SIZE, spacing=KEY_SPACING):
+    if not keys:
+        return 0
+
+    key_widths = sum(get_key_width(key, size) for key in keys)
+    return key_widths + spacing * (len(keys) - 1)
+
+
+def get_shortcut_area_width():
+    return max(
+        get_shortcut_width(keys)
+        for section in SHORTCUTS.values()
+        for keys, _ in section["items"]
+    )
+
 
 class KeyImage(QSvgWidget):
-    def __init__(self, key, size):
-        super().__init__()
-        if key == "Ctrl" or key == "Shift" or key == "Space" or key == "Alt" or key == "Num+" or key == "Num-":
-            width = 2 * size
-            icon = "keycap_large"
-        else:
-            width = size
-            icon = "keycap_common"
+    def __init__(self, key, size, parent=None):
+        super().__init__(parent)
+        style = get_key_style(key)
+        width = get_key_width(key, size)
 
-        icon = Icon.load_widget(self, "shortcuts", icon, width, size)
+        Icon.load_widget(self, "shortcuts", style["icon"], width, size)
         self.setStyleSheet("background: transparent;")
-        self.setMaximumSize(width, size)
-        self.setMinimumSize(width, size)
+        self.setFixedSize(width, size)
+
+
+class ShortcutKey(QWidget):
+    def __init__(self, key, size=KEY_SIZE):
+        super().__init__()
+        style = get_key_style(key)
+        width = get_key_width(key, size)
+        self.setFixedSize(width, size)
+        self.setStyleSheet("background: transparent;")
+
+        self.image = KeyImage(key, size, self)
+        self.image.move(0, 0)
+
+        if not style.get("show_label", True):
+            return
+
+        self.key_label = QLabel(key, self)
+        self.key_label.setAlignment(Qt.AlignCenter)
+        self.key_label.setFixedSize(width, size)
+        self.key_label.setStyleSheet(f"background: transparent; color: {Theme.TEXT_INV};")
 
 
 class ShortcutRow(QWidget):
-    def __init__(self, keys, label, category):
+    def __init__(self, keys, label, key_area_width):
         super().__init__()
-        key_size = 24
-        spacing = 6
         layout = QHBoxLayout(self)
         layout.setContentsMargins(0, 4, 0, 4)
-        layout.setSpacing(spacing)
+        layout.setSpacing(KEY_SPACING)
 
-        if category == ("general", "General"):
-            spaceCount = 1
-        elif category == ("edition", "Edition"):
-            spaceCount = 2
-        elif category == ("graph", "Graph"):
-            spaceCount = 1
+        key_container = QWidget()
+        key_container.setFixedWidth(key_area_width)
+        key_container.setStyleSheet("background: transparent;")
 
-        for i, key in enumerate(keys):
-            key_label = QLabel(key)
-            key_label.setAlignment(Qt.AlignCenter)
-            key_label.setStyleSheet(f"background: transparent; color: {Theme.TEXT_INV};")
+        key_layout = QHBoxLayout(key_container)
+        key_layout.setContentsMargins(0, 0, 0, 0)
+        key_layout.setSpacing(KEY_SPACING)
+        key_layout.setAlignment(Qt.AlignLeft)
 
-            if key == "Ctrl" or key == "Shift" or key == "Space" or key == "Alt" or key == "Num+" or key == "Num-":
-                layout.addWidget(KeyImage(key, key_size))
-                key_label.setFixedWidth(key_size * 2)
-                layout.addSpacing((key_size * 2 + spacing) * -1)
-                layout.addWidget(key_label)
-            elif spaceCount == i:
-                layout.addWidget(KeyImage(key, key_size))
-                key_label.setFixedWidth(key_size)
-                layout.addSpacing((key_size + spacing) * -1)
-                layout.addWidget(key_label)
-                layout.addSpacing(key_size)
-            else:
-                layout.addSpacing(key_size / 2)
-                layout.addWidget(KeyImage(key, key_size))
-                key_label.setFixedWidth(key_size)
-                layout.addSpacing((key_size + spacing) * -1)
-                layout.addWidget(key_label)
-                layout.addSpacing(key_size / 2)
+        for key in keys:
+            key_layout.addWidget(ShortcutKey(key))
 
-        layout.addSpacing((spaceCount - i) * 54 - 12)
+        layout.addWidget(key_container)
+
         text = QLabel(Traduction.get_trad(label, label))
         text.setStyleSheet(f"font-size: 15px; color: {Theme.TEXT}; background: transparent;")
         layout.addWidget(text)
@@ -162,10 +200,11 @@ class KeyboardShortcutsDialog(QDialog):
         content = QHBoxLayout()
         content.setSpacing(56)
 
+        key_area_width = get_shortcut_area_width()
         for section in SHORTCUTS.values():
             col = ShortcutColumn(Traduction.get_trad(*section["title"]))
             for keys, text in section["items"]:
-                col.layout.addWidget(ShortcutRow(keys, text, section["title"]))
+                col.layout.addWidget(ShortcutRow(keys, text, key_area_width))
             col.layout.addStretch()
             content.addWidget(col)
 
