@@ -5,6 +5,7 @@
     "error_cannot_save_empty_graph": "Impossible de sauvegarder un graphe vide.",
     "graph_saved_successfully": "Graphe sauvegardé à {file_path} avec {node_count} nœuds et {edge_count} arêtes.",
     "graph_loaded_successfully": "Graphe chargé depuis {file_path} avec {node_count} nœuds et {edge_count} arêtes.",
+    "file_dialog_open": "Ouvrir un graphe",
     "running_windows": "Il n'est pas possible d'exécuter le script sur Windows.",
     "no_bash_script": "Aucun script bash trouvé pour exécuter le graphe.",
     "running_generated_bash_script": "Exécution du script bash généré...",
@@ -20,8 +21,21 @@
     "theme_purple": "Violet",
     "theme_white": "Clair",
     "theme_breeze_dark": "Breeze sombre",
+    "more_options": "Plus d'options",
 
     "about": "À propos",
+    "never_modified": "Jamais enregistré",
+    "remove_recent": "Retirer des récents",
+    "welcome_title": "Bienvenue",
+    "welcome_recent_projects": "Projets récents",
+    "welcome_new_project": "Nouveau projet",
+    "welcome_open_project": "Ouvrir un projet",
+    "no_recent_projects": "Aucun projet récent",
+    "remove_recent_question": "Voulez-vous retirer ce projet de la liste des récents ?",
+    "new_project_name": "Nom du projet",
+    "new_project_enter_name": "Saisir le nom du projet :",
+    "select_project_folder": "Sélectionner le dossier du projet",
+
     "settings": "Paramètres",
     "appearance": "Apparence",
     "theme": "Thème",
@@ -34,6 +48,8 @@
     "custom_shebang": "Shebang personnalisé",
     "full_screen": "Plein écran",
     "close": "Fermer",
+    "import_theme": "Importer...",
+    "delete_theme": "Supprimer",
 
     "app_name": "Visual Bash Editor",
     "app_tagline": "Une manière visuelle de créer des scripts Bash",
@@ -45,6 +61,8 @@
     "about_whats_new": "Quoi de neuf?",
     "about_questions": "FAQs",
     "about_support": "Soutenir le projet",
+    "about_theme_repo": "Dépôt de collection de thèmes",
+    "about_matrix": "Rejoindre notre salon Matrix",
     "about_legal_text": "Ce logiciel est fourni tel quel, sans aucune garantie.",
 
     "keyboard_shortcuts": "Raccourcis clavier",
@@ -59,6 +77,7 @@
     "shortcut_paste": "Coller",
     "shortcut_cut_selection": "Couper la sélection",
     "shortcut_undo": "Annuler",
+    "shortcut_redo": "Rétablir",
     "shortcut_redo_1": "Rétablir (1)",
     "shortcut_redo_2": "Rétablir (2)",
     "shortcut_select_all": "Sélectionner tous les nœuds",
@@ -68,6 +87,17 @@
     "shortcut_comment_box": "Créer une boîte de commentaire",
     "shortcut_auto_layout": "Organiser automatiquement le graphe",
     "shortcut_rebuild_graph": "Reconstruire le graphe",
+    "shortcut_frame_all": "Tout cadrer",
+    "shortcut_welcome_window": "Ouvrir la fenêtre d'accueil",
+    "shortcut_toggle_fullscreen": "Basculer en plein écran",
+    "shortcut_open_settings": "Ouvrir les paramètres",
+    "shortcut_temporary_translation": "Traduction temporaire (maintenir Alt)",
+    "shortcut_zoom_in": "Zoomer",
+    "shortcut_zoom_out": "Dézoomer",
+    "shortcut_reconnection_mode": "Mode de reconnexion",
+    "shortcut_removing_mode": "Mode suppression",
+    "shortcut_reset_zoom": "Réinitialiser le zoom",
+    "shortcut_save_log_file": "Enregistrer le fichier journal",
 
 
     "Commands": "Commandes",
@@ -218,5 +248,50 @@
     "to_int": "Convertir en entier",
     "to_int_label": "Convertir en entier",
     "to_int_desc": "Convertit une valeur en nombre entier.",
-    "to_int_tooltip": "Transforme une valeur en entier."
+    "to_int_tooltip": "Transforme une valeur en entier.",
+
+    "pipe": "Tube",
+    "pipe_label": "Tube",
+    "pipe_desc": "Transmet la sortie d'une commande à une autre.",
+    "pipe_tooltip": "Connecte la sortie d'une commande à une autre commande.",
+
+    "sequencer": "Séquenceur",
+    "sequencer_label": "Séquenceur",
+    "sequencer_desc": "Exécute les nœuds connectés séquentiellement de haut en bas.",
+    "sequencer_tooltip": "Exécute les nœuds connectés en séquence.",
+
+    "equals_string": "Égal à (texte)",
+    "equals_string_label": "Égal à (texte)",
+    "equals_string_desc": "Vérifie si deux valeurs de texte sont égales.",
+    "equals_string_tooltip": "Comparaison d'égalité de texte.",
+
+    "equals_variable": "Égal à (variable)",
+    "equals_variable_label": "Égal à (variable)",
+    "equals_variable_desc": "Vérifie si une variable correspond à une autre valeur.",
+    "equals_variable_tooltip": "Comparaison d'égalité de variable.",
+
+    "command_condition": "Condition de commande",
+    "command_condition_label": "Condition de commande",
+    "command_condition_desc": "Utilise une commande personnalisée comme condition.",
+    "command_condition_tooltip": "Traite le résultat de la commande comme une condition.",
+
+    "sleep": "Attendre",
+    "sleep_label": "Attendre",
+    "sleep_desc": "Met l'exécution en pause pendant une durée spécifiée.",
+    "sleep_tooltip": "Attend avant de poursuivre l'exécution.",
+
+    "download_file": "Télécharger un fichier",
+    "download_file_label": "Télécharger un fichier",
+    "download_file_desc": "Télécharge un fichier depuis une URL spécifiée.",
+    "download_file_tooltip": "Télécharge un fichier distant.",
+
+    "git_clone": "Cloner Git",
+    "git_clone_label": "Cloner Git",
+    "git_clone_desc": "Clone un dépôt Git vers une destination spécifiée.",
+    "git_clone_tooltip": "Clone un dépôt.",
+
+    "open_website": "Ouvrir un site web",
+    "open_website_label": "Ouvrir un site web",
+    "open_website_desc": "Ouvre une URL spécifiée dans le navigateur par défaut.",
+    "open_website_tooltip": "Ouvre une URL dans le navigateur."
 }

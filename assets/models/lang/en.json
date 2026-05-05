@@ -58,6 +58,7 @@
     "about_report": "Report an issue",
     "about_credits": "Credits",
     "about_legal": "Legal",
+    "about_legal_text": "This software is provided as is, without any warranty.",
     "about_whats_new": "What's new?",
     "about_questions": "FAQs",
     "about_support": "Support the project",
@@ -76,6 +77,7 @@
     "shortcut_paste": "Paste",
     "shortcut_cut_selection": "Cut selection",
     "shortcut_undo": "Undo",
+    "shortcut_redo": "Redo",
     "shortcut_redo_1": "Redo (1)",
     "shortcut_redo_2": "Redo (2)",
     "shortcut_select_all": "Select all nodes",
@@ -94,6 +96,7 @@
     "shortcut_zoom_out": "Zoom out",
     "shortcut_reconnection_mode": "Reconnection mode",
     "shortcut_removing_mode": "Removing mode",
+    "shortcut_reset_zoom": "Reset zoom",
     "shortcut_save_log_file": "Save log file",
 
     "Commands": "Commands",
@@ -244,5 +247,50 @@
     "to_int": "Convert to integer",
     "to_int_label": "Convert to integer",
     "to_int_desc": "Converts a value to an integer number.",
-    "to_int_tooltip": "Transforms a value into an integer."
+    "to_int_tooltip": "Transforms a value into an integer.",
+
+    "pipe": "Pipe",
+    "pipe_label": "Pipe",
+    "pipe_desc": "Pipes output from one command into another.",
+    "pipe_tooltip": "Connects command output to another command.",
+
+    "sequencer": "Sequencer",
+    "sequencer_label": "Sequencer",
+    "sequencer_desc": "Executes connected nodes sequentially from top to bottom.",
+    "sequencer_tooltip": "Runs connected nodes in sequence.",
+
+    "equals_string": "Equal to (text)",
+    "equals_string_label": "Equal to (text)",
+    "equals_string_desc": "Checks if two text values are equal.",
+    "equals_string_tooltip": "Text equality comparison.",
+
+    "equals_variable": "Equal to (variable)",
+    "equals_variable_label": "Equal to (variable)",
+    "equals_variable_desc": "Checks if a variable matches another value.",
+    "equals_variable_tooltip": "Variable equality comparison.",
+
+    "command_condition": "Command condition",
+    "command_condition_label": "Command condition",
+    "command_condition_desc": "Uses a custom command as a condition.",
+    "command_condition_tooltip": "Treats the command result as a condition.",
+
+    "sleep": "Sleep",
+    "sleep_label": "Sleep",
+    "sleep_desc": "Pauses execution for a specified duration.",
+    "sleep_tooltip": "Waits before continuing execution.",
+
+    "download_file": "Download file",
+    "download_file_label": "Download file",
+    "download_file_desc": "Downloads a file from a specified URL.",
+    "download_file_tooltip": "Downloads a remote file.",
+
+    "git_clone": "Git clone",
+    "git_clone_label": "Git clone",
+    "git_clone_desc": "Clones a Git repository to a specified destination.",
+    "git_clone_tooltip": "Clones a repository.",
+
+    "open_website": "Open website",
+    "open_website_label": "Open website",
+    "open_website_desc": "Opens a specified URL in the default web browser.",
+    "open_website_tooltip": "Opens a URL in the browser."
 }
