@@ -233,7 +233,8 @@ class VisualBashEditor(QMainWindow):
             return
 
         if not self.project_manager.get_project_path():
-            Debug.Error("No project loaded.")
+            if msg: # Notice that without this, this func is called every frame when having an AUTO_SAVE=True, might need to fix this in the future
+                Debug.Error("No project loaded.")
             return
 
         file_path = self.project_manager.get_graph_path()
