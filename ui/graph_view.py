@@ -736,9 +736,8 @@ class GraphView(QGraphicsView):
                 target_input = p
                 break
 
-        if source_output and target_input:                                      #TODO outdated code
-            self.graph_scene.start_connection(source_output)
-            self.graph_scene.finalize_connection(source_output, target_input)
+        if source_output and target_input:
+            self.graph_scene.set_edge(source_output, target_input, None)
 
         self.close_node_palette()
 
