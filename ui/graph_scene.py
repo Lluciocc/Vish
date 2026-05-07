@@ -264,6 +264,7 @@ class GraphScene(QGraphicsScene):                                          #TODO
                             self.restore_pending_connection()
 
                 else:                                   # LB, ignoring modifier
+                    self.is_ctrl = False
                     if first_port.is_input == (first_port.is_input == second_port.is_input): # XNOR operator
                         self.set_edge(drag_edge.source_port, second_port, drag_edge)
                     else:
