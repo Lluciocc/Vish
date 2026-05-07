@@ -56,5 +56,5 @@ class Logger:
 
     @staticmethod
     def anonymize(message: str):
-        message = message.replace(f"{Path.home()}", "[user_dir]")
+        message = message.replace(f"{Path.home()}", "~")
         return message
