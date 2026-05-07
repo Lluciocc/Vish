@@ -68,15 +68,17 @@ class GraphScene(QGraphicsScene):                                          #TODO
             self.new_edge(first_port)
 
     def new_edge(self, first_port):
+        drag_edge = self.initialize_edge(first_port)
+        drag_edge.target_pos = first_port.center_scene_pos()
+        drag_edge.update_positions()
+        self.drag_edges.append(drag_edge)
+
+    def initialize_edge(self, first_port):
         drag_edge = EdgeItem()
         drag_edge.source_port = first_port
         drag_edge.apply_style_from_source()
-
         self.addItem(drag_edge)
-        drag_edge.target_pos = first_port.center_scene_pos()
-        drag_edge.update_positions()
-
-        self.drag_edges.append(drag_edge)
+        return drag_edge
 
     def delete_edges(self): # Only edges in self.drag_edges become deleted!
         for edge in self.drag_edges:
@@ -141,7 +143,7 @@ class GraphScene(QGraphicsScene):                                          #TODO
                 edge = self.graph.update_edge(edge.edge.id, edge.source_port.port, edge.target_port.port)
 
                 if Config.DEBUG:
-                    Logger.LogMessage(f"GRAPH.ADD_EDGE returned: {edge}")
+                    Logger.LogMessage(f"GRAPH.UPDATE_EDGE returned: {edge}")
 
             second_port.edges.clear()
             for edge in self.pending_edges:
@@ -154,7 +156,7 @@ class GraphScene(QGraphicsScene):                                          #TODO
                 edge = self.graph.update_edge(edge.edge.id, edge.source_port.port, edge.target_port.port)
 
                 if Config.DEBUG:
-                    Logger.LogMessage(f"GRAPH.ADD_EDGE returned: {edge}")
+                    Logger.LogMessage(f"GRAPH.UPDATE_EDGE returned: {edge}")
 
             self.pending_edges.clear()
 
@@ -221,10 +223,13 @@ class GraphScene(QGraphicsScene):                                          #TODO
             modifier = QApplication.keyboardModifiers()
             if second_port.edges:
                 if modifier == Qt.AltModifier:          # Deleting previous edges (Alt)
-                    self.pending_edges = self.drag_edges
-                    self.drag_edges = second_port.edges
-                    self.delete_edges()
-                    self.drag_edges = self.pending_edges
+                    if first_port.port.port_type == second_port.port.port_type:
+                        self.pending_edges = self.drag_edges
+                        self.drag_edges = second_port.edges
+                        self.delete_edges()
+                        self.drag_edges = self.pending_edges
+                    else:
+                        self.restore_pending_connection()
 
 
             if self.pending_port:                       # Check for self-connection on multi-dragging
@@ -280,6 +285,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
             else:
                 self._show_invalid_feedback(first_port, second_port)
             return
+
+        if not drag_edge:
+            drag_edge = self.initialize_edge(first_port)
 
         if self.pending_port:
             if self.pending_port.is_input:
