@@ -190,8 +190,6 @@ class VisualBashEditor(QMainWindow):
     def generate_bash(self):
         if not self.graph.nodes:
             Debug.Warn(Traduction.get_trad("warn_generating_empty_graph", "Generating an empty graph."))
-        if Config.DEBUG:
-            Logger.LogMessage(f"EDGES: {len(self.graph.edges)}")
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)
