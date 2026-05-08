@@ -13,6 +13,7 @@ class Logger:
 
     @staticmethod
     def _log(level: str, message: str, color: str):
+        message = Logger.anonymize(message)
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
 
         msg_log = f"[{timestamp}] [{level}] {message}"
@@ -25,17 +26,14 @@ class Logger:
 
     @staticmethod
     def LogMessage(message: str):
-        message = Logger.anonymize(message)
         Logger._log("INFO", message, Colors.CYAN)
 
     @staticmethod
     def LogWarning(message: str):
-        message = Logger.anonymize(message)
         Logger._log("WARN", message, Colors.YELLOW)
 
     @staticmethod
     def LogError(message: str):
-        message = Logger.anonymize(message)
         Logger._log("ERROR", message, Colors.RED)
 
     @staticmethod
