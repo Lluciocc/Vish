@@ -1,5 +1,5 @@
-import datetime
 from pathlib import Path
+import datetime
 
 class Colors:
     RESET  = "\033[0m"
@@ -25,14 +25,17 @@ class Logger:
 
     @staticmethod
     def LogMessage(message: str):
+        message = Logger.anonymize(message)
         Logger._log("INFO", message, Colors.CYAN)
 
     @staticmethod
     def LogWarning(message: str):
+        message = Logger.anonymize(message)
         Logger._log("WARN", message, Colors.YELLOW)
 
     @staticmethod
     def LogError(message: str):
+        message = Logger.anonymize(message)
         Logger._log("ERROR", message, Colors.RED)
 
     @staticmethod
@@ -50,3 +53,8 @@ class Logger:
                 f.write(f"\n{message_error}")
 
         Logger.LogMessage(f"Logged messages saved to {log_path}")
+
+    @staticmethod
+    def anonymize(message: str):
+        message = message.replace(f"{Path.home()}", "~")
+        return message
