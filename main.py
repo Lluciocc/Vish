@@ -54,14 +54,14 @@ class VisualBashEditor(QMainWindow):
         super().__init__()
         self.setWindowTitle("Visual Bash Editor")
         self.resize(1400, 900)
-        
+
         self.graph = Graph()
         self.node_factory = NodeFactory()
         self.project_manager = ProjectManager()
-        
+
         self.setup_ui()
         self.create_initial_graph()
-    
+
     def setup_ui(self):
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -139,7 +139,7 @@ class VisualBashEditor(QMainWindow):
 
         self.graph_view = GraphView(self.graph, self)
         splitter.addWidget(self.graph_view)
-        
+
         self.property_panel = PropertyPanel(graph_view=self.graph_view)
         splitter.addWidget(self.property_panel)
 
@@ -178,7 +178,7 @@ class VisualBashEditor(QMainWindow):
         self.graph.add_node(start_node)
         self.graph_view.add_node_item(start_node)
         self.property_panel.set_node(start_node)
-    
+
     def add_node(self, node_type: str):
         node = self.node_factory.create_node(node_type)
         if node:
@@ -186,12 +186,10 @@ class VisualBashEditor(QMainWindow):
             node.y = 300
             self.graph.add_node(node)
             self.graph_view.add_node_item(node)
-    
+
     def generate_bash(self):
         if not self.graph.nodes:
             Debug.Warn(Traduction.get_trad("warn_generating_empty_graph", "Generating an empty graph."))
-        if Config.DEBUG:
-            Logger.LogMessage(f"EDGES: {len(self.graph.edges)}")
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)
@@ -214,7 +212,7 @@ class VisualBashEditor(QMainWindow):
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
-    
+
     def open_welcome_screen(self):
         welcome = WelcomeScreen(self, self.project_manager)
         if welcome.exec() == QDialog.Accepted:
@@ -226,7 +224,7 @@ class VisualBashEditor(QMainWindow):
                     "No project loaded. You can create or open a project from the welcome screen."
                 )
             )
-        
+
     def save_graph(self, msg=True):
         if not self.graph.nodes:
             Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
@@ -248,10 +246,11 @@ class VisualBashEditor(QMainWindow):
             Debug.Log("Project saved.")
 
     def load_graph(self):
+        projects_path = os.path.dirname(os.path.dirname(self.project_manager.get_graph_path()))
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             Traduction.get_trad("file_dialog_open", "Load Graph"),
-            "",
+            f"{projects_path}/graph.json",
             "JSON Files (*.json)"
         )
 
@@ -273,7 +272,10 @@ class VisualBashEditor(QMainWindow):
                 edge_count=len(self.graph.edges)
             )
         )
-    
+
+        if Config.SYNC_NODES_AND_GEN:
+            self.generate_bash()
+
     def load_current_project(self):
         graph_path = self.project_manager.get_graph_path()
 
@@ -289,6 +291,9 @@ class VisualBashEditor(QMainWindow):
             Logger.LogMessage(
                 f"Loaded project from {graph_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges."
             )
+
+        if Config.SYNC_NODES_AND_GEN:
+            self.generate_bash()
 
     def _load_graph_data(self, json_data):
         try:
@@ -347,7 +352,7 @@ class VisualBashEditor(QMainWindow):
 
         self._connect_signals()
         splitter.setSizes([900, 300, 400])
-    
+
     def _restore_viewport(self, viewport):
         center = QPointF(viewport.get("x", 0), viewport.get("y", 0))
         self.graph_view.set_zoom(viewport.get("zoom", 1.0))
@@ -463,7 +468,7 @@ class VisualBashEditor(QMainWindow):
 
         return result.stdout
 
-    
+
     def run_bash(self):
         if Info.get_os() == "Windows":
             Debug.Warn(Traduction.get_trad("running_windows", "It is not possible to run scripts on Windows."))
@@ -582,7 +587,7 @@ def main():
     editor.open_welcome_screen()
 
     sys.exit(app.exec())
-    
+
 if __name__ == "__main__":
     try:
         main()
