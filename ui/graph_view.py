@@ -166,7 +166,8 @@ class GraphView(QGraphicsView):
                         scene.set_edge(valid_port, edge.source_port, edge)
                 scene.drag_edges.clear()
             else:
-                scene._cancel_drag_edge()
+                scene.restore_pending_connection()
+                scene.drag_edges.clear()
 
         self.close_node_palette()
 
