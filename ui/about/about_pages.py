@@ -231,41 +231,42 @@ class AboutTextPage(QWidget):
         content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         content.document().setDocumentMargin(0)
 
-        content.setStyleSheet("""
-        QTextBrowser {
+        content.setStyleSheet(f"""
+        QTextBrowser {{
             background: transparent;
             border: none;
+            color: {Theme.TEXT};
             padding: 0;
             opacity: 0.85;
-        }
+        }}
 
-        QScrollBar:vertical {
+        QScrollBar:vertical {{
             background: transparent;
-            width: 8px;
-            margin: 2px;
-            border-radius: 4px;
-        }
+            width: 10px;
+            margin: 2px 0;
+        }}
 
-        QScrollBar::handle:vertical {
-            background: rgba(255, 255, 255, 120);
-            min-height: 30px;
-            border-radius: 4px;
-        }
+        QScrollBar::handle:vertical {{
+            background: {Theme.BUTTON_PRESSED};
+            min-height: 34px;
+            border-radius: 5px;
+        }}
 
-        QScrollBar::handle:vertical:hover {
-            background: rgba(255, 255, 255, 160);
-        }
+        QScrollBar::handle:vertical:hover {{
+            background: {Theme.ACCENT};
+        }}
 
         QScrollBar::add-line:vertical,
-        QScrollBar::sub-line:vertical {
+        QScrollBar::sub-line:vertical {{
             height: 0;
             background: none;
-        }
+            border: none;
+        }}
 
         QScrollBar::add-page:vertical,
-        QScrollBar::sub-page:vertical {
+        QScrollBar::sub-page:vertical {{
             background: transparent;
-        }
+        }}
         """)
 
         layout.addWidget(content)

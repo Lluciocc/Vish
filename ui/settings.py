@@ -2,10 +2,10 @@ from PySide6.QtWidgets import (
     QDialog, QVBoxLayout, QHBoxLayout,
     QLabel, QComboBox, QPushButton,
     QFrame, QWidget, QLineEdit, QMessageBox,
-    QFileDialog,
+    QFileDialog, QScrollArea, QSizePolicy,
 )
 from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
-from PySide6.QtGui import QPainter, QColor
+from PySide6.QtGui import QPainter, QColor, QPalette
 from core.config import Config, ConfigManager
 from core.traduction import Traduction
 from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, Theme
@@ -45,6 +45,62 @@ _BUILTIN_SETTERS = {
     "white": set_white_theme,
 }
 
+def settings_scroll_area_style() -> str:
+    return f"""
+        QScrollArea#SettingsScrollArea {{
+            background: transparent;
+            border: none;
+        }}
+        QScrollArea#SettingsScrollArea > QWidget > QWidget {{
+            background: transparent;
+        }}
+        QScrollBar:vertical {{
+            background: transparent;
+            width: 10px;
+            margin: 2px 0;
+        }}
+        QScrollBar::handle:vertical {{
+            background: {Theme.BUTTON_PRESSED};
+            min-height: 34px;
+            border-radius: 5px;
+        }}
+        QScrollBar::handle:vertical:hover {{
+            background: {Theme.ACCENT};
+        }}
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {{
+            height: 0;
+            background: none;
+            border: none;
+        }}
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {{
+            background: transparent;
+        }}
+    """
+
+def apply_combo_box_colors(combo: QComboBox) -> None:
+    selected_text = Theme.TEXT if Theme.type == "dark" else Theme.TEXT_INV
+    palette = combo.palette()
+
+    for role, color in [
+        (QPalette.Window, Theme.PANEL),
+        (QPalette.Base, Theme.PANEL),
+        (QPalette.Button, Theme.BUTTON),
+        (QPalette.Text, Theme.TEXT),
+        (QPalette.ButtonText, Theme.TEXT),
+        (QPalette.WindowText, Theme.TEXT),
+        (QPalette.Highlight, Theme.ACCENT),
+        (QPalette.HighlightedText, selected_text),
+    ]:
+        palette.setColor(role, QColor(color))
+
+    combo.setStyleSheet("")
+    combo.setPalette(palette)
+    combo.view().setStyleSheet("")
+    combo.view().setPalette(palette)
+    combo.view().viewport().setPalette(palette)
+
 class SettingsDialog(QDialog):
     traduction_changed = Signal()
     def __init__(self, parent=None):
@@ -55,8 +111,27 @@ class SettingsDialog(QDialog):
         else:
             self.setFixedWidth(380)
 
-        self.layout = QVBoxLayout(self)
+        self.root_layout = QVBoxLayout(self)
+        self.root_layout.setSpacing(12)
+
+        self.content_widget = QWidget()
+        self.content_widget.setObjectName("SettingsContent")
+        self.content_widget.setStyleSheet("QWidget#SettingsContent { background: transparent; }")
+
+        self.layout = QVBoxLayout(self.content_widget)
         self.layout.setSpacing(12)
+        self.layout.setContentsMargins(0, 0, 0, 0)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setObjectName("SettingsScrollArea")
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QScrollArea.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        self.scroll_area.setWidget(self.content_widget)
+
+        self.root_layout.addWidget(self.scroll_area)
 
         self._build_appearance_section()
         add_separator(self.layout)
@@ -64,6 +139,7 @@ class SettingsDialog(QDialog):
         add_separator(self.layout)
         self._build_advanced_section()
         self._build_footer()
+        self._apply_themed_styles()
 
         self.refresh_ui_texts()
 
@@ -121,6 +197,11 @@ class SettingsDialog(QDialog):
         row.addWidget(self.lang_combo)
         self.layout.addLayout(row)
 
+    def _apply_themed_styles(self):
+        self.scroll_area.setStyleSheet(settings_scroll_area_style())
+        apply_combo_box_colors(self.theme_combo)
+        apply_combo_box_colors(self.lang_combo)
+
     def _build_advanced_section(self):
         self._switches = []
         self.advanced_title = self.make_section_title("advanced", "Advanced")
@@ -156,7 +237,7 @@ class SettingsDialog(QDialog):
         self.close_btn = QPushButton()
         self.close_btn.clicked.connect(self.accept)
         footer.addWidget(self.close_btn)
-        self.layout.addLayout(footer)
+        self.root_layout.addLayout(footer)
 
     def _populate_theme_combo(self):
         self.theme_combo.clear()
@@ -201,6 +282,7 @@ class SettingsDialog(QDialog):
 
         ConfigManager.save_config()
         self._refresh_delete_btn_state()
+        self._apply_themed_styles()
         self._propagate_theme_change()
 
     def on_import_theme(self):

@@ -2,9 +2,58 @@ from core.config import MarkdownLoader
 from core.debug import Info
 from core.traduction import Traduction
 from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt
-from PySide6.QtWidgets import QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton, QStackedWidget, QVBoxLayout
+from PySide6.QtWidgets import (
+    QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton,
+    QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout,
+)
 from theme.theme import Theme
 from ui.about.about_pages import AboutMainPage, AboutTextPage
+
+def about_scroll_area_style() -> str:
+    return f"""
+        QScrollArea#AboutScrollArea {{
+            background: transparent;
+            border: none;
+        }}
+        QScrollArea#AboutScrollArea > QWidget > QWidget {{
+            background: transparent;
+        }}
+        QScrollBar:vertical {{
+            background: transparent;
+            width: 10px;
+            margin: 2px 0;
+        }}
+        QScrollBar::handle:vertical {{
+            background: {Theme.BUTTON_PRESSED};
+            min-height: 34px;
+            border-radius: 5px;
+        }}
+        QScrollBar::handle:vertical:hover {{
+            background: {Theme.ACCENT};
+        }}
+        QScrollBar::add-line:vertical,
+        QScrollBar::sub-line:vertical {{
+            height: 0;
+            background: none;
+            border: none;
+        }}
+        QScrollBar::add-page:vertical,
+        QScrollBar::sub-page:vertical {{
+            background: transparent;
+        }}
+    """
+
+def scrollable_page(widget):
+    scroll = QScrollArea()
+    scroll.setObjectName("AboutScrollArea")
+    scroll.setWidgetResizable(True)
+    scroll.setFrameShape(QScrollArea.NoFrame)
+    scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+    scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+    scroll.setWidget(widget)
+    scroll.setStyleSheet(about_scroll_area_style())
+    return scroll
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
@@ -51,7 +100,7 @@ class AboutDialog(QDialog):
 
         self.pages = {}
 
-        self.pages["main"] = AboutMainPage(self.go_to)
+        self.pages["main"] = scrollable_page(AboutMainPage(self.go_to))
         self.pages["credits"] = AboutTextPage(
             "about_credits",
             "Credits",
