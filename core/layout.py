@@ -1,8 +1,22 @@
-# Hi there! If you're reading this, you're probably interested in how the graph layout engine works.
-# This module provides a simple yet effective way to automatically arrange nodes in the graph.
-# You should look at compute to have an idea of the overall flow.
-# NOTE: Im using something call "Barycentric coordinate system" for minimizing edge crossings. and HELL YEAH it works pretty well!
-# If you want to learn more about it, check out: https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+# layout.py
+#
+# Copyright 2026 Lluciocc
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from __future__ import annotations
 from dataclasses import dataclass
 from collections import defaultdict,deque
