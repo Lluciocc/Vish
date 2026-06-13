@@ -1,3 +1,6 @@
+# This repository has moved to Codeberg.org
+https://codeberg.org/Lluciocc/Vish
+
 # Visual Bash Editor (Vish)
 
 Vish is a graphical editor for creating and managing Bash scripts using a node-based interface. It allows users to visually design their scripts by connecting various nodes that represent different Bash commands and constructs.
