@@ -78,7 +78,7 @@
         meta = {
           description = "Vish is a graphical editor for creating and managing Bash scripts using a node-based interface";
           homepage = "https://github.com/Lluciocc/Vish";
-          license = lib.licenses.mit;
+          license = lib.licenses.gpl3;
           sourceProvenance = with lib.sourceTypes; [ fromSource ];
           mainProgram = "vish";
           platforms = supportedSystems;
