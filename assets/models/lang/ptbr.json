@@ -11,7 +11,7 @@
     "running_generated_bash_script": "Executando script bash gerado...",
     "add_node": "Adicionar um nodo",
     "search_nodes": "Procurar...",
-    "lang_set": "Definir idioma para {lang}",
+    "lang_set": "Idioma definido como {lang}",
     "btn_generate_bash": "Gerar Script Bash",
     "btn_save": "Salvar",
     "btn_load": "Carregar",
@@ -23,7 +23,7 @@
     "theme_breeze_dark": "Breeze Dark",
     "more_options": "Mais opções",
 
-    "never_modified": "Nunca salvar",
+    "never_modified": "Nunca salvo",
     "remove_recent": "Remover de recentes",
     "welcome_title": "Bem-vindo",
     "welcome_recent_projects": "Projetos Recentes",
@@ -31,7 +31,7 @@
     "welcome_open_project": "Abrir Projeto",
     "no_recent_projects": "Nenhum projeto recente",
     "remove_recent_question": "Deseja remover esse projeto da lista de recentes?",
-    "new_project_name": "Nome de Projeto",
+    "new_project_name": "Nome do Projeto",
     "new_project_enter_name": "Informe o nome do projeto:",
     "select_project_folder": "Selecionar Pasta do Projeto",
 
@@ -57,7 +57,8 @@
     "about_website": "Website",
     "about_report": "Reportar um problema",
     "about_credits": "Créditos",
-    "about_legal": "Legal",
+    "about_legal": "Avisos Legais",
+    "about_legal_text": "Este software é fornecido \"no estado em que se encontra\", sem qualquer garantia.",
     "about_whats_new": "O que há de novo?",
     "about_questions": "FAQs",
     "about_support": "Apoie o projeto",
@@ -76,6 +77,7 @@
     "shortcut_paste": "Colar",
     "shortcut_cut_selection": "Recortar seleção",
     "shortcut_undo": "Desfazer",
+    "shortcut_redo": "Refazer",
     "shortcut_redo_1": "Refazer (1)",
     "shortcut_redo_2": "Refazer (2)",
     "shortcut_select_all": "Selecionar todos os nodos",
@@ -94,6 +96,7 @@
     "shortcut_zoom_out": "Diminuir zoom",
     "shortcut_reconnection_mode": "Modo de reconexão",
     "shortcut_removing_mode": "Modo de remoção",
+    "shortcut_reset_zoom": "Redefinir zoom",
     "shortcut_save_log_file": "Salvar arquivo de log",
 
     "Commands": "Comandos",
@@ -128,7 +131,7 @@
 
     "if": "Condicional IF",
     "if_label": "Condicional IF",
-    "if_desc": "Valida uma condição e ramifica o fluxo de execução com base no resultado.",
+    "if_desc": "Avalia uma condição e ramifica o fluxo de execução com base no resultado.",
     "if_tooltip": "Executa diferentes caminhos com base no resultado da condição.",
 
     "for": "Laço FOR",
@@ -226,8 +229,8 @@
     "set_variable_desc": "Atribui um valor a uma variável.",
     "set_variable_tooltip": "Cria ou modifica uma variável.",
 
-    "get_variable": "Acessar variável",
-    "get_variable_label": "Acessar variável",
+    "get_variable": "Obter variável",
+    "get_variable_label": "Obter variável",
     "get_variable_desc": "Recupera o valor de uma variável.",
     "get_variable_tooltip": "Acessa o valor de uma variável existente.",
 
@@ -244,5 +247,50 @@
     "to_int": "Converter para inteiro",
     "to_int_label": "Converter para inteiro",
     "to_int_desc": "Converte um valor para número inteiro.",
-    "to_int_tooltip": "Transforma um valor em inteiro."
+    "to_int_tooltip": "Transforma um valor em inteiro.",
+
+    "pipe": "Pipe",
+    "pipe_label": "Pipe",
+    "pipe_desc": "Envia a saída de um comando para outro.",
+    "pipe_tooltip": "Conecta a saída de um comando a outro comando.",
+
+    "sequencer": "Sequenciador",
+    "sequencer_label": "Sequenciador",
+    "sequencer_desc": "Executa nodos conectados sequencialmente de cima para baixo.",
+    "sequencer_tooltip": "Executa nodos conectados em sequência.",
+
+    "equals_string": "Igual a (texto)",
+    "equals_string_label": "Igual a (texto)",
+    "equals_string_desc": "Verifica se dois valores de texto são iguais.",
+    "equals_string_tooltip": "Comparação de igualdade entre textos.",
+
+    "equals_variable": "Igual a (variável)",
+    "equals_variable_label": "Igual a (variável)",
+    "equals_variable_desc": "Verifica se uma variável é igual a outro valor.",
+    "equals_variable_tooltip": "Comparação de igualdade entre variáveis.",
+
+    "command_condition": "Comando condicional",
+    "command_condition_label": "Comando condicional",
+    "command_condition_desc": "Usa um comando personalizado como uma condicional.",
+    "command_condition_tooltip": "Trata o resultado do comando como uma condicional.",
+
+    "sleep": "Aguardar",
+    "sleep_label": "Aguardar",
+    "sleep_desc": "Pausa a execução por uma duração especificada.",
+    "sleep_tooltip": "Espera antes de continuar a execução.",
+
+    "download_file": "Baixar arquivo",
+    "download_file_label": "Baixar arquivo",
+    "download_file_desc": "Baixa um arquivo de uma URL especificada.",
+    "download_file_tooltip": "Baixa um arquivo remoto.",
+
+    "git_clone": "Clonar Git",
+    "git_clone_label": "Clonar Git",
+    "git_clone_desc": "Clona um repositório Git para um destino especificado.",
+    "git_clone_tooltip": "Clona um repositório.",
+
+    "open_website": "Abrir website",
+    "open_website_label": "Abrir website",
+    "open_website_desc": "Abre uma URL especificada no navegador padrão.",
+    "open_website_tooltip": "Abre uma URL no navegador."
 }
