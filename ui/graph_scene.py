@@ -66,6 +66,7 @@ class GraphScene(QGraphicsScene):                                          #TODO
                             edge.target_port = edge.source_port
                         else:
                             edge.source_port = edge.target_port
+                    self.colorize_port(first_port, True)
                     if Config.DEBUG:
                         Logger.LogMessage("-SCENE.START_CONNECTION: grab edge")
 
@@ -118,12 +119,14 @@ class GraphScene(QGraphicsScene):                                          #TODO
         for edge in self.drag_edges:
             if edge.source_port:
                 if edge.source_port.edges:
-                    self.colorize_port(edge.source_port, True)
-                    edge.source_port.edges.remove(edge)
+                    if edge in edge.source_port.edges:
+                        self.colorize_port(edge.source_port, True)
+                        edge.source_port.edges.remove(edge)
             if edge.target_port:
                 if edge.target_port.edges:
-                    self.colorize_port(edge.target_port, True)
-                    edge.target_port.edges.remove(edge)
+                    if edge in edge.target_port.edges:
+                        self.colorize_port(edge.target_port, True)
+                        edge.target_port.edges.remove(edge)
             if edge.edge:
                 self.graph.remove_edge(edge.edge.id)
             self.removeItem(edge)
@@ -168,7 +171,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
                 first_port.edges.clear()
                 if backswitch:
                     for edge in second_port.edges:
-                        self.colorize_port(second_port, False)
                         first_port.edges.append(edge)
                         if first_port.is_input:
                             edge.target_port = first_port
@@ -187,6 +189,8 @@ class GraphScene(QGraphicsScene):                                          #TODO
                     edge.update_positions()
                     self.graph.update_edge(edge.edge.id, edge.source_port.port, edge.target_port.port)
 
+                self.colorize_port(first_port, False)
+                self.colorize_port(second_port, False)
                 self.pending_edges.clear()
 
                 if Config.SYNC_NODES_AND_GEN:
@@ -207,8 +211,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
         if not second_port:
             self.views()[0].show_node_palette(mouse_pos)
             return
-
-        self.colorize_port(second_port, False)
 
         if first_port == second_port:
             if second_port.edges:
@@ -325,10 +327,12 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
         if second_port.port.port_type == PortType.ANY:
             drag_edge.overwrite_color(first_port.port.port_type)
-            self.colorize_port(second_port, False)
 
         edge = self.graph.add_edge(first_port.port, second_port.port)
         drag_edge.edge = edge
+
+        if second_port.port.port_type == PortType.ANY:
+            self.colorize_port(second_port, False)
 
         if Config.DEBUG:
             Logger.LogMessage(f"SCENE.SET_EDGE: {first_port.port.port_type} -> {second_port.port.port_type}")
@@ -343,7 +347,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
     def _show_invalid_feedback(self):
         if not self.drag_edges:
             return
-
         edge0 = self.drag_edges[0]
 
         if self.pending_port:
@@ -363,7 +366,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
             def restore_edges():
                 for edge in edges:
                     edge.source_port.overwrite_color(None)
-                    edge.overwrite_color(None)
                     match (port.is_input, is_ctrl):
                         case (True, False):
                             edge.source_port = edge.target_port
@@ -375,10 +377,13 @@ class GraphScene(QGraphicsScene):                                          #TODO
                             edge.target_port = port
                         case (False, True):
                             edge.source_port = port
-
+                    edge.overwrite_color(None)
                     edge.update_positions()
+                self.colorize_port(edges[0].source_port, False)
+                self.colorize_port(edges[0].target_port, False)
 
             QTimer.singleShot(180, restore_edges)
+
 
         elif not edge0.target_port or edge0.source_port != edge0.target_port:
             edges = []
@@ -399,11 +404,12 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
     def colorize_port(self, colorize_port, reset):
         if reset:
-            colorize_port.overwrite_color("")
+            colorize_port.overwrite_color("reset")
 
         elif colorize_port.port.port_type == PortType.ANY:
-            color = self.drag_edges[0].get_default_style().color
-            colorize_port.overwrite_color(color)
+            if colorize_port.edges:
+                color = colorize_port.edges[0].get_default_style().color
+                colorize_port.overwrite_color(color)
 
     def add_core_edge(self, core_edge, node_items):
 
@@ -421,6 +427,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
         self.addItem(edge_item)
         edge_item.update_positions()
+
+        self.colorize_port(source_port_item, False)
+        self.colorize_port(target_port_item, False)
 
     def update_edges_for_node(self, node_item):
         for port_item in node_item.port_items.values():

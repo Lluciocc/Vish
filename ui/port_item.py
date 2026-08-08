@@ -60,7 +60,7 @@ class PortItem(QGraphicsPathItem):
                 self.setPen(QPen(QColor("#E74C3C"), 3))
         elif QColor.isValidColor(str(color)):
             self.setBrush(QBrush(QColor(color)))
-        else:
+        else:                                           #reset
             self.setBrush(QBrush(QColor(self.get_color())))
             if self.highlight:
                 self.setPen(QPen(QColor("#ECF0F1"), 3))
