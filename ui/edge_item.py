@@ -98,3 +98,20 @@ class EdgeItem(QGraphicsPathItem):
         )
 
         self.setPath(path)
+
+    def get_default_style(self):
+        port_type = self.source_port.port.port_type
+        style = PORT_STYLES.get(port_type)
+        return style
+
+    def overwrite_color(self, color):
+        style = self.get_default_style()
+        width = style.thickness
+
+        if color == "invalid":
+            self.setPen(QPen(QColor("#E74C3C"), width))
+        elif QColor.isValidColor(str(color)):
+            self.setPen(QPen(QColor(color), width))
+        else:
+            color = QColor(style.color)
+            self.setPen(QPen(QColor(color), width))

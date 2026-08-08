@@ -17,6 +17,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from core.config import Config
+from core.logger import Logger
 from core.port_types import PortDirection, PortType
 
 
@@ -24,32 +26,45 @@ class GraphValidator:
     @staticmethod
     def is_valid_connection(graph, a, b) -> bool:
         if a is b:
+            if Config.DEBUG:
+                Logger.LogMessage("VALIDATOR: invalid, port self connection")
             return False
 
         if a.port.node.id == b.port.node.id:
+            if Config.DEBUG:
+                Logger.LogMessage("VALIDATOR: invalid, node self connection")
             return False
 
         if a.is_input == b.is_input:
+            if Config.DEBUG:
+                if a.is_input:
+                    Logger.LogMessage("VALIDATOR: invalid, both input port")
+                else:
+                    Logger.LogMessage("VALIDATOR: invalid, both output port")
             return False
 
         if not a.port.can_connect_to(b.port):
+            if Config.DEBUG:
+                Logger.LogMessage(f"VALIDATOR: invalid, {a.port.port_type} -> {b.port.port_type}")
             return False
 
         if a.port.direction == PortDirection.OUTPUT:
-            src_item = a
-            dst_item = b
+            source_item = a
+            target_item = b
         else:
-            src_item = b
-            dst_item = a
+            source_item = b
+            target_item = a
 
-        src = src_item.port
-        dst = dst_item.port
+        source = source_item.port
+        target = target_item.port
 
-        if GraphValidator._can_reach(graph, dst.node, src.node):
+        if GraphValidator._can_reach(graph, target.node, source.node):
+            if Config.DEBUG:
+                Logger.LogMessage("VALIDATOR: invalid -> cannot reach")
             return False
 
-
-        is_exec = src.port_type == PortType.EXEC
+        if Config.DEBUG:
+            Logger.LogMessage("VALIDATOR: valid")
         return True
 
     @staticmethod
@@ -71,3 +86,12 @@ class GraphValidator:
             return False
 
         return dfs(start_node)
+
+    @staticmethod
+    def is_valid_port_type(drag_edges, target_port) -> bool:
+        for edge in drag_edges:
+            if not edge.source_port.port.can_connect_to(target_port.port):
+                if Config.DEBUG:
+                    Logger.LogMessage(f"VALIDATOR: invalid, {edge.source_port.port.port_type} -> {target_port.port.port_type}")
+                return False
+        return True
