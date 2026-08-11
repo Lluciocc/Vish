@@ -26,6 +26,7 @@ from core.icons import Icon
 from core.layout import GraphLayoutEngine
 from core.port_types import PortType
 from core.serializer import Serializer
+from core.validator import GraphValidator
 from nodes.registry import create_node
 from PySide6.QtCore import Property, QEasingCurve, QEvent, QPointF, QPropertyAnimation, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QKeySequence, QMouseEvent, QPainter, QUndoStack
@@ -172,7 +173,7 @@ class GraphView(QGraphicsView):
             for port in node_item.port_items.values():
                 if port.is_input == target_is_input:
                     target_port = port
-                    valid = scene._is_valid_connection(source_port, target_port)
+                    valid = GraphValidator.is_valid_connection(self.graph, source_port, target_port)
                     if valid:
                         valid_port = target_port
                         break
