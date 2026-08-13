@@ -64,7 +64,7 @@ class EdgeItem(QGraphicsPathItem):
             self.target_pos = self.target_port.center_scene_pos()
         self.update_path()
 
-    
+
     def set_positions(self, source: QPointF, target: QPointF):
         self.source_pos = source
         self.target_pos = target
@@ -77,11 +77,11 @@ class EdgeItem(QGraphicsPathItem):
             self.target_pos = pos
         self.update_path()
 
-    
+
     def update_path(self):
         path = QPainterPath()
         path.moveTo(self.source_pos)
-        
+
         dx = self.target_pos.x() - self.source_pos.x()
         dy = self.target_pos.y() - self.source_pos.y()
         d_str = (dx ** 2 + dy ** 2) ** 0.5 * 1.35
@@ -90,7 +90,7 @@ class EdgeItem(QGraphicsPathItem):
         ctrl1_y = self.source_pos.y()
         ctrl2_x = self.target_pos.x() - min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
         ctrl2_y = self.target_pos.y()
-        
+
         path.cubicTo(
             QPointF(ctrl1_x, ctrl1_y),
             QPointF(ctrl2_x, ctrl2_y),
@@ -98,3 +98,20 @@ class EdgeItem(QGraphicsPathItem):
         )
 
         self.setPath(path)
+
+    def get_default_style(self):
+        port_type = self.source_port.port.port_type
+        style = PORT_STYLES.get(port_type)
+        return style
+
+    def overwrite_color(self, color):
+        style = self.get_default_style()
+        width = style.thickness
+
+        if color == "invalid":
+            self.setPen(QPen(QColor("#E74C3C"), width))
+        elif QColor.isValidColor(str(color)):
+            self.setPen(QPen(QColor(color), width))
+        else:                                           #reset
+            color = QColor(style.color)
+            self.setPen(QPen(QColor(color), width))

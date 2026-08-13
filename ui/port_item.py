@@ -51,7 +51,21 @@ class PortItem(QGraphicsPathItem):
         style = PORT_STYLES.get(port_type)
         if style:
             return QColor(style.color)
-        return QColor("#95A5A6")  
+        return QColor("#95A5A6")
+
+    def overwrite_color(self, color):
+        if color == "invalid":
+            self.setBrush(QBrush(QColor("#E74C3C")))
+            if self.highlight:
+                self.setPen(QPen(QColor("#E74C3C"), 3))
+        elif QColor.isValidColor(str(color)):
+            self.setBrush(QBrush(QColor(color)))
+        else:                                           #reset
+            self.setBrush(QBrush(QColor(self.get_color())))
+            if self.highlight:
+                self.setPen(QPen(QColor("#ECF0F1"), 3))
+            else:
+                self.setPen(QPen(QColor("#2C3E50"), 2))
 
     def generate_path(self, port: Port, style: PortStyle) -> QPainterPath:
         retval = QPainterPath()
@@ -79,7 +93,6 @@ class PortItem(QGraphicsPathItem):
     def mousePressEvent(self, event):
         # print("PORT CLICK")
         pass
-
 
     def hoverEnterEvent(self, event):
         self.highlight = True
