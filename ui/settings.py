@@ -128,7 +128,7 @@ class SettingsDialog(QDialog):
         if Info.get_device_type() == "phone":
             self.showMaximized()
         else:
-            self.setFixedWidth(380)
+            self.resize(380, 520)
 
         self.root_layout = QVBoxLayout(self)
         self.root_layout.setSpacing(12)

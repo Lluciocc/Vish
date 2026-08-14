@@ -82,7 +82,7 @@ class AboutDialog(QDialog):
         if Info.get_device_type() == "phone":
             self.showMaximized()
         else:
-            self.resize(440, 520)
+            self.resize(380, 780)
         self.setWindowTitle(Traduction.get_trad("about", "About"))
 
         self.current_index = 0
