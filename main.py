@@ -73,6 +73,8 @@ class VisualBashEditor(QMainWindow):
         super().__init__()
         self.setWindowTitle("Visual Bash Editor")
         self.resize(1400, 900)
+        if Info.get_device_type() == "phone":
+            self.setMinimumSize(360, 294)
 
         self.graph = Graph()
         self.node_factory = NodeFactory()
@@ -154,13 +156,13 @@ class VisualBashEditor(QMainWindow):
 
         main_layout.addLayout(toolbar)
 
-        splitter = QSplitter(Qt.Horizontal)
+        self.splitter = QSplitter(Qt.Horizontal)
 
         self.graph_view = GraphView(self.graph, self)
-        splitter.addWidget(self.graph_view)
+        self.splitter.addWidget(self.graph_view)
 
         self.property_panel = PropertyPanel(graph_view=self.graph_view)
-        splitter.addWidget(self.property_panel)
+        self.splitter.addWidget(self.property_panel)
 
         self.output_splitter = QSplitter(Qt.Vertical)
 
@@ -180,15 +182,35 @@ class VisualBashEditor(QMainWindow):
         self.output_splitter.addWidget(self.run_output_text)
         self.output_splitter.setSizes([300, 0])
 
-        splitter.addWidget(self.output_splitter)
+        self.splitter.addWidget(self.output_splitter)
 
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
-        splitter.setSizes([900, 300, 400])
-        main_layout.addWidget(splitter)
+        self.splitter.setSizes([900, 300, 400])
+        main_layout.addWidget(self.splitter)
 
         self._connect_signals()
 
+    def resizeEvent(self, event):
+        if Info.get_device_type() == "phone":
+            if self.splitter.orientation() is self.splitter.orientation().Horizontal:
+                if event.size().width() < event.size().height():
+                    self.splitter.setOrientation(Qt.Vertical)
+                    self.generate_btn.setText("")
+                    self.save_btn.setText("")
+                    self.load_btn.setText("")
+                    self.run_bash_btn.setText("")
+                    self.copy_btn.setText("")
+            else:
+                if event.size().width() > event.size().height():
+                    self.splitter.setOrientation(Qt.Horizontal)
+                    self.generate_btn.setText(Traduction.get_trad("btn_generate_bash", "Generate Bash"))
+                    self.save_btn.setText(Traduction.get_trad("btn_save", "Save"))
+                    self.load_btn.setText(Traduction.get_trad("btn_load", "Load"))
+                    self.run_bash_btn.setText(Traduction.get_trad("btn_run_bash", "Run Bash Script"))
+                    self.copy_btn.setText(Traduction.get_trad("btn_copy_clipboard", "Copy to Clipboard"))
+        
+        super().resizeEvent(event)
 
     def create_initial_graph(self):
         start_node = StartNode()
