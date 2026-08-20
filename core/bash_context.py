@@ -38,9 +38,6 @@ class BashContext:
     def add_function_line(self, line: str):
         self.function_lines.append(line)
 
-    def build(self) -> str:
-        return "\n".join(self.function_lines + [""] + self.lines)
-    
     def indent(self):
         self.indent_level += 1
     
