@@ -30,7 +30,7 @@ class BashEmitter:
         context = BashContext()
 
         header = [
-            "#!/bin/bash/env bash",
+            "#!/usr/bin/env bash",
             "",
             "# Generated with Visual Bash Editor",
             "",
