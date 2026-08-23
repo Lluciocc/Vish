@@ -157,6 +157,7 @@ class VisualBashEditor(QMainWindow):
         main_layout.addLayout(toolbar)
 
         self.splitter = QSplitter(Qt.Horizontal)
+        self.splitter.setHandleWidth(12)
 
         self.graph_view = GraphView(self.graph, self)
         self.splitter.addWidget(self.graph_view)
