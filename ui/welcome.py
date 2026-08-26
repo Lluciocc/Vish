@@ -303,7 +303,6 @@ class WelcomeScreen(QDialog):
                 Traduction.get_trad("no_recent_projects", "No recent projects")
             )
             placeholder.setFlags(Qt.NoItemFlags)
-            placeholder.setForeground(QColor("#555"))
             self.recent_list.addItem(placeholder)
 
     def _rename_project(self, path_str: str, new_name: str):
@@ -415,7 +414,6 @@ def _format_last_modified(iso: str | None) -> str:
 def lineedit_style() -> str:
     return f"""
             QLineEdit {{
-                WELCOME-PUSHDELETE_BACKGROUND
                 border: 1px solid {Theme.get_color("WELCOME-LINEEDIT_BORDER")};
                 border-radius: 5px;
                 padding: 3px 5px;
