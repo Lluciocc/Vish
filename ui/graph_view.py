@@ -21,7 +21,7 @@ from commands.undo_commands import *
 from core.config import Config
 from core.clipboard import GraphClipboard
 from core.debug import Debug
-from core.graph import Port#, Graph
+from core.graph import Port
 from core.icons import Icon
 from core.layout import GraphLayoutEngine
 from core.port_types import PortType
@@ -747,8 +747,8 @@ class GraphView(QGraphicsView):
         self.zoom_out_button.setStyleSheet(zoom_button_style())
         self.zoom_label.setStyleSheet(zoom_label_style())
         self.frame_button.setIcon(self.get_icon("frame"))
- #       self.frame_button.setIcon(self.get_icon("frame"))                  #TODO: required?
-  #      self.viewport().update()
+#        self.frame_button.setIcon(self.get_icon("frame"))                  #TODO: required?
+#        self.viewport().update()
 
 
 def frame_button_style() -> str:

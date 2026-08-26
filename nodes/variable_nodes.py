@@ -17,10 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.port_types import PortType
 from core.bash_context import BashContext
+from core.port_types import PortType
+from nodes.base_node import BaseNode
 from nodes.registry import register_node
-from .base_node import BaseNode
+
 
 @register_node("set_variable", category="Variables", label="Set Variable", description="Sets a variable to a specific value")
 class SetVariableNode(BaseNode):
@@ -42,7 +43,6 @@ class SetVariableNode(BaseNode):
         else:
             value_expr = f'"{raw_value}"'
 
-
         value_port = self.inputs[1]
         if value_port.connected_edges:
             source_node = value_port.connected_edges[0].source.node
@@ -54,19 +54,21 @@ class SetVariableNode(BaseNode):
         context.variables[var_name] = value_expr
         return f'{var_name}={value_expr}'
 
+
 @register_node("get_variable", category="Variables", label="Get Variable", description="Gets the value of a variable")
 class GetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("get_variable", "Get Variable")
         self.add_output("Value", PortType.VARIABLE, "Variable value")
         self.properties["variable"] = "VAR"
-    
+
     def emit_bash(self, context: BashContext) -> str:
         var_name = self.properties.get("variable", "VAR")
         return f"${var_name}"
-    
+
     def emit_bash_value(self, context):
         return f"${self.properties['variable']}"
+
 
 @register_node("file_exists", category="Variables", label="File Exists", description="Checks if a file exists")
 class FileExistsNode(BaseNode):
@@ -75,17 +77,18 @@ class FileExistsNode(BaseNode):
         self.add_input("Path", PortType.PATH, "File path")
         self.add_output("Result", PortType.CONDITION, "Existence check result")
         self.properties["path"] = ""
-    
+
     def emit_bash(self, context: BashContext) -> str:
         path = self.properties.get("path", "")
-        
+
         path_port = self.inputs[0]
         if path_port.connected_edges:
             source_node = path_port.connected_edges[0].source.node
             path = source_node.properties.get("value", path)
-        
+
         return f'[ -f "{path}" ]'
-    
+
+
 @register_node("string_constant", category="Constants", label="String Constant", description="Represents a string constant value")
 class StringConstantNode(BaseNode):
     def __init__(self):

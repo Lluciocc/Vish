@@ -17,10 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.port_types import PortType
 from core.bash_context import BashContext
-from .base_node import BaseNode
+from core.port_types import PortType
+from nodes.base_node import BaseNode
 from nodes.registry import register_node
+
 
 @register_node("to_string", category="Conversion", label="To String")
 class ToString(BaseNode):
@@ -39,13 +40,14 @@ class ToString(BaseNode):
 
         return f'"{expr}"'
 
+
 @register_node("to_int", category="Conversion", label="To Int")
 class ToInt(BaseNode):
     def __init__(self):
         super().__init__("to_int", "To Int")
         self.add_input("Input", PortType.VARIABLE, "Value to convert to integer")
         self.add_output("Output", PortType.INT, "Integer representation")
-        
+
     def emit_bash(self, context):
         input_port = self.inputs[0]
 
@@ -55,6 +57,7 @@ class ToInt(BaseNode):
             expr = input_port.value or "0"
 
         return f'$(( {expr} ))'
+
 
 @register_node("sleep", category="Utilities", label="Sleep", description="Pauses execution for a specified duration")
 class SleepNode(BaseNode):
@@ -74,7 +77,8 @@ class SleepNode(BaseNode):
             duration = source_node.properties.get("value", duration)
 
         return f'sleep {duration}'
-    
+
+
 @register_node("download_file", category="Utilities", label="Download File", description="Downloads a file from a specified URL")
 class DownloadFileNode(BaseNode):
     def __init__(self):
@@ -90,6 +94,7 @@ class DownloadFileNode(BaseNode):
 
         return f'curl -o "{output_path}" "{url}"'
 
+
 @register_node("git_clone", category="Utilities", label="Git Clone", description="Clones a Git repository to a specified destination")
 class GitCloneNode(BaseNode):
     def __init__(self):
@@ -104,7 +109,6 @@ class GitCloneNode(BaseNode):
         destination_path = self.properties.get("destination_path", "")
 
         return f'git clone "{repo_url}" "{destination_path}"'
-
 
 
 @register_node("open_website", category="Utilities", label="Open Website", description="Opens a specified URL in the default web browser")  

@@ -18,10 +18,11 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-from dataclasses import dataclass
 from collections import defaultdict,deque
-from typing import Dict,List,Tuple,Set
 from core.port_types import PortType
+from dataclasses import dataclass
+from typing import Dict, List, Set, Tuple
+
 
 PORT_PRIORITY:Dict[PortType,int]={PortType.EXEC:100,PortType.CONDITION:80,getattr(PortType,"DATA",PortType.STRING):60,PortType.STRING:50,getattr(PortType,"INT",PortType.STRING):45,getattr(PortType,"FLOAT",PortType.STRING):45}
 BASE_X_SPACING=260
@@ -29,12 +30,14 @@ BASE_Y_SPACING=140
 DATA_PROXIMITY_PULL=0.25
 MAX_COLLISION_ITER=2000
 
+
 @dataclass
 class _LEdge:
     src:str
     tgt:str
     port_type:PortType
     weight:int
+
 
 class _LNode:
     __slots__=("id","node","in_edges","out_edges","x","y","w_hint","h_hint")
@@ -49,6 +52,7 @@ class _LNode:
         self.h_hint=int(getattr(node,"height",120)or 120)
     def max_in_weight(self)->int:
         return max((e.weight for e in self.in_edges),default=0)
+
 
 class GraphLayoutEngine:
     def __init__(self,graph,*,x_spacing=BASE_X_SPACING,y_spacing=BASE_Y_SPACING):
@@ -218,4 +222,3 @@ class GraphLayoutEngine:
                 for n in cur:
                     n.y=y
                     y+=self.y_spacing
-
