@@ -17,13 +17,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.debug import Info
 from core.icons import Icon
 from core.traduction import Traduction
 from nodes.registry import NODE_REGISTRY
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
-from theme.theme import Theme
+from PySide6.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget, QFrame
+from themes.theme_manager import Theme
 import os
 
 
@@ -37,7 +36,7 @@ class CustomQLineEdit(QLineEdit):
     def keyPressEvent(self, event):
         key_code = event.key()
         if (key_code == Qt.Key_Up or key_code == Qt.Key_Down):
-            self.parent().keyPressEventArrow(event)
+            self.parent().parent().keyPressEventArrow(event)
 
         super().keyPressEvent(event)
 
@@ -51,7 +50,7 @@ class CustomQTreeWidget(QTreeWidget):
 
         # if the user manually switches into the tree we want to 
         # allow selection of the category 
-        if (not self.parent().search_input.hasFocus()):
+        if (not self.parent().parent().search_input.hasFocus()):
             return
 
         # if a category is selected after the keyPressEvent,
@@ -70,25 +69,37 @@ class NodePalette(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle(Traduction.get_trad("add_node", "Add Node"))
-        self.resize(320, 420)
         self.setWindowFlags(Qt.Popup)
 
-        layout = QVBoxLayout(self)
+        self.background = QWidget(self)
+        self.background.setObjectName("Background")
+        self.background.resize(320, 420)
 
         self.search_input = CustomQLineEdit(self)
         self.search_input.setPlaceholderText(Traduction.get_trad("search_nodes", "Search nodes..."))
         self.search_input.textChanged.connect(self.filter_nodes)
-        layout.addWidget(self.search_input)
 
         self.tree = CustomQTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
         self.tree.setMouseTracking(True)
         self.tree.viewport().setMouseTracking(True)
+        self.tree.setIndentation(10)
+        self.tree.setAlternatingRowColors(True)
+
+        separator = QFrame()
+        separator.setFrameShape(QFrame.HLine)
+        separator.setFrameShadow(QFrame.Sunken)
+        separator.setStyleSheet(separator_style())
+
+        layout = QVBoxLayout(self.background)
+        layout.addWidget(self.search_input)
+        layout.addWidget(separator)
         layout.addWidget(self.tree)
 
         self._node_chosen = False
         self.populate_tree()
+        self.setStyleSheet(tree_style())
 
     def keyPressEventArrow(self, event):
         self.tree.keyPressEvent(event)
@@ -166,7 +177,6 @@ class NodePalette(QWidget):
             self.tree.setCurrentItem(self.tree.topLevelItem(0))
         self.search_input.setFocus()
 
-
     def keyPressEvent(self, event):
         key = event.key()
 
@@ -210,3 +220,72 @@ class NodePalette(QWidget):
     def get_icon(self, name):
         icon = Icon.load_icon("menu_graph", name)
         return icon
+
+
+def separator_style() -> str:
+    return f"""
+            QFrame[frameShape="4"] {{
+                border: none;
+                max-height: 1px;
+                background: {Theme.get_color("PALETTE-SEPARATOR")};
+            }}
+        """
+
+def tree_style() -> str:
+    return f"""
+            QWidget {{
+                background: transparent;
+            }}
+            QWidget#Background {{
+                background: {Theme.get_color("PALETTE-BACKGROUND")};
+                border-radius: 12px;
+                border: 1px solid {Theme.get_color("PALETTE-BORDER")};
+            }}
+            CustomQTreeWidget::item,
+            CustomQTreeWidget {{
+                selection-background-color: transparent;
+                alternate-background-color: {Theme.get_color("PALETTE-BACKGROUND_ALTERNATE")};
+                outline: none
+            }}
+            CustomQTreeWidget::item:focus,
+            CustomQTreeWidget::item:selected {{
+                border: 1px solid {Theme.get_color("PALETTE-BACKGROUND_HOVER")};
+                border-radius: 6px;
+            }}
+            CustomQTreeWidget::item:hover{{
+                border-bottom: 1px solid {Theme.get_color("PALETTE-BACKGROUND_HOVER")};
+                border-radius: 6px;
+            }}
+            CustomQLineEdit {{
+                border: transparent;
+                margin: 0px 8px;
+            }}
+            QScrollArea#SettingsScrollArea {{
+                background: {Theme.get_color("SCROLL_AREA")};
+                border: none;
+            }}
+            QScrollArea#SettingsScrollArea > QWidget > QWidget {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                margin: 2px 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {Theme.get_color("SCROLL_HANDLE")};
+                min-height: 34px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {Theme.get_color("SCROLL_HANDLE_HOVER")};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+        """

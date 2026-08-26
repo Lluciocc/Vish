@@ -17,20 +17,26 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import QGraphicsRectItem, QGraphicsTextItem, QGraphicsItem, QMenu, QGraphicsView
-from PySide6.QtCore import Qt, QRectF, QPointF, QSizeF
-from PySide6.QtGui import QCursor, QPen, QColor, QPainter, QBrush, QPainterPath, QLinearGradient, QFont, QKeySequence
 from commands.undo_commands import *
-from core.logger import Logger
 from core.config import Config
+from core.logger import Logger
+from PySide6.QtCore import QPointF, QRectF, QSizeF, Qt
+from PySide6.QtGui import QBrush, QColor, QCursor, QFont, QKeySequence, QLinearGradient, QPainter, QPen, QPainterPath
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsTextItem, QGraphicsView, QMenu
+from themes.theme_manager import Theme
 
 
 ACCENT_COLORS = [
-    QColor(99, 179, 237),   # sky blue
-    QColor(154, 117, 242),  # violet
-    QColor(72, 199, 142),   # mint
-    QColor(250, 176, 5),    # amber
-    QColor(240, 101, 101),  # coral
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_0")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_1")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_2")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_3")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_4")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_5")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_6")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_7")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_8")),
+    QColor(Theme.get_color("COMMENT_BOX-ACCENT_9")),
 ]
 
 SIZE_PRESETS = [
@@ -41,12 +47,12 @@ SIZE_PRESETS = [
     48.0,  # extra large
 ]
 
-COLOR_BG = QColor(18, 20, 28, 185)         # dark body background
-COLOR_HEADER_BG = QColor(255, 255, 255, 12) # subtle header tint
-COLOR_BORDER = QColor(255, 255, 255, 30)    # default border
-COLOR_BORDER_SEL = QColor(255, 255, 255, 90) # selected border
-COLOR_TITLE = QColor(230, 230, 240)         # title text
-COLOR_BODY_TEXT = QColor(215, 218, 230)
+COLOR_BG = QColor(Theme.get_color("COMMENT_BOX-DARK_BACKGROUND"))           # dark body background
+COLOR_HEADER_BG = QColor(Theme.get_color("COMMENT_BOX-HEADER_TINT"))        # subtle header tint
+COLOR_BORDER = QColor(Theme.get_color("COMMENT_BOX-BORDER"))                # default border
+COLOR_BORDER_SEL = QColor(Theme.get_color("COMMENT_BOX-BORDER_SELECTION"))  # selected border
+COLOR_TITLE = QColor(Theme.get_color("COMMENT_BOX-LABEL_TITLE"))            # title text
+COLOR_BODY_TEXT = QColor(Theme.get_color("COMMENT_BOX-TEXT_BODY"))
 
 RADIUS = 10
 MIN_COMMENT_WIDTH = 160
@@ -54,8 +60,8 @@ MIN_COMMENT_HEIGHT = 80
 COMMENT_Z_BASE = -20_000
 COMMENT_Z_TOP = -2
 
-# TODO: add options for font, opacity, etc. (maybe in a future update)
 
+# TODO: add options for font, opacity, etc. (maybe in a future update)
 class CommentTextItem(QGraphicsTextItem):
     def __init__(self, text: str, owner, section: str):
         super().__init__(text, owner)
@@ -497,7 +503,7 @@ class CommentBoxItem(QGraphicsRectItem):
         if not self._in_header(event.pos()):
             if self.scene() and self.scene().views():
                 view = self.scene().views()[0]
-                
+
                 view.setDragMode(QGraphicsView.NoDrag)
                 scene_pos = event.scenePos()
                 view.show_node_palette(scene_pos)
@@ -505,25 +511,27 @@ class CommentBoxItem(QGraphicsRectItem):
             event.accept()
             return
 
-        menu = QMenu()
-        lock_action = menu.addAction("Unlock" if self.locked else "Lock")
-        menu.addSeparator()
-        color_menu = menu.addMenu("Accent colour")
-        color_names = ["Blue", "Violet", "Green", "Yellow", "Red"]
+        self.menu = QMenu()
+        self.menu.setStyleSheet(menu_style())
+        lock_action = self.menu.addAction("Unlock" if self.locked else "Lock")
+        self.menu.addSeparator()
+
+        color_menu = self.menu.addMenu("Accent colour")
+        color_names = Theme.comment_labels.split(";")
         color_actions = [
             color_menu.addAction(f"{'●' if i == self._accent_index else '○'} {n}")
             for i, n in enumerate(color_names)
         ]
-        size_menu = menu.addMenu("Size")
+        size_menu = self.menu.addMenu("Size")
         size_names = ["Small", "Medium", "Medium-Large", "Large", "Extra Large"]
         size_actions = [
             size_menu.addAction(f"{'●' if i == self._size_index else '○'} {n}")
             for i, n in enumerate(size_names)
         ]
 
-        menu.addSeparator()
-        delete_action = menu.addAction("Delete")
-        action = menu.exec(event.screenPos())
+        self.menu.addSeparator()
+        delete_action = self.menu.addAction("Delete")
+        action = self.menu.exec(event.screenPos())
         try:
             if action == lock_action:
                 self.set_locked(not self.locked)
@@ -533,9 +541,9 @@ class CommentBoxItem(QGraphicsRectItem):
                 self.set_title_size_index(size_actions.index(action))
             elif action == delete_action:
                 self._delete_self()
-        finally: # always call graph_changed after context menu actions
+        finally: # always call graph_changed after context self.menu actions
             self._call_auto_save()
-    
+
         event.accept()
 
     def _call_auto_save(self):
@@ -731,3 +739,32 @@ class CommentBoxItem(QGraphicsRectItem):
 
                 if rect.contains(center):
                     self._captured_nodes.append(item)
+
+
+def menu_style() -> str:
+    return f"""
+            QMenu {{
+                background: {Theme.get_color("COMMENT_BOX-MENU_BACKGROUND")};
+                color: {Theme.get_color("COMMENT_BOX-MENU_TEXT")};
+                border-radius: 12px;
+                padding: 8px;
+                border: 1px solid {Theme.get_color("COMMENT_BOX-MENU_BORDER")};
+                font-size: 14px;
+            }}
+            QMenu::icon {{
+                padding: 0px 0px 0px 15px;
+            }}
+            QMenu::item {{
+                padding: 10px 5px 10px 15px;
+                border-radius: 8px;
+                min-width: 150px;
+            }}
+            QMenu::item:selected {{
+                background: {Theme.get_color("COMMENT_BOX-MENU_ITEM_SELECTION")};
+            }}
+            QMenu::separator {{
+                height: 1px;
+                background: {Theme.get_color("COMMENT_BOX-MENU_SEPARATOR")};
+                margin: 8px 10px;
+            }}
+        """

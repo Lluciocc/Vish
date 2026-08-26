@@ -21,58 +21,11 @@ from core.config import MarkdownLoader
 from core.debug import Info
 from core.traduction import Traduction
 from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt
-from PySide6.QtWidgets import (
-    QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton,
-    QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout,
-)
-from theme.theme import Theme
+from PySide6.QtWidgets import (QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton,
+                               QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout)
+from themes.theme_manager import Theme
 from ui.about.about_pages import AboutMainPage, AboutTextPage
 
-def about_scroll_area_style() -> str:
-    return f"""
-        QScrollArea#AboutScrollArea {{
-            background: transparent;
-            border: none;
-        }}
-        QScrollArea#AboutScrollArea > QWidget > QWidget {{
-            background: transparent;
-        }}
-        QScrollBar:vertical {{
-            background: transparent;
-            width: 10px;
-            margin: 2px 0;
-        }}
-        QScrollBar::handle:vertical {{
-            background: {Theme.BUTTON_PRESSED};
-            min-height: 34px;
-            border-radius: 5px;
-        }}
-        QScrollBar::handle:vertical:hover {{
-            background: {Theme.ACCENT};
-        }}
-        QScrollBar::add-line:vertical,
-        QScrollBar::sub-line:vertical {{
-            height: 0;
-            background: none;
-            border: none;
-        }}
-        QScrollBar::add-page:vertical,
-        QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }}
-    """
-
-def scrollable_page(widget):
-    scroll = QScrollArea()
-    scroll.setObjectName("AboutScrollArea")
-    scroll.setWidgetResizable(True)
-    scroll.setFrameShape(QScrollArea.NoFrame)
-    scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
-    scroll.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-    scroll.setWidget(widget)
-    scroll.setStyleSheet(about_scroll_area_style())
-    return scroll
 
 class AboutDialog(QDialog):
     def __init__(self, parent=None):
@@ -82,59 +35,34 @@ class AboutDialog(QDialog):
         if Info.get_device_type() == "phone":
             self.showMaximized()
         else:
-            self.resize(380, 780)
+            self.resize(380, 740)
+        self.setMinimumSize(360, 294)
         self.setWindowTitle(Traduction.get_trad("about", "About"))
 
         self.current_index = 0
         self.animations = []
 
         main_layout = QVBoxLayout(self)
-        main_layout.setContentsMargins(24, 24, 24, 20)
+        main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(12)
 
-        header = QHBoxLayout()
-        self.back_btn = QPushButton("←")
-        self.back_btn.setFixedSize(32, 32)
-        self.back_btn.setEnabled(False)
-        self.back_opacity = QGraphicsOpacityEffect(self.back_btn)
-        self.back_opacity.setOpacity(0.0)
-        self.back_btn.setGraphicsEffect(self.back_opacity)
-        self.back_btn.clicked.connect(self.go_back)
-        self.back_btn.setStyleSheet(f"""
-            QPushButton {{
-                border-radius: 16px;
-                background-color: rgba(255,255,255,0.06);
-            }}
-            QPushButton:hover {{
-                background-color: {Theme.BUTTON_HOVER};
-            }}
-        """)
-
-        header.addWidget(self.back_btn)
-        header.addStretch()
-        main_layout.addLayout(header)
+        self.scroll_area = QScrollArea()
+        self.scroll_area.setObjectName("AboutScrollArea")
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area.setFrameShape(QScrollArea.NoFrame)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.stack = QStackedWidget()
-        main_layout.addWidget(self.stack)
+        self.stack.setContentsMargins(10, 0, 10, 2)
+        self.scroll_area.setWidget(self.stack)
 
         self.pages = {}
-
-        self.pages["main"] = scrollable_page(AboutMainPage(self.go_to))
-        self.pages["credits"] = AboutTextPage(
-            "about_credits",
-            "Credits",
-            MarkdownLoader.load_markdown("CREDITS.md")
-        )
-        self.pages["legal"] = AboutTextPage(
-            "about_legal",
-            "Legal",
-            MarkdownLoader.load_markdown("LICENSE.md")
-        )
-        self.pages["whats_new"] = AboutTextPage(
-            "about_whats_new",
-            "What's New",
-            MarkdownLoader.load_markdown("WHATSNEW.md")
-        )
+        self.pages["main"] = AboutMainPage(self.go_to)
+        self.pages["credits"] = AboutTextPage("about_credits", "Credits", MarkdownLoader.load_markdown("CREDITS.md"))
+        self.pages["legal"] = AboutTextPage("about_legal", "Legal", MarkdownLoader.load_markdown("LICENSE.md"))
+        self.pages["whats_new"] = AboutTextPage("about_whats_new", "What's New", MarkdownLoader.load_markdown("WHATSNEW.md"))
 
         for page in self.pages.values():
             self.stack.addWidget(page)
@@ -142,44 +70,32 @@ class AboutDialog(QDialog):
         self.stack.setCurrentWidget(self.pages["main"])
         self.current_index = self.stack.currentIndex()
 
-        close_btn = QPushButton(Traduction.get_trad("close", "Close"))
-        close_btn.setFixedHeight(40)
-        close_btn.clicked.connect(self.accept)
-        main_layout.addWidget(close_btn)
+        self.back_button = QPushButton(Traduction.get_trad("back", "Back"))
+        self.back_button.setFixedHeight(40)
+        self.back_button.clicked.connect(self.go_back)
+        self.back_button.setStyleSheet(pushbutton_style())
+        self.back_button.hide()
 
-        self.setStyleSheet(f"""
-            QDialog {{
-                background-color: {Theme.PANEL};
-                color: {Theme.TEXT};
-                border-radius: 16px;
-            }}
-        """)
+        close_button = QPushButton(Traduction.get_trad("close", "Close"))
+        close_button.setFixedHeight(40)
+        close_button.clicked.connect(self.accept)
+        close_button.setStyleSheet(pushbutton_style())
+
+        footer = QHBoxLayout()
+        footer.addWidget(self.back_button)
+        footer.addWidget(close_button)
+        footer.setContentsMargins(0, 0, 10, 10)
+
+        main_layout.addSpacing(10)
+        main_layout.addWidget(self.scroll_area)
+        main_layout.addLayout(footer)
+        self._apply_theme()
 
     def show_back_button(self):
-        self.back_btn.setEnabled(True)
-        self.back_btn.setAttribute(Qt.WA_TransparentForMouseEvents, False)
-        anim = QPropertyAnimation(self.back_opacity, b"opacity", self)
-        anim.setDuration(120)
-        anim.setStartValue(self.back_opacity.opacity())
-        anim.setEndValue(1.0)
-        anim.start()
-        self.animations.append(anim)
-
+        self.back_button.show()
 
     def hide_back_button(self):
-        self.back_btn.setAttribute(Qt.WA_TransparentForMouseEvents, True)
-        anim = QPropertyAnimation(self.back_opacity, b"opacity", self)
-        anim.setDuration(120)
-        anim.setStartValue(self.back_opacity.opacity())
-        anim.setEndValue(0.0)
-
-        def finish():
-            self.back_btn.setEnabled(False)
-        anim.finished.connect(finish)
-        anim.start()
-        self.animations.append(anim)
-
-
+        self.back_button.hide()
 
     def animate_switch(self, target_index, direction):
         current = self.stack.currentWidget()
@@ -211,7 +127,6 @@ class AboutDialog(QDialog):
             else:
                 self.show_back_button()
 
-
         anim_in.finished.connect(finish)
 
         anim_out.start()
@@ -228,3 +143,66 @@ class AboutDialog(QDialog):
         if self.current_index == 0:
             return
         self.animate_switch(0, -1)
+
+    def _apply_theme(self):
+        self.scroll_area.setStyleSheet(scroll_style())
+        self.setStyleSheet(main_style())
+
+
+def main_style() -> str:
+    return f"""
+            background: {Theme.get_color("ABOUT-BACKGROUND")};
+            color: {Theme.get_color("ABOUT-TEXT")};
+        """
+
+def pushbutton_style() -> str:
+    return f"""
+            QPushButton {{
+                color: {Theme.get_color("ABOUT-PUSHBUTTON_TEXT")};
+                border-radius: 16px;
+                background: {Theme.get_color("ABOUT-PUSHBUTTON")};
+                border: 1px solid {Theme.get_color("ABOUT-PUSHBUTTON_BORDER")};
+                font-size: 15px;
+                border-radius: 5px;
+                margin-left: 10px;
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                background: {Theme.get_color("ABOUT-PUSHBUTTON_HOVER")};
+                border: 1px solid {Theme.get_color("ABOUT-PUSHBUTTON_BORDER_HOVER")};
+                outline: none;
+            }}
+        """
+
+def scroll_style() -> str:
+    return f"""
+            QScrollArea#SettingsScrollArea {{
+                background: {Theme.get_color("SCROLL_AREA")};
+                border: none;
+            }}
+            QScrollArea#SettingsScrollArea > QWidget > QWidget {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                margin: 2px 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {Theme.get_color("SCROLL_HANDLE")};
+                min-height: 34px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {Theme.get_color("SCROLL_HANDLE_HOVER")};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+        """

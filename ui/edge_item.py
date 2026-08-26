@@ -17,11 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import QGraphicsPathItem
-from PySide6.QtCore import QPointF, Qt
-from PySide6.QtGui import QPainterPath, QPen, QColor
 from core.graph import Edge
 from core.port_types import PORT_STYLES, PortType
+from PySide6.QtCore import QPointF, Qt
+from PySide6.QtGui import QColor, QPainterPath, QPen
+from PySide6.QtWidgets import QGraphicsPathItem
+from themes.theme_manager import Theme
+
 
 class EdgeItem(QGraphicsPathItem):
     def __init__(self, edge=None, source_port=None, target_port=None):
@@ -38,7 +40,7 @@ class EdgeItem(QGraphicsPathItem):
 
     def apply_style_from_source(self):
         if not self.source_port:
-            color = QColor("#95A5A6")
+            color = QColor(Theme.get_color("EDGE_ITEM-EDGE_ANY"))
             width = 3
         else:
             port_type = self.source_port.port.port_type
@@ -48,10 +50,10 @@ class EdgeItem(QGraphicsPathItem):
                 color = QColor(style.color)
                 width = style.thickness
             else:
-                color = QColor("#95A5A6")
+                color = QColor(Theme.get_color("EDGE_ITEM-EDGE_ANY"))
                 width = 3
             if port_type == PortType.EXEC:
-                color = QColor("#95A5A6")
+                color = QColor(Theme.get_color("EDGE_ITEM-EDGE_EXEC"))
 
         pen = QPen(color, width)
         pen.setCapStyle(Qt.RoundCap)
@@ -64,7 +66,6 @@ class EdgeItem(QGraphicsPathItem):
             self.target_pos = self.target_port.center_scene_pos()
         self.update_path()
 
-
     def set_positions(self, source: QPointF, target: QPointF):
         self.source_pos = source
         self.target_pos = target
@@ -76,7 +77,6 @@ class EdgeItem(QGraphicsPathItem):
         else:
             self.target_pos = pos
         self.update_path()
-
 
     def update_path(self):
         path = QPainterPath()
@@ -109,7 +109,7 @@ class EdgeItem(QGraphicsPathItem):
         width = style.thickness
 
         if color == "invalid":
-            self.setPen(QPen(QColor("#E74C3C"), width))
+            self.setPen(QPen(QColor(Theme.get_color("EDGE_ITEM-EDGE_INVALID")), width))
         elif QColor.isValidColor(str(color)):
             self.setPen(QPen(QColor(color), width))
         else:                                           #reset

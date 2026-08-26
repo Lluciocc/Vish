@@ -17,9 +17,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
-)
+from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
+from themes.theme_manager import Theme
 
 
 class PropertyPanel(QWidget):
@@ -37,32 +36,34 @@ class PropertyPanel(QWidget):
         if not node:
             return
 
-        self.layout.addWidget(QLabel(f"<b>{node.title}</b>"))
+        self.title = QLabel(f"<b>{node.title}</b>")
+        self.layout.addWidget(self.title)
 
         for key, value in node.properties.items():
 
             if key.startswith("DYNAMIC_"):
-                label = key.replace("DYNAMIC_", "").replace("_", " ").title()
+                self.label = key.replace("DYNAMIC_", "").replace("_", " ").title()
 
-                button = QPushButton(label)
-                button.clicked.connect(
+                self.button = QPushButton(label)
+                self.button.clicked.connect(
                     lambda _, k=key: self._run_dynamic(k)
                 )
 
-                self.layout.addWidget(button)
+                self.layout.addWidget(self.button)
                 continue
 
-            label = QLabel(key)
-            field = QLineEdit(str(value))
+            self.label = QLabel(key)
+            self.field = QLineEdit(str(value))
 
-            field.textChanged.connect(
+            self.field.textChanged.connect(
                 lambda v, k=key: self._update_property(k, v)
             )
 
-            self.layout.addWidget(label)
-            self.layout.addWidget(field)
+            self.layout.addWidget(self.label)
+            self.layout.addWidget(self.field)
 
         self.layout.addStretch()
+        self._apply_theme()
 
     def _update_property(self, key, value):
         if self.current_node:
@@ -90,3 +91,45 @@ class PropertyPanel(QWidget):
             widget = item.widget()
             if widget:
                 widget.deleteLater()
+
+    def _apply_theme(self):
+        self.title.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-TITLELABEL_TEXT")}")
+        for widget in self.layout.parent().children():
+            if isinstance(widget, QLabel):
+                widget.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-LABEL_TEXT")}")
+            elif isinstance(widget, QPushButton):
+                widget.setStyleSheet(pushbutton_style())
+            elif isinstance(widget, QLineEdit):
+                widget.setStyleSheet(lineedit_style())
+
+
+def lineedit_style() -> str:
+    return f"""
+            QLineEdit {{
+                selection-background-color: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_SELECT_BACKGROUND")};
+            }}
+            QLineEdit:focus,
+            QLineEdit:selected,
+            QLineEdit:hover {{
+                border: 1px solid {Theme.get_color("PROPERTY_PANEL-LINEEDIT_BORDER_HOVER")};
+            }}
+        """
+
+def pushbutton_style() -> str:
+    return f"""
+            QPushButton {{
+                color: {Theme.get_color("PROPERTY_PANEL-PUSHBUTTON_TEXT")};
+                border: 1px solid {Theme.get_color("PROPERTY_PANEL-PUSHBUTTON_BORDER")};
+                border-radius: 5px;
+                min-width: 60px;
+                padding: 3px 5px;
+                background: {Theme.get_color("PROPERTY_PANEL-PUSHBUTTON_BACKGROUND")};
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                border-color: {Theme.get_color("PROPERTY_PANEL-PUSHBUTTON_BORDER_HOVER")};
+                background: {Theme.get_color("PROPERTY_PANEL-PUSHBUTTON_BACKGROUND_HOVER")};
+                outline: none;
+            }}
+        """

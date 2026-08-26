@@ -22,6 +22,7 @@ from core.port_types import PortStyle, PORT_STYLES, PortType
 from PySide6.QtCore import QRectF, Qt
 from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
 from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from themes.theme_manager import Theme
 
 
 class PortItem(QGraphicsPathItem):
@@ -35,7 +36,7 @@ class PortItem(QGraphicsPathItem):
         self.edges = []
 
         self.setBrush(QBrush(QColor(style.color)))
-        self.setPen(QPen(QColor("#2C3E50"), 2))
+        self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-BORDER")), 2))
 
         self.setAcceptedMouseButtons(Qt.LeftButton)
         self.setAcceptHoverEvents(True)
@@ -51,21 +52,21 @@ class PortItem(QGraphicsPathItem):
         style = PORT_STYLES.get(port_type)
         if style:
             return QColor(style.color)
-        return QColor("#95A5A6")
+        return QColor(Theme.get_color(f"PORT_ITEM-FILL_BROKEN"))
 
     def overwrite_color(self, color):
         if color == "invalid":
-            self.setBrush(QBrush(QColor("#E74C3C")))
+            self.setBrush(QBrush(QColor(Theme.get_color(f"PORT_ITEM-FILL_INVALID"))))
             if self.highlight:
-                self.setPen(QPen(QColor("#E74C3C"), 3))
+                self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-FILL_INVALID")), 3))
         elif QColor.isValidColor(str(color)):
             self.setBrush(QBrush(QColor(color)))
         else:                                           #reset
             self.setBrush(QBrush(QColor(self.get_color())))
             if self.highlight:
-                self.setPen(QPen(QColor("#ECF0F1"), 3))
+                self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-BORDER_RESET")), 3))
             else:
-                self.setPen(QPen(QColor("#2C3E50"), 2))
+                self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-BORDER")), 2))
 
     def generate_path(self, port: Port, style: PortStyle) -> QPainterPath:
         retval = QPainterPath()
@@ -96,12 +97,12 @@ class PortItem(QGraphicsPathItem):
 
     def hoverEnterEvent(self, event):
         self.highlight = True
-        self.setPen(QPen(QColor("#ECF0F1"), 3))
+        self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-BORDER_HOVER")), 3))
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
         self.highlight = False
-        self.setPen(QPen(QColor("#2C3E50"), 2))
+        self.setPen(QPen(QColor(Theme.get_color(f"PORT_ITEM-BORDER")), 2))
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):

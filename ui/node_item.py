@@ -17,18 +17,18 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from unicodedata import category
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem, QGraphicsPixmapItem
-from PySide6.QtCore import QRectF, Qt, QPointF
-from PySide6.QtGui import QPainter, QColor, QPen, QBrush, QPainterPath
 from core.graph import Node
-from theme.theme import Theme
-from ui.port_item import PortItem
-from nodes.registry import NODE_REGISTRY
-from core.traduction import Traduction
 from core.icons import Icon
-from core.logger import Logger
+from core.traduction import Traduction
+from nodes.registry import NODE_REGISTRY
+from PySide6.QtCore import QPointF, QRectF, Qt
+from PySide6.QtGui import QBrush, QColor, QPainter, QPainterPath, QPen
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsTextItem
+from themes.theme_manager import Theme
+from ui.port_item import PortItem
+from unicodedata import category
 import os
+
 
 class NodeItem(QGraphicsItem):
     WIDTH = 180
@@ -47,7 +47,7 @@ class NodeItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
         self.title_item = QGraphicsTextItem(Traduction.get_trad(node.node_type, node.title), self)
-        self.title_item.setDefaultTextColor(QColor("#ECF0F1"))
+        self.title_item.setDefaultTextColor(QColor(Theme.get_color(f"NODE_ITEM-TITLE")))
         self.title_item.setPos(10, 8)
         self.setZValue(1)
 
@@ -86,11 +86,11 @@ class NodeItem(QGraphicsItem):
         path.addRoundedRect(self.boundingRect(), 8, 8)
 
         if self.isSelected():
-            painter.setPen(QPen(QColor("#3498DB"), 3))
+            painter.setPen(QPen(QColor(Theme.get_color(f"NODE_ITEM-BORDER_HOVER")), 3))
         else:
-            painter.setPen(QPen(QColor("#2C3E50"), 2))
+            painter.setPen(QPen(QColor(Theme.get_color(f"NODE_ITEM-BORDER")), 2))
 
-        painter.setBrush(QBrush(QColor("#34495E")))
+        painter.setBrush(QBrush(QColor(Theme.get_color(f"NODE_ITEM-BACKGROUND"))))
         painter.drawPath(path)
 
         header_rect = QRectF(0, 0, self.WIDTH, self.HEADER_HEIGHT)

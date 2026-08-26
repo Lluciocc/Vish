@@ -1,0 +1,356 @@
+name:
+    AR:         "بنفسجي"
+    CS:         "Fialové"
+    DE:         "Vish Lila"
+    EN:         "Vish Purple"
+    ES:         "Púrpura"
+    FR:         "Violet"
+    IT:         "Viola"
+    PTBR:       "Roxo"
+description:
+    DE:         "Vishs violetter Standardstil."
+    EN:         "Vish's purple main theme."
+author:         "Ick & Lluciocc"
+version:        "-"
+comment_labels:
+    DE:         "Blau;Violett;Grün;Gelb;Rot"
+    EN:         "Blue;Violet;Green;Yellow;Red"
+icons:          "dark"
+
+
+theme_main:
+
+    DARK_BACKGROUND:        "#35204f"
+    BACKGROUND:             "#2b1b3f"
+    PANEL_BORDER:           "#12ffffff"
+    CONTRAST:               "#33d4d4d4"
+    FONT:                   "#e6d9ff"
+    FONT_INVERT:            "#0c0024"
+    DISABLED:               "#5e5e5e"
+    CUSTOM_ACCENT:          "#9b59b6"
+    INVALID:                "#d4001c"
+
+    # NODES DEFAULT COLORS
+    NODES_BORDER:           "#2C3E50"
+
+    NODES_GRAPH_PORTAL:     "#88e66836"
+    NODES_FLOW:             "#88BBBBBB"
+    NODES_MATH:             "#883498DB"
+    NODES_LOGICAL:          "#88be9e36"
+    NODES_STRING:           "#8853ffcb"
+    NODES_CONVERSION:       "#887c55b6"
+    NODES_BASH_FUNCTION:    "#88e64ade"
+
+
+theme_detail:
+
+    # BASH DEFAULTS
+    MAIN-BASH_TEXT:                             "FONT"
+    HIGHLIGHTS-KEYWORD:                         "#C792EA"
+    HIGHLIGHTS-FUNCTION_DEF:                    "#D000FF"
+    HIGHLIGHTS-FUNCTION_CALL:                   "#D000FF"
+    HIGHLIGHTS-COMMAND:                         "#82AAFF"
+    HIGHLIGHTS-STRING:                          "#C3E88D"
+    HIGHLIGHTS-COMMENT:                         "#616161"
+    HIGHLIGHTS-VARIABLE:                        "#F78C6C"
+    HIGHLIGHTS-NUMBER:                          "#FFCB6B"
+
+    # GENERAL SCROLLBARS
+    SCROLL_HANDLE:                              "#444444"
+    SCROLL_HANDLE_HOVER:                        "CUSTOM_ACCENT"
+    SCROLL_AREA:                                "transparent"
+    SCROLL_SUB_BAR:                             "transparent"
+
+    # MAIN
+    MAIN-BASHPANEL_BACKGROUND:                  "DARK_BACKGROUND"
+    MAIN-BASHPANEL_BORDER:                      "PANEL_BORDER"
+
+    MAIN-TOOLPANALS_BACKGROUND:                 "BACKGROUND"
+    MAIN-TOOLPANELS_TEXT:                       "FONT"
+    MAIN-TOOLPANELS_SELECT_BACKGROUND:          "CUSTOM_ACCENT"
+
+    MAIN-MENU_BACKGROUND:                       "BACKGROUND"
+    MAIN-MENU_TEXT:                             "FONT"
+    MAIN-MENU_BORDER:                           "CONTRAST"
+    MAIN-MENU_ITEM_SELECTION:                   "CUSTOM_ACCENT"
+    MAIN-MENU_SEPARATOR:                        "CONTRAST"
+
+    MAIN-BUTTON_TEXT:                           "FONT"
+    MAIN-BUTTON_BORDER:                         "CONTRAST"
+    MAIN-BUTTON_BACKGROUND_HOVER:               "transparent"
+    MAIN-BUTTON_BORDER_HOVER:                   "CUSTOM_ACCENT"
+
+    MAIN-PUSHBUTTON_TEXT:                       "FONT"
+    MAIN-PUSHBUTTON_BORDER:                     "CONTRAST"
+    MAIN-PUSHBUTTON_BACKGROUND:                 "transparent"
+    MAIN-PUSHBUTTON_BORDER_HOVER:               "CUSTOM_ACCENT"
+    MAIN-PUSHBUTTON_BACKGROUND_HOVER:           "transparent"
+
+    # PROPERTY PANAL
+    PROPERTY_PANEL-TITLELABEL_TEXT:             "CUSTOM_ACCENT"
+    PROPERTY_PANEL-LABEL_TEXT:                  "FONT"
+    PROPERTY_PANEL-LINEEDIT_BORDER_HOVER:       "CUSTOM_ACCENT"
+    PROPERTY_PANEL-LINEEDIT_SELECT_BACKGROUND:  "CUSTOM_ACCENT"
+
+    PROPERTY_PANEL-PUSHBUTTON_TEXT:             "FONT"
+    PROPERTY_PANEL-PUSHBUTTON_BORDER:           "CONTRAST"
+    PROPERTY_PANEL-PUSHBUTTON_BACKGROUND:       "transparent"
+    PROPERTY_PANEL-PUSHBUTTON_BORDER_HOVER:     "CUSTOM_ACCENT"
+    PROPERTY_PANEL-PUSHBUTTON_BACKGROUND_HOVER: "transparent"
+
+    # GRAPH VIEW
+    GRAPH_VIEW-BACKGROUND:                      "DARK_BACKGROUND"
+    GRAPH_VIEW-BACKGROUND_BORDER:               "PANEL_BORDER"
+    GRAPH_VIEW-FRAMEBUTTON_BACKGROUND:          "BACKGROUND"
+    GRAPH_VIEW-FRAMEBUTTON_BACKGROUND_HOVER:    "BACKGROUND"
+    GRAPH_VIEW-FRAMEBUTTON_BORDER:              "CONTRAST"
+    GRAPH_VIEW-FRAMEBUTTON_BORDER_HOVER:        "CUSTOM_ACCENT"
+
+    GRAPH_VIEW-ZOOMWIDGET_BACKGROUND:           "BACKGROUND"
+    GRAPH_VIEW-ZOOMWIDGET_BORDER:               "CONTRAST"
+    GRAPH_VIEW-ZOOMLABEL_TEXT:                  "FONT"
+
+    GRAPH_VIEW-ZOOMSLIDER_HANDLE:               "BACKGROUND"
+    GRAPH_VIEW-ZOOMSLIDER_BACKGROUND_ACTIVE:    "CUSTOM_ACCENT"
+    GRAPH_VIEW-ZOOMSLIDER_BACKGROUND:           "DISABLED"
+    GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER:        "DISABLED"
+    GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_HOVER:  "CUSTOM_ACCENT"
+
+    GRAPH_VIEW-ZOOMBUTTON_BACKGROUND:           "transparent"
+    GRAPH_VIEW-ZOOMBUTTON_BACKGROUND_HOVER:     "transparent"
+    GRAPH_VIEW-ZOOMBUTTON_BORDER:               "CONTRAST"
+    GRAPH_VIEW-ZOOMBUTTON_BORDER_HOVER:         "CUSTOM_ACCENT"
+    GRAPH_VIEW-ZOOMBUTTON_TEXT:                 "FONT"
+
+    # NODE HEADER COLORS
+    BASE_NODE-EXIT:                             "NODES_GRAPH_PORTAL"
+    BASE_NODE-START:                            "NODES_GRAPH_PORTAL"
+    BASE_NODE-FUNCTION:                         "NODES_GRAPH_PORTAL"
+    BASE_NODE-CALL:                             "NODES_GRAPH_PORTAL"
+    BASE_NODE-RETURN:                           "NODES_GRAPH_PORTAL"
+
+    BASE_NODE-RUN_COMMAND:                      "NODES_STRING"
+    BASE_NODE-PIPE:                             "NODES_STRING"
+    BASE_NODE-ECHO:                             "NODES_STRING"
+    BASE_NODE-SET_VARIABLE:                     "NODES_STRING"
+    BASE_NODE-GET_VARIABLE:                     "NODES_STRING"
+    BASE_NODE-STRING_CONSTANT:                  "NODES_STRING"
+
+    BASE_NODE-SEQUENCER:                        "NODES_FLOW"
+    BASE_NODE-IF:                               "NODES_FLOW"
+    BASE_NODE-FOR:                              "NODES_FLOW"
+    BASE_NODE-WHILE:                            "NODES_FLOW"
+
+    BASE_NODE-NUMBER_CONSTANT:                  "NODES_MATH"
+    BASE_NODE-ADDITION:                         "NODES_MATH"
+    BASE_NODE-SUBTRACTION:                      "NODES_MATH"
+    BASE_NODE-MULTIPLICATION:                   "NODES_MATH"
+    BASE_NODE-DIVISION:                         "NODES_MATH"
+    BASE_NODE-MODULO:                           "NODES_MATH"
+
+    BASE_NODE-LESS_THAN:                        "NODES_LOGICAL"
+    BASE_NODE-GREATER_THAN:                     "NODES_LOGICAL"
+    BASE_NODE-EQUALS:                           "NODES_LOGICAL"
+    BASE_NODE-EQUALS_STRING:                    "NODES_LOGICAL"
+    BASE_NODE-EQUALS_VARIABLE:                  "NODES_LOGICAL"
+    BASE_NODE-LOGICAL_AND:                      "NODES_LOGICAL"
+    BASE_NODE-LOGICAL_OR:                       "NODES_LOGICAL"
+    BASE_NODE-LOGICAL_NOT:                      "NODES_LOGICAL"
+    BASE_NODE-COMMAND_CONDITION:                "NODES_LOGICAL"
+    BASE_NODE-FILE_EXISTS:                      "NODES_LOGICAL"
+
+    BASE_NODE-SLEEP:                            "NODES_BASH_FUNCTION"
+    BASE_NODE-DOWNLOAD_FILE:                    "NODES_BASH_FUNCTION"
+    BASE_NODE-GIT_CLONE:                        "NODES_BASH_FUNCTION"
+    BASE_NODE-OPEN_WEBSITE:                     "NODES_BASH_FUNCTION"
+
+    BASE_NODE-TO_STRING:                        "NODES_CONVERSION"
+    BASE_NODE-TO_INT:                           "NODES_CONVERSION"
+
+    # NODE ITEM
+    NODE_ITEM-TITLE:                            "#f9f9f9"   # Matches SVG colors.
+    NODE_ITEM-BACKGROUND:                       "#34495E"
+    NODE_ITEM-BORDER:                           "NODES_BORDER"
+    NODE_ITEM-BORDER_HOVER:                     "CUSTOM_ACCENT"
+
+    # PORT ITEM
+    PORT_ITEM-BORDER:                           "NODES_BORDER"
+    PORT_ITEM-FILL_BROKEN:                      "ff5500"
+    PORT_ITEM-FILL_INVALID:                     "INVALID"
+    PORT_ITEM-BORDER_RESET:                     "CUSTOM_ACCENT"
+    PORT_ITEM-BORDER_HOVER:                     "CUSTOM_ACCENT"
+
+    # EDGE ITEM
+    EDGE_ITEM-EDGE_ANY:                         "#333333"
+    EDGE_ITEM-EDGE_EXEC:                        "#000000"
+    EDGE_ITEM-EDGE_INVALID:                     "INVALID"
+
+    # PORT AND EDGE COLORS
+    PORT_TYPES-EXEC:                            "#000000"
+    PORT_TYPES-STRING:                          "#53ffcb"
+    PORT_TYPES-INT:                             "#3498db"
+    PORT_TYPES-BOOL:                            "#95e1d3"
+    PORT_TYPES-PATH:                            "#f38181"
+    PORT_TYPES-VARIABLE:                        "#ffa07a"
+    PORT_TYPES-CONDITION:                       "#be9e36"
+    PORT_TYPES-ANY:                             "#333333"
+
+    # PALETTE
+    PALETTE-BACKGROUND:                         "BACKGROUND"
+    PALETTE-BACKGROUND_ALTERNATE:               "BACKGROUND"
+    PALETTE-BACKGROUND_HOVER:                   "CUSTOM_ACCENT"
+    PALETTE-BORDER:                             "CONTRAST"
+    PALETTE-SEPARATOR:                          "FONT"
+
+    # COMMENT BOX
+    COMMENT_BOX-ACCENT_0:                       "#63b3ed"
+    COMMENT_BOX-ACCENT_1:                       "#9a75f2"
+    COMMENT_BOX-ACCENT_2:                       "#48c78e"
+    COMMENT_BOX-ACCENT_3:                       "#fab005"
+    COMMENT_BOX-ACCENT_4:                       "#f06565"
+    COMMENT_BOX-ACCENT_5:                       "#b94db2"
+    COMMENT_BOX-ACCENT_6:                       "#75f2d5"
+    COMMENT_BOX-ACCENT_7:                       "#c77d48"
+    COMMENT_BOX-ACCENT_8:                       "#b4b4b4"
+    COMMENT_BOX-ACCENT_9:                       "#e7651a"
+
+    COMMENT_BOX-DARK_BACKGROUND:                "#b912141c"
+    COMMENT_BOX-HEADER_TINT:                    "#0cffffff"
+    COMMENT_BOX-BORDER:                         "#1effffff"
+    COMMENT_BOX-BORDER_SELECTION:               "#5affffff"
+    COMMENT_BOX-LABEL_TITLE:                    "#e6e6f0"
+    COMMENT_BOX-TEXT_BODY:                      "#d7dae6"
+
+    COMMENT_BOX-MENU_BACKGROUND:                "BACKGROUND"
+    COMMENT_BOX-MENU_TEXT:                      "FONT"
+    COMMENT_BOX-MENU_BORDER:                    "CONTRAST"
+    COMMENT_BOX-MENU_ITEM_SELECTION:            "CUSTOM_ACCENT"
+    COMMENT_BOX-MENU_SEPARATOR:                 "CONTRAST"
+
+    # SETTINGS
+    SETTINGS-BACKGROUND:                        "BACKGROUND"
+    SETTINGS-TEXT:                              "FONT"
+    SETTINGS-SEPARATORS:                        "FONT"
+    SETTINGS-SETTING_ENABLED:                   "CUSTOM_ACCENT"
+    SETTINGS-SETTING_DISABLED:                  "DISABLED"
+    SETTINGS-SEPARATOR:                         "CONTRAST"
+
+    SETTINGS-COMBOBOX_TEXT:                     "FONT"
+    SETTINGS-COMBOBOX_BORDER:                   "CONTRAST"
+    SETTINGS-COMBOBOX_BORDER_HOVER:             "CUSTOM_ACCENT"
+    SETTINGS-COMBOBOX_BACKGROUND:               "transparent"
+    SETTINGS-COMBOBOX_BACKGROUND_HOVER:         "transparent"
+    SETTINGS-COMBOBOX_MAIN_BACKGROUND:          "BACKGROUND"
+    SETTINGS-COMBOBOX_SELECTION:                "CUSTOM_ACCENT"
+    SETTINGS-COMBOBOX_SEPARATOR:                "CONTRAST"
+
+    SETTINGS-PUSHBUTTON_TEXT:                   "FONT"
+    SETTINGS-PUSHBUTTON_BORDER:                 "CONTRAST"
+    SETTINGS-PUSHBUTTON_BACKGROUND:             "transparent"
+    SETTINGS-PUSHBUTTON_BORDER_HOVER:           "CUSTOM_ACCENT"
+    SETTINGS-PUSHBUTTON_BACKGROUND_HOVER:       "transparent"
+
+    SETTINGS-LINEEDIT_TEXT:                     "FONT"
+    SETTINGS-LINEEDIT_SELECTION_TEXT:           "FONT"
+    SETTINGS-LINEEDIT_SELECTION:                "CUSTOM_ACCENT"
+    SETTINGS-LINEEDIT_BACKGROUND:               "transparent"
+    SETTINGS-LINEEDIT_BORDER:                   "CONTRAST"
+    SETTINGS-LINEEDIT_BORDER_HOVER:             "CUSTOM_ACCENT"
+
+    SETTINGS-LABEL_TEXT:                        "FONT"
+    SETTINGS-TITELLABEL_TEXT:                   "CUSTOM_ACCENT"
+    SETTINGS-DESCRIPTIONLABEL_TEXT:             "FONT"
+    SETTINGS-AUTHORLABEL_TEXT:                  "CUSTOM_ACCENT"
+
+    SETTINGS-MESSAGEBOX_TEXT:                   "FONT"
+    SETTINGS-MESSAGEBOX_BACKGROUND:             "BACKGROUND"
+
+    # WELCOME
+    WELCOME-BACKGROUND:                         "DARK_BACKGROUND"
+    WELCOME-SEPARATOR:                          "CONTRAST"
+    WELCOME-TITLELABEL_TEXT:                    "FONT"
+    WELCOME-TITLELABEL_BACKGROUND:              "transparent"
+    WELCOME-SUBLABEL_TEXT:                      "FONT"
+    WELCOME-SUBLABEL_BACKGROUND:                "transparent"
+
+    WELCOME-NAMELABEL_TEXT:                     "FONT"
+    WELCOME-NAMELABEL_BACKGROUND:               "transparent"
+    WELCOME-DATELABEL_TEXT:                     "FONT"
+    WELCOME-DATELABEL_BACKGROUND:               "transparent"
+
+    WELCOME-LISTWIDGET_BACKGROUND:              "BACKGROUND"
+    WELCOME-LISTWIDGET_BUTTON_SELECTION:        "CUSTOM_ACCENT"
+    WELCOME-LISTWIDGET_BUTTON_HOVER:            "CONTRAST"
+    WELCOME-LISTWIDGET_BORDER:                  "PANEL_BORDER"
+
+    WELCOME-DELETEBUTTON_BACKGROUND:            "transparent"
+    WELCOME-DELETEBUTTON_TEXT:                  "FONT"
+    WELCOME-DELETEBUTTON_BACKGROUND_HOVER:      "#d9c0392b"
+    WELCOME-DELETEBUTTON_BACKGROUND_PRESSED:    "#f296281e"
+    WELCOME-DELETEBUTTON_TEXT_HOVER:            "FONT"
+    WELCOME-DELETEBUTTON_TEXT_PRESSED:          "FONT"
+    WELCOME-TOOLTIP_BACKGROUND:                 "BACKGROUND"
+
+    WELCOME-PUSHBUTTON_TEXT:                    "FONT"
+    WELCOME-PUSHBUTTON_BORDER:                  "CONTRAST"
+    WELCOME-PUSHBUTTON_BACKGROUND_HOVER:        "transparent"
+    WELCOME-PUSHBUTTON_BORDER_HOVER:            "CUSTOM_ACCENT"
+
+    WELCOME-LINEEDIT_TEXT:                      "FONT"
+    WELCOME-LINEEDIT_SELECTION_TEXT:            "FONT"
+    WELCOME-LINEEDIT_SELECTION:                 "CUSTOM_ACCENT"
+    WELCOME-LINEEDIT_BACKGROUND:                "BACKGROUND"
+    WELCOME-LINEEDIT_BORDER:                    "CONTRAST"
+    WELCOME-LINEEDIT_BORDER_HOVER:              "CUSTOM_ACCENT"
+
+    # SHORTCUTS
+    SHORTCUTS-BACKGROUND:                       "BACKGROUND"
+    SHORTCUTS-SEPARATOR:                        "CUSTOM_ACCENT"
+
+    SHORTCUTS-LABEL_TEXT_INVERT:                "FONT_INVERT"
+    SHORTCUTS-LABEL_DESCRIPTION:                "FONT"
+    SHORTCUTS-LABEL_TITLE:                      "FONT"
+
+    # INFO BOX
+    INFO-ERRORWIDGET_BACKGROUND:                "#d63031"
+    INFO-ERRORWIDGET_BORDER:                    "#b02324"
+    INFO-ERRORWIDGET_TEXT:                      "#ffc7c7"
+
+    INFO-WARNWIDGET_BACKGROUND:                 "#f39c12"
+    INFO-WARNWIDGET_BORDER:                     "#d68910"
+    INFO-WARNWIDGET_TEXT:                       "#ffe5bb"
+
+    INFO-INFOWIDGET_BACKGROUND:                 "#2e86c1"
+    INFO-INFOWIDGET_BORDER:                     "#1f618d"
+    INFO-INFOWIDGET_TEXT:                       "#c8e0ff"
+
+    # ABOUT WINDOW
+    ABOUT-BACKGROUND:                           "BACKGROUND"
+    ABOUT-TEXT:                                 "FONT"
+
+    ABOUT-PUSHBUTTON:                           "transparent"
+    ABOUT-PUSHBUTTON_TEXT:                      "FONT"
+    ABOUT-PUSHBUTTON_HOVER:                     "transparent"
+    ABOUT-PUSHBUTTON_BORDER:                    "CONTRAST"
+    ABOUT-PUSHBUTTON_BORDER_HOVER:              "CUSTOM_ACCENT"
+
+    # ABOUT PAGES
+    ABOUT_PAGES-PUSHBUTTON_BACKGROUND:          "transparent"
+    ABOUT_PAGES-PUSHBUTTON_BACKGROUND_HOVER:    "CUSTOM_ACCENT"
+    ABOUT_PAGES-BUTTONGROUP_BACKGROUND:         "PANEL_BORDER"
+    ABOUT_PAGES-ARROWLABEL_TEXT:                "FONT"
+    ABOUT_PAGES-LABEL_TEXT:                     "FONT"
+    ABOUT_PAGES-BROWSER_TEXT:                   "FONT"
+
+    ABOUT_PAGES-VERSIONLABEL_BACKGROUND:        "CUSTOM_ACCENT"
+    ABOUT_PAGES-VERSIONLABEL_TEXT:              "FONT"
+    ABOUT_PAGES-VERSIONLABEL_TEXT_INVERT:       "FONT_INVERT"
+
+    ABOUT_PAGES-MESSAGEBOX_BACKGROUND:          "BACKGROUND"
+    ABOUT_PAGES-MESSAGEBOX_TEXT:                "FONT"
+
+    ABOUT_PAGES-MESSAGE_PUSHBUTTON_TEXT:        "FONT"
+    ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER:      "CONTRAST"
+    ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND:  "transparent"
+    ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER_HOVER: "CUSTOM_ACCENT"
+    ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND_HOVER: "transparent"

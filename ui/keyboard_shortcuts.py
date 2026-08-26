@@ -17,17 +17,15 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import (
-    QDialog, QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QScrollArea, QSizePolicy, QGridLayout, QScroller,
-)
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QLinearGradient, QPainter
-from core.traduction import Traduction
-from theme.theme import Theme
 from core.debug import Info
 from core.icons import Icon
+from core.traduction import Traduction
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QLinearGradient, QPainter
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import (QDialog, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
+                               QScroller, QSizePolicy, QVBoxLayout, QWidget)
+from themes.theme_manager import Theme
 
 
 SHORTCUTS = {
@@ -91,6 +89,7 @@ DEFAULT_KEY_STYLE = {
     "width": 1,
     "show_label": True,
 }
+
 KEY_STYLES = {
     "Ctrl": {"icon": "keycap_large", "width": 2},
     "Shift": {"icon": "keycap_large", "width": 2},
@@ -104,14 +103,11 @@ KEY_STYLES = {
     "Mouse": {"icon": "mouse_simple", "width": 1, "show_label": False},
 }
 
-
 def get_key_style(key):
     return KEY_STYLES.get(key, DEFAULT_KEY_STYLE)
 
-
 def get_key_width(key, size=KEY_SIZE):
     return int(get_key_style(key)["width"] * size)
-
 
 def get_shortcut_width(keys, size=KEY_SIZE, spacing=KEY_SPACING):
     if not keys:
@@ -120,7 +116,6 @@ def get_shortcut_width(keys, size=KEY_SIZE, spacing=KEY_SPACING):
     key_widths = sum(get_key_width(key, size) for key in keys)
     return key_widths + spacing * (len(keys) - 1)
 
-
 def get_shortcut_area_width():
     return max(
         get_shortcut_width(keys)
@@ -128,7 +123,6 @@ def get_shortcut_area_width():
         for item in section["items"]
         for keys in item["shortcuts"]
     )
-
 
 def _clear_layout(layout):
     while layout.count():
@@ -149,7 +143,6 @@ class KeyImage(QSvgWidget):
         width = get_key_width(key, size)
 
         Icon.load_widget(self, "shortcuts", style["icon"], width, size)
-        self.setStyleSheet("background: transparent;")
         self.setFixedSize(width, size)
 
 
@@ -159,7 +152,6 @@ class ShortcutKey(QWidget):
         style = get_key_style(key)
         width = get_key_width(key, size)
         self.setFixedSize(width, size)
-        self.setStyleSheet("background: transparent;")
 
         self.image = KeyImage(key, size, self)
         self.image.move(0, 0)
@@ -170,13 +162,12 @@ class ShortcutKey(QWidget):
         self.key_label = QLabel(key, self)
         self.key_label.setAlignment(Qt.AlignCenter)
         self.key_label.setFixedSize(width, size)
-        self.key_label.setStyleSheet(f"background: transparent; color: {Theme.TEXT_INV};")
+        self.key_label.setStyleSheet(f"color: {Theme.get_color("SHORTCUTS-LABEL_TEXT_INVERT")}")
 
 
 class ShortcutRow(QWidget):
     def __init__(self, keys, description, key_area_width):
         super().__init__()
-        self.setStyleSheet("background: transparent;")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         layout = QHBoxLayout(self)
@@ -188,19 +179,17 @@ class ShortcutRow(QWidget):
             text.setWordWrap(True)
             text.setMinimumWidth(DESCRIPTION_MIN_WIDTH)
             text.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            text.setStyleSheet(f"font-size: 15px; color: {Theme.TEXT}; background: transparent;")
+            text.setStyleSheet(f"font-size: 15px; color: {Theme.get_color("SHORTCUTS-LABEL_DESCRIPTION")}")
             layout.addWidget(text, 1, Qt.AlignVCenter)
         else:
             spacer = QWidget()
             spacer.setMinimumWidth(DESCRIPTION_MIN_WIDTH)
             spacer.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
-            spacer.setStyleSheet("background: transparent;")
             layout.addWidget(spacer, 1)
 
         key_container = QWidget()
         key_container.setFixedWidth(key_area_width)
         key_container.setFixedHeight(KEY_SIZE)
-        key_container.setStyleSheet("background: transparent;")
 
         key_layout = QHBoxLayout(key_container)
         key_layout.setContentsMargins(0, 0, 0, 0)
@@ -216,7 +205,6 @@ class ShortcutRow(QWidget):
 class ShortcutEntry(QWidget):
     def __init__(self, item, key_area_width):
         super().__init__()
-        self.setStyleSheet("background: transparent;")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         layout = QVBoxLayout(self)
@@ -232,7 +220,6 @@ class ShortcutEntry(QWidget):
 class ShortcutColumn(QWidget):
     def __init__(self, section, key_area_width):
         super().__init__()
-        self.setStyleSheet("background: transparent;")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         layout = QVBoxLayout(self)
@@ -240,16 +227,17 @@ class ShortcutColumn(QWidget):
         layout.setSpacing(ROW_SPACING)
 
         label = QLabel(Traduction.get_trad(*section["title"]))
-        label.setStyleSheet(f"font-size: 16px; font-weight: 600; color: {Theme.TEXT}; background: transparent;")
         layout.addWidget(label)
 
         title_bar = QWidget()
         title_bar.setFixedHeight(2)
-        title_bar.setStyleSheet(f"background-color: {Theme.ACCENT}; border-radius: 1px;")
         layout.addWidget(title_bar)
 
         for item in section["items"]:
             layout.addWidget(ShortcutEntry(item, key_area_width))
+
+        label.setStyleSheet(f"font-size: 16px; font-weight: 600; color: {Theme.get_color("SHORTCUTS-LABEL_TITLE")};")
+        title_bar.setStyleSheet(f"background-color: {Theme.get_color("SHORTCUTS-SEPARATOR")}; border-radius: 1px;")
 
 
 class ResponsiveShortcutsWidget(QWidget):
@@ -257,7 +245,6 @@ class ResponsiveShortcutsWidget(QWidget):
         super().__init__()
         self.key_area_width = get_shortcut_area_width()
         self.column_count = 0
-        self.setStyleSheet("background: transparent;")
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.grid = QGridLayout(self)
@@ -296,7 +283,6 @@ class ResponsiveShortcutsWidget(QWidget):
         stack_weights = []
         for column in range(column_count):
             stack = QWidget()
-            stack.setStyleSheet("background: transparent;")
             stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
             stack_layout = QVBoxLayout(stack)
@@ -327,7 +313,7 @@ class ScrollFade(QWidget):
 
     def paintEvent(self, event):
         painter = QPainter(self)
-        base = QColor(Theme.BACKGROUND)
+        base = QColor(Theme.get_color("SHORTCUTS-BACKGROUND"))
         solid = QColor(base)
         solid.setAlpha(230)
         transparent = QColor(base)
@@ -351,38 +337,7 @@ class ShortcutScrollArea(QScrollArea):
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        self.setStyleSheet(f"""
-            QScrollArea {{
-                background: transparent;
-                border: none;
-            }}
-            QScrollArea > QWidget > QWidget {{
-                background: transparent;
-            }}
-            QScrollBar:vertical {{
-                background: transparent;
-                width: 8px;
-                margin: 2px;
-                border-radius: 4px;
-            }}
-            QScrollBar::handle:vertical {{
-                background: rgba(255, 255, 255, 120);
-                min-height: 30px;
-                border-radius: 4px;
-            }}
-            QScrollBar::handle:vertical:hover {{
-                background: rgba(255, 255, 255, 160);
-            }}
-            QScrollBar::add-line:vertical,
-            QScrollBar::sub-line:vertical {{
-                height: 0;
-                background: none;
-            }}
-            QScrollBar::add-page:vertical,
-            QScrollBar::sub-page:vertical {{
-                background: transparent;
-            }}
-        """)
+        self.setStyleSheet(scroll_style())
 
         self.top_fade = ScrollFade("top", self.viewport())
         self.bottom_fade = ScrollFade("bottom", self.viewport())
@@ -429,14 +384,7 @@ class KeyboardShortcutsDialog(QDialog):
         else:
             self.resize(980, 560)
 
-        self.setStyleSheet(f"""
-            QDialog {{
-                background-color: {Theme.BACKGROUND};
-            }}
-            QLabel {{
-                background: transparent;
-            }}
-        """)
+        self.setStyleSheet(f"QDialog {{background: {Theme.get_color("SHORTCUTS-BACKGROUND")}}}")
 
         root = QVBoxLayout(self)
         root.setContentsMargins(12, 12, 12, 12)
@@ -445,3 +393,36 @@ class KeyboardShortcutsDialog(QDialog):
         scroll = ShortcutScrollArea()
         scroll.setWidget(ResponsiveShortcutsWidget())
         root.addWidget(scroll)
+
+
+def scroll_style() -> str:
+    return f"""
+            QScrollArea {{
+                background: {Theme.get_color("SCROLL_AREA")};
+                border: none;
+            }}
+            QScrollArea > QWidget > QWidget {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                margin: 2px 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {Theme.get_color("SCROLL_HANDLE")};
+                min-height: 34px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {Theme.get_color("SCROLL_HANDLE_HOVER")};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+        """

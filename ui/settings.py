@@ -17,21 +17,19 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QHBoxLayout,
-    QLabel, QComboBox, QPushButton,
-    QFrame, QWidget, QLineEdit, QMessageBox,
-    QFileDialog, QScrollArea, QSizePolicy,
-)
-from PySide6.QtCore import Qt, QPropertyAnimation, Property, Signal
-from PySide6.QtGui import QPainter, QColor, QPalette
 from core.config import Config, ConfigManager
-from core.traduction import Traduction
-from theme.theme import set_dark_theme, set_purple_theme, set_white_theme, Theme
-from theme.theme_parser import load_theme, import_theme, delete_theme, theme_list, BUILTIN_THEMES, _themes_dir, parse_yaml
-from ui.menu_style import apply_menu_style, apply_btn_style
 from core.debug import Debug, Info
 from core.logger import Logger
+from core.traduction import Traduction
+from PySide6.QtCore import Property, QPropertyAnimation, Qt, Signal
+from PySide6.QtGui import QColor, QPainter
+from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout,
+                               QLabel, QPushButton, QLineEdit, QMessageBox,
+                               QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
+from themes.theme_manager import Theme
+import os
+import shutil
+
 
 def set_config_bool(attr_name: str, value: bool) -> None:
     if not hasattr(Config, attr_name):
@@ -45,7 +43,6 @@ def add_separator(layout: QVBoxLayout) -> None:
     sep = QFrame()
     sep.setFrameShape(QFrame.HLine)
     sep.setFrameShadow(QFrame.Sunken)
-    sep.setStyleSheet("color: #d0d0d0;")
     layout.addWidget(sep)
 
 def create_switch_row(label_key: str, fallback: str, config_attr: str):
@@ -58,88 +55,27 @@ def create_switch_row(label_key: str, fallback: str, config_attr: str):
     row.addWidget(switch)
     return row, label
 
-_BUILTIN_SETTERS = {
-    "dark": set_dark_theme,
-    "purple": set_purple_theme,
-    "white": set_white_theme,
-}
-
-def settings_scroll_area_style() -> str:
-    return f"""
-        QScrollArea#SettingsScrollArea {{
-            background: transparent;
-            border: none;
-        }}
-        QScrollArea#SettingsScrollArea > QWidget > QWidget {{
-            background: transparent;
-        }}
-        QScrollBar:vertical {{
-            background: transparent;
-            width: 10px;
-            margin: 2px 0;
-        }}
-        QScrollBar::handle:vertical {{
-            background: {Theme.BUTTON_PRESSED};
-            min-height: 34px;
-            border-radius: 5px;
-        }}
-        QScrollBar::handle:vertical:hover {{
-            background: {Theme.ACCENT};
-        }}
-        QScrollBar::add-line:vertical,
-        QScrollBar::sub-line:vertical {{
-            height: 0;
-            background: none;
-            border: none;
-        }}
-        QScrollBar::add-page:vertical,
-        QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }}
-    """
-
-def apply_combo_box_colors(combo: QComboBox) -> None:
-    selected_text = Theme.TEXT if Theme.type == "dark" else Theme.TEXT_INV
-    palette = combo.palette()
-
-    for role, color in [
-        (QPalette.Window, Theme.PANEL),
-        (QPalette.Base, Theme.PANEL),
-        (QPalette.Button, Theme.BUTTON),
-        (QPalette.Text, Theme.TEXT),
-        (QPalette.ButtonText, Theme.TEXT),
-        (QPalette.WindowText, Theme.TEXT),
-        (QPalette.Highlight, Theme.ACCENT),
-        (QPalette.HighlightedText, selected_text),
-    ]:
-        palette.setColor(role, QColor(color))
-
-    combo.setStyleSheet("")
-    combo.setPalette(palette)
-    combo.view().setStyleSheet("")
-    combo.view().setPalette(palette)
-    combo.view().viewport().setPalette(palette)
 
 class SettingsDialog(QDialog):
     traduction_changed = Signal()
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setModal(True)
+        self.setMinimumSize(360, 294)
         if Info.get_device_type() == "phone":
             self.showMaximized()
         else:
             self.resize(380, 520)
 
         self.root_layout = QVBoxLayout(self)
-        self.root_layout.setSpacing(12)
+        self.root_layout.setContentsMargins(0, 0, 0, 0)
 
         self.content_widget = QWidget()
         self.content_widget.setObjectName("SettingsContent")
-        self.content_widget.setStyleSheet("QWidget#SettingsContent { background: transparent; }")
 
         self.layout = QVBoxLayout(self.content_widget)
         self.layout.setSpacing(12)
-        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setContentsMargins(10, 10, 10, 2)
 
         self.scroll_area = QScrollArea()
         self.scroll_area.setObjectName("SettingsScrollArea")
@@ -151,6 +87,8 @@ class SettingsDialog(QDialog):
         self.scroll_area.setWidget(self.content_widget)
 
         self.root_layout.addWidget(self.scroll_area)
+        add_separator(self.root_layout)
+        self.root_layout.setSpacing(11)
 
         self._build_appearance_section()
         add_separator(self.layout)
@@ -158,13 +96,11 @@ class SettingsDialog(QDialog):
         add_separator(self.layout)
         self._build_advanced_section()
         self._build_footer()
-        self._apply_themed_styles()
-
-        self.refresh_ui_texts()
+        self._apply_theme()
 
     def make_section_title(self, key: str, fallback: str) -> QLabel:
         label = QLabel(Traduction.get_trad(key, fallback))
-        label.setStyleSheet("font-weight: bold;")
+        label.setObjectName("SectionTitle")
         return label
 
     def _build_appearance_section(self):
@@ -172,30 +108,60 @@ class SettingsDialog(QDialog):
         self.layout.addWidget(self.appearance_title)
 
         self.theme_combo = QComboBox()
-        self._populate_theme_combo()
-        self.theme_combo.setCurrentIndex(self.theme_combo.findData(Config.theme))
+        self.theme_combo.setMaxVisibleItems(16)
+        self._populate_theme_combo(False)
+        self.theme_combo.setCurrentIndex(self.theme_combo.findData(Theme.theme))
         self.theme_combo.currentIndexChanged.connect(self.on_theme_changed)
+        self.theme_combo.setPlaceholderText(Traduction.get_trad("unknown", "Unknown"))
 
-        self.theme_label = QLabel(Traduction.get_trad("theme", "Theme"))
+        if Theme.author.count(" ") > 0:
+            self.theme_author = QLabel(Traduction.get_trad("authors", "Authors"))
+        else:
+            self.theme_author = QLabel(Traduction.get_trad("author", "Author"))
+        self.theme_title = QLabel(Traduction.get_trad("theme", "Theme"))
+        self.theme_author_name = QLabel(Theme.author)
+        self.theme_author_name.setObjectName("Author")
+        self.theme_description = QLabel(Theme.description)
+        self.theme_description.setObjectName("ThemeDescription")
+        self.theme_description.setWordWrap(True)
 
-        self.import_theme_btn = QPushButton(Traduction.get_trad("import_theme", "Import…"))
-        self.delete_theme_btn = QPushButton(Traduction.get_trad("delete_theme", "Delete"))
-        self.import_theme_btn.clicked.connect(self.on_import_theme)
-        self.delete_theme_btn.clicked.connect(self.on_delete_theme)
-        self._refresh_delete_btn_state()
+        self.import_theme_button = QPushButton(Traduction.get_trad("import_theme", "Import"))
+        self.delete_theme_button = QPushButton(Traduction.get_trad("delete_theme", "Delete"))
+        self.import_theme_button.clicked.connect(self.on_import_theme)
+        self.delete_theme_button.clicked.connect(self.on_delete_theme)
+        self._refresh_delete_button_state()
 
-        row = QHBoxLayout()
-        row.addWidget(self.theme_label)
-        row.addStretch()
-        row.addWidget(self.theme_combo)
+        authors_layout = QHBoxLayout()
+        authors_layout.addWidget(self.theme_author)
+        authors_layout.addWidget(self.theme_author_name)
+        authors_layout.addStretch()
 
-        btn_row = QHBoxLayout()
-        btn_row.addWidget(self.import_theme_btn)
-        btn_row.addWidget(self.delete_theme_btn)
-        btn_row.addStretch()
+        information_layout = QVBoxLayout()
+        information_layout.setContentsMargins(0, 5, 0, 0)
+        information_layout.addWidget(self.theme_title)
+        information_layout.addLayout(authors_layout)
+        information_layout.addWidget(self.theme_description)
+        information_layout.addStretch()
 
-        self.layout.addLayout(row)
-        self.layout.addLayout(btn_row)
+        combobox_layout = QHBoxLayout()
+        combobox_layout.addStretch()
+        combobox_layout.addWidget(self.theme_combo)
+
+        manage_theme_layout = QHBoxLayout()
+        manage_theme_layout.addStretch()
+        manage_theme_layout.addWidget(self.import_theme_button)
+        manage_theme_layout.addWidget(self.delete_theme_button)
+
+        action_layout = QVBoxLayout()
+        action_layout.addLayout(combobox_layout)
+        action_layout.addStretch()
+        action_layout.addLayout(manage_theme_layout)
+
+        appearance_layout = QHBoxLayout()
+        appearance_layout.addLayout(information_layout)
+        appearance_layout.addStretch()
+        appearance_layout.addLayout(action_layout)
+        self.layout.addLayout(appearance_layout)
 
     def _build_language_section(self):
         self.language_title = self.make_section_title("language", "Language")
@@ -206,6 +172,7 @@ class SettingsDialog(QDialog):
             self.lang_combo.addItem(label, code)
 
         self.lang_combo.setCurrentIndex(self.lang_combo.findData(Config.lang))
+        self.lang_combo.setPlaceholderText("English")
         self.lang_combo.currentIndexChanged.connect(self.on_lang_changed)
 
         self.language_label = QLabel(Traduction.get_trad("language", "Language"))
@@ -215,11 +182,6 @@ class SettingsDialog(QDialog):
         row.addStretch()
         row.addWidget(self.lang_combo)
         self.layout.addLayout(row)
-
-    def _apply_themed_styles(self):
-        self.scroll_area.setStyleSheet(settings_scroll_area_style())
-        apply_combo_box_colors(self.theme_combo)
-        apply_combo_box_colors(self.lang_combo)
 
     def _build_advanced_section(self):
         self._switches = []
@@ -247,34 +209,53 @@ class SettingsDialog(QDialog):
             self._switches.append(switch)
             setattr(self, f"{attr.lower()}_row",   row)
             setattr(self, f"{attr.lower()}_label", label)
+            row.setContentsMargins(0, 0, 2, 0)
             self.layout.addLayout(row)
 
     def _build_footer(self):
-        self.layout.addStretch()
+        self.layout.addStretch(1)
+        self.close_button = QPushButton(Traduction.get_trad("close", "Close"))
+        self.close_button.clicked.connect(self.accept)
+
         footer = QHBoxLayout()
         footer.addStretch()
-        self.close_btn = QPushButton()
-        self.close_btn.clicked.connect(self.accept)
-        footer.addWidget(self.close_btn)
+        footer.addWidget(self.close_button)
+        footer.setContentsMargins(0, 0, 10, 10)
         self.root_layout.addLayout(footer)
 
-    def _populate_theme_combo(self):
+    def _populate_theme_combo(self, imported):
         self.theme_combo.clear()
-        builtin_labels = {
-            "dark": ("theme_dark", "Dark"),
-            "purple": ("theme_purple", "Purple"),
-            "white": ("theme_white", "White"),
-        }
-        for name in theme_list:
-            if name in builtin_labels:
-                key, fallback = builtin_labels[name]
-                self.theme_combo.addItem(Traduction.get_trad(key, fallback), name)
-            else:
-                self.theme_combo.addItem(name, name)
+        themes_names = self.get_themes_names(imported)
 
-    def _refresh_delete_btn_state(self):
+        for i in range(len(themes_names[0])):
+            self.theme_combo.addItem(themes_names[1][i], themes_names[0][i])
+        if themes_names[2] != -1:
+            self.theme_combo.insertSeparator(themes_names[2])
+
+    def get_themes_names(self, imported):
+        temp_list = []
+        separator_index = -1
+        themes = (Info.get_files_from_directory("resource_path", "themes/", ".yml"))
+
+        for theme in themes:
+            if "_" in theme:
+                temp_list.append(theme)
+                themes.remove(theme)
+        separator_index = len(themes)
+        if temp_list:
+            themes = themes + temp_list
+
+        temp_list = Info.get_files_from_directory("config_path", "themes/", ".yml")
+        if temp_list:
+            for theme in temp_list:
+                if theme not in themes:
+                    themes.append(theme)
+        name = Theme.get_properties("name", Config.lang.upper())
+        names = Theme.get_theme_names(themes, Config.lang.upper(), imported)
+        return themes, names, separator_index
+
+    def _refresh_delete_button_state(self):
         current = self.theme_combo.currentData()
-        self.delete_theme_btn.setEnabled(current not in BUILTIN_THEMES)
 
     def on_theme_changed(self):
         theme = self.theme_combo.currentData()
@@ -283,58 +264,123 @@ class SettingsDialog(QDialog):
 
         Config.theme = theme
         ConfigManager.save_config()
-
-        Logger.LogMessage(f"Theme changed to: {theme}")
-
-        setter = _BUILTIN_SETTERS.get(theme)
-        if setter:
-            setter()
-        else:
-            for file in _themes_dir().glob("*.yml"):
-                try:
-                    data = parse_yaml(file.read_text(encoding="utf-8"))
-                    if data.get("name") == theme:
-                        load_theme(str(file))
-                        break
-                except Exception:
-                    Debug.Error(f"Failed to load theme from {file.name}")
-
-        ConfigManager.save_config()
-        self._refresh_delete_btn_state()
-        self._apply_themed_styles()
-        self._propagate_theme_change()
+        self._apply_theme()
+        Logger.LogMessage(f"SETTINGS: Theme changed to: {theme}")
 
     def on_import_theme(self):
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Import Theme", "", "YAML Theme Files (*.yml *.yaml)"
-        )
+        path, _ = QFileDialog.getOpenFileName(self, "Import Theme", "", "YAML Theme Files (*.yml)")
         if not path:
             return
-        theme = import_theme(path)
-        if theme is None:
-            QMessageBox.critical(self, "Error", "Failed to import theme.")
-            return
-        self._populate_theme_combo()
-        idx = self.theme_combo.findData(theme.selected_theme)
-        if idx != -1:
-            self.theme_combo.setCurrentIndex(idx)
+
+        file_name = path.rsplit("/", 1)[1]
+        config_theme_path = Info.get_config_path()+"/themes/"
+        Info.ensure_dir_exists(config_theme_path)
+        temp_list = Info.get_files_from_directory("config_path", "themes/", ".yml")
+
+        for temp_file in temp_list:
+            if file_name == temp_file:
+                question = QMessageBox()
+                question.setIcon(QMessageBox.Question)
+                question.setWindowTitle("Theme already existing")
+                question.setText(f"Theme with file name {temp_file} exists.\n\n How do you want to approach?\n")
+                question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes | QMessageBox.Ok)
+                question.setStyleSheet(f"""
+                                        background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
+                                        color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
+                                    """)
+
+                rename = question.button(QMessageBox.Ok)
+                rename.setStyleSheet(pushbutton_style())
+                rename.setText("Rename File")
+                overwrite = question.button(QMessageBox.Yes)
+                overwrite.setStyleSheet(pushbutton_style())
+                overwrite.setText("Overwrite File")
+                cancel = question.button(QMessageBox.Cancel)
+                cancel.setStyleSheet(pushbutton_style())
+                cancel.setText("Cancel")
+
+                question.setDefaultButton(QMessageBox.Cancel)
+                question.exec_()
+
+                if question.clickedButton() == rename:
+                    index = 0
+                    terms = temp_file.rsplit("_")
+                    while index < len(temp_list):
+                        if terms[0]+f"({index})_"+terms[1] in temp_list:
+                            index += 1
+                        else:
+                            break
+                    try:
+                        shutil.copy(path, config_theme_path+terms[0]+f"({index})_"+terms[1])
+                    except Exception as exception:
+                        if Config.DEBUG:
+                            Debug.Error(f"Failed to copy theme file: {exception}")
+                    self._populate_theme_combo(True)
+                    self.theme_combo.setCurrentIndex(self.theme_combo.count() - 1)
+                    return
+
+                elif question.clickedButton() == overwrite:
+                    try:
+                        shutil.copy(path, config_theme_path+file_name)
+                    except Exception as exception:
+                        if Config.DEBUG:
+                            Debug.Error(f"Failed to copy theme file: {exception}")
+                return
+
+        try:
+            shutil.copy(path, config_theme_path+file_name)
+        except Exception as exception:
+            if Config.DEBUG:
+                Debug.Error(f"Failed to copy theme file: {exception}")
 
     def on_delete_theme(self):
+        themes = (Info.get_files_from_directory("config_path", "themes/", ".yml"))
         name = self.theme_combo.currentData()
-        if name in BUILTIN_THEMES:
-            return
-        reply = QMessageBox.question(
-            self, "Delete Theme",
-            f"Delete theme \"{name}\"?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-        if reply == QMessageBox.No:
-            return
-        delete_theme(name)
-        self._populate_theme_combo()
-        self.theme_combo.setCurrentIndex(self.theme_combo.findData(Config.theme))
-        Logger.LogMessage(f"Theme deleted: {name}")
+
+        for theme in themes:
+            if name == theme:
+                question = QMessageBox()
+                question.setIcon(QMessageBox.Warning)
+                question.setWindowTitle("Delete Theme")
+                question.setText(f"Theme {name} will be deleted.\n\n Are you sure?\n")
+                question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes)
+                question.setStyleSheet(f"""
+                                        background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
+                                        color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
+                                    """)
+
+                delete = question.button(QMessageBox.Yes)
+                delete.setStyleSheet(pushbutton_style())
+                delete.setText("Delete File")
+                cancel = question.button(QMessageBox.Cancel)
+                cancel.setStyleSheet(pushbutton_style())
+                cancel.setText("Cancel")
+
+                question.setDefaultButton(QMessageBox.Cancel)
+                question.exec_()
+
+                if question.clickedButton() == delete:
+                    os.remove(Info.get_config_path()+"/themes/"+theme)
+                    self._populate_theme_combo(True)
+                    self.theme_combo.setCurrentIndex(0)
+                    return
+
+        information = QMessageBox()
+        information.setIcon(QMessageBox.Information)
+        information.setWindowTitle("Delete Theme")
+        if "_" in name:
+            information.setText(f"Theme {name} not found in config directory.\n")
+        else:
+            information.setText(f"Standard theme {name} cannot be deleted.\n")
+        information.setStandardButtons(QMessageBox.Ok)
+        information.setStyleSheet(f"background: {Theme.get_color("SETTINGS-BACKGROUND")}")
+
+        ok = information.button(QMessageBox.Ok)
+        ok.setStyleSheet(pushbutton_style())
+        ok.setText("Okay")
+
+        information.setDefaultButton(QMessageBox.Ok)
+        information.exec_()
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
@@ -369,30 +415,23 @@ class SettingsDialog(QDialog):
         ConfigManager.save_config()
         Logger.LogMessage(f"Custom shebang changed to: {new_value}")
 
-    def _propagate_theme_change(self):
-        p = self.parent()
-        if p:
-            p.graph_view.apply_theme()
-            apply_menu_style(p.more_menu)
-            apply_btn_style(p.more_btn)
-            p.refresh_ui_texts()
-
-        # Update switches
-        for switch in getattr(self, "_switches", []):
-            switch.update()
-
     def refresh_ui_texts(self):
         self.setWindowTitle(Traduction.get_trad("settings", "Settings"))
 
         self.appearance_title.setText(Traduction.get_trad("appearance", "Appearance"))
+        self.theme_author_name.setText(Theme.author)
         self.language_title.setText(Traduction.get_trad("language", "Language"))
         self.advanced_title.setText(Traduction.get_trad("advanced", "Advanced"))
-        self.theme_label.setText(Traduction.get_trad("theme", "Theme"))
+        self.theme_title.setText(Traduction.get_trad("theme", "Theme"))
         self.language_label.setText(Traduction.get_trad("language", "Language"))
         self.shebang_label.setText(Traduction.get_trad("custom_shebang", "Custom Shebang"))
-        self.close_btn.setText(Traduction.get_trad("close", "Close"))
-        self.import_theme_btn.setText(Traduction.get_trad("import_theme", "Import…"))
-        self.delete_theme_btn.setText(Traduction.get_trad("delete_theme", "Delete"))
+        self.close_button.setText(Traduction.get_trad("close", "Close"))
+        self.import_theme_button.setText(Traduction.get_trad("import_theme", "Import…"))
+        self.delete_theme_button.setText(Traduction.get_trad("delete_theme", "Delete"))
+        if Theme.author.count(" ") > 0:
+            self.theme_author.setText(Traduction.get_trad("authors", "Authors"))
+        else:
+            self.theme_author.setText(Traduction.get_trad("author", "Author"))
 
         for attr, key, fallback in [
             ("debug", "debug", "Debug mode"),
@@ -404,17 +443,47 @@ class SettingsDialog(QDialog):
             if label:
                 label.setText(Traduction.get_trad(key, fallback))
 
-        for data_val, key, fallback in [
-            ("dark", "theme_dark", "Dark"),
-            ("purple", "theme_purple", "Purple"),
-            ("white", "theme_white", "White"),
-        ]:
-            idx = self.theme_combo.findData(data_val)
-            if idx != -1:
-                self.theme_combo.setItemText(idx, Traduction.get_trad(key, fallback))
+        themes_names = self.get_themes_names(False)
+        for i in range(len(themes_names[0])):
+            idx = self.theme_combo.findData(themes_names[0][i])
+            self.theme_combo.setItemText(idx, themes_names[1][i])
 
         if self.parent():
             self.parent().refresh_ui_texts()
+
+    def _apply_theme(self):
+        self.scroll_area.setStyleSheet(scroll_style())
+        self.theme_combo.setStyleSheet(combobox_style())
+        self.lang_combo.setStyleSheet(combobox_style())
+        self.import_theme_button.setStyleSheet(pushbutton_style())
+        self.delete_theme_button.setStyleSheet(pushbutton_style())
+        self.close_button.setStyleSheet(pushbutton_style())
+        self.shebang_input.setStyleSheet(lineedit_style())
+
+        for widget in self.layout.parent().children():
+            if isinstance(widget, QLabel):
+                widget.setStyleSheet(label_style())
+            elif isinstance(widget, QFrame):
+                widget.setStyleSheet(separator_style())
+        for widget in self.root_layout.parent().children():
+            if isinstance(widget, QFrame) and not isinstance(widget, QScrollArea):
+                widget.setStyleSheet(separator_style())
+
+        self.setStyleSheet(f"background: {Theme.get_color("SETTINGS-BACKGROUND")}")
+        self.content_widget.setStyleSheet("QWidget#SettingsContent { background: transparent; }")
+
+        if self.parent():
+            self.parent().graph_view._apply_theme()
+            self.parent().refresh_ui_icons()
+            self.parent().refresh_ui_colors()
+
+        self.theme_description.setText(Theme.description)
+        if Theme.author.count(" ") > 0:
+            self.theme_author.setText(Traduction.get_trad("authors", "Authors"))
+        else:
+            self.theme_author.setText(Traduction.get_trad("author", "Author"))
+        self.theme_author_name.setText(Theme.author)
+
 
 class Switch(QWidget):
     toggled = Signal(bool)
@@ -440,7 +509,7 @@ class Switch(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(Theme.ACCENT) if self._checked else QColor("#b0b0b0"))
+        painter.setBrush(QColor(Theme.get_color("SETTINGS-SETTING_ENABLED")) if self._checked else QColor(Theme.get_color("SETTINGS-SETTING_DISABLED")))
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(0, 0, 42, 22, 11, 11)
         painter.setBrush(Qt.white)
@@ -454,3 +523,132 @@ class Switch(QWidget):
         self.update()
 
     offset = Property(int, getOffset, setOffset)
+
+
+def label_style() -> str:
+    return f"""
+            QLabel {{
+                color: {Theme.get_color("SETTINGS-LABEL_TEXT")};
+            }}
+            QLabel#SectionTitle {{
+                font-weight: bold;
+                font-size: 16px;
+                color: {Theme.get_color("SETTINGS-TITELLABEL_TEXT")};
+            }}
+            QLabel#ThemeDescription {{
+                font-style: italic;
+                color: {Theme.get_color("SETTINGS-DESCRIPTIONLABEL_TEXT")};
+            }}
+            QLabel#Author {{
+                color: {Theme.get_color("SETTINGS-AUTHORLABEL_TEXT")};
+            }}
+        """
+
+def scroll_style() -> str:
+    return f"""
+            QScrollArea#SettingsScrollArea {{
+                background: {Theme.get_color("SCROLL_AREA")};
+                border: none;
+            }}
+            QScrollArea#SettingsScrollArea > QWidget > QWidget {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                margin: 2px 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {Theme.get_color("SCROLL_HANDLE")};
+                min-height: 34px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {Theme.get_color("SCROLL_HANDLE_HOVER")};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+        """
+
+def combobox_style() -> str:
+    return f"""
+            QComboBox {{
+                color: {Theme.get_color("SETTINGS-COMBOBOX_TEXT")};
+                border: 1px solid {Theme.get_color("SETTINGS-COMBOBOX_BORDER")};
+                border-radius: 5px;
+                padding: 3px 0px 3px 5px;
+                background: {Theme.get_color("SETTINGS-COMBOBOX_BACKGROUND")};
+                combobox-popup: 0;
+            }}
+            QComboBox:focus,
+            QComboBox:selected,
+            QComboBox:hover {{
+                border-color: {Theme.get_color("SETTINGS-COMBOBOX_BORDER_HOVER")};
+                background: {Theme.get_color("SETTINGS-COMBOBOX_BACKGROUND_HOVER")};
+            }}
+            QComboBox QAbstractItemView {{
+                border: 1px solid {Theme.get_color("SETTINGS-COMBOBOX_BORDER")};
+                border-radius: 5px;
+                background: {Theme.get_color("SETTINGS-COMBOBOX_MAIN_BACKGROUND")};
+                padding: 5px;
+            }}
+            QComboBox QAbstractItemView:item:focus {{
+                background: {Theme.get_color("SETTINGS-COMBOBOX_SELECTION")};
+                border-radius: 5px;
+            }}
+            QComboBox::separator {{
+                background: {Theme.get_color("SETTINGS-COMBOBOX_SEPARATOR")};
+            }}
+        """
+
+def pushbutton_style() -> str:
+    return f"""
+            QPushButton {{
+                color: {Theme.get_color("SETTINGS-PUSHBUTTON_TEXT")};
+                border: 1px solid {Theme.get_color("SETTINGS-PUSHBUTTON_BORDER")};
+                border-radius: 5px;
+                min-width: 60px;
+                padding: 3px 5px;
+                background: {Theme.get_color("SETTINGS-PUSHBUTTON_BACKGROUND")};
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                border-color: {Theme.get_color("SETTINGS-PUSHBUTTON_BORDER_HOVER")};
+                background: {Theme.get_color("SETTINGS-PUSHBUTTON_BACKGROUND_HOVER")};
+                outline: none;
+            }}
+        """
+
+def lineedit_style() -> str:
+    return f"""
+            QLineEdit {{
+                color: {Theme.get_color("SETTINGS-LINEEDIT_TEXT")};
+                border: 1px solid {Theme.get_color("SETTINGS-LINEEDIT_BORDER")};
+                border-radius: 5px;
+                padding: 3px 5px;
+                background: {Theme.get_color("SETTINGS-LINEEDIT_BACKGROUND")};
+                selection-background-color: {Theme.get_color("SETTINGS-LINEEDIT_SELECTION")};
+                selection-color: {Theme.get_color("SETTINGS-LINEEDIT_SELECTION_TEXT")};
+            }}
+            QLineEdit:focus,
+            QLineEdit:selected,
+            QLineEdit:hover {{
+                border-color: {Theme.get_color("SETTINGS-LINEEDIT_BORDER_HOVER")};
+            }}
+        """
+
+def separator_style() -> str:
+    return f"""
+            QFrame[frameShape="4"] {{
+                border: none;
+                max-height: 1px;
+                background: {Theme.get_color("SETTINGS-SEPARATOR")};
+            }}
+        """

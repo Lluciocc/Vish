@@ -17,16 +17,18 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pathlib import Path
-from datetime import datetime, timezone
-import json
 from core.debug import Info
 from core.logger import Logger
+from datetime import datetime, timezone
+from pathlib import Path
+import json
+
 
 class Project:
     NAME = ""
     PATH = ""
     LAST_MODIFIED = None
+
 
 class ProjectManager:
     MAX_RECENTS = 10
@@ -34,7 +36,7 @@ class ProjectManager:
     def __init__(self):
         self.current_project_path: Path | None = None
         self.project_data: dict | None = None
-        self.config_dir = Path(Info.get_config_path()).parent
+        self.config_dir = Path(Info.get_config_path())
         self.recents_file = self.config_dir / "vish" / "recent_projects.json"
 
     def _now_iso(self) -> str:
@@ -120,7 +122,7 @@ class ProjectManager:
             return [p for p in data if Path(p).exists()]
         except Exception:
             return []
-        
+
     def remove_project(self, path: Path):
         path = str(path.resolve())
         recents = self.get_recent_projects()

@@ -17,20 +17,25 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from core.config import Config
+from core.debug import Info
 from PySide6.QtSvgWidgets import QGraphicsSvgItem, QSvgWidget
 from PySide6.QtGui import QIcon
-from theme.theme import Theme
-from core.debug import Info
+from themes.theme_manager import Theme
 import os
 
 
-class Path:  
+class Path:
     @staticmethod
     def get_path(category, icon_name):
+        if category == None:
+            icon_path = Info.resource_path("assets/icons/Vish.svg")
+            return icon_path
+
         category = category.lower().replace(" ", "_")
         icon_name = icon_name.lower().replace(" ", "_")
+        contrast = Theme.icons
 
-        contrast = Theme.type
         icon_path = Info.resource_path(f"assets/icons/{category}/{icon_name}.svg")
         if not os.path.exists(icon_path):
             icon_path = Info.resource_path(f"assets/icons/{category}/{contrast}/{icon_name}.svg")
@@ -66,3 +71,8 @@ class Icon:
         icon_path = Path.get_path(category, name)
         icon = QSvgWidget(icon_path, self)
         icon.setFixedSize(width, height)
+
+    @staticmethod   # For use in stylesheets only! Use the above 3 methods elsewhere.
+    def get_icon_path(category, name):
+        icon_path = Path.get_path(category, name)
+        return icon_path

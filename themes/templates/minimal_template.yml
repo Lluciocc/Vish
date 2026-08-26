@@ -1,0 +1,40 @@
+# This is a minimal template for custom themes. Change the file name to theme-name followed by underscore and the preferred fallback file name you can find in .../Vish/themes as *.yml file without underscore in name. For example: MyTheme_dark.yml or: MyTheme_light.yml. For questions join our Matrix room. The link is on our repository's Readme or on the about page on Vish.
+
+name:
+    EN:         "Theme Name" # At least an English name is required! It will be visible in settings, so choose with care.
+description:
+    EN:         "Description." # Optional line (remove if unused).
+author:         "Author1, Author2, Author3" # Optional line (remove if unused).
+version:        1.2 # Required! Note down the latest Vish version this theme is supporting.
+comment_labels:
+    EN:         "Blue;Violet;Green;Yellow;Red" # At least an English set of color names is required! 1-10 colors are supported. The ; splits colors appart, don't put it to the end.
+icons:          "dark" "light" # Important: remove what you do not want! For white icons on dark theme, use "dark".
+
+theme_main: #Don't change or remove this line, required!
+# To get a basic design quickly, change the colors of this section.
+# You can add or remove any line in this section, but all lines require a color or "ACCENT" (for system accent color).
+
+    DARK_BACKGROUND:        "#1e1e1e"
+    BACKGROUND:             "#252525"
+    PANEL_BORDER:           "#12ffffff"
+    CONTRAST:               "#33d4d4d4"
+    FONT:                   "#d4d4d4"
+    FONT_INVERT:            "#2b2b2b"
+    DISABLED:               "#5e5e5e"
+    CUSTOM_ACCENT:          "#007acc"
+    INVALID:                "#d4001c"
+
+    # NODES DEFAULT COLORS
+    NODES_BORDER:           "#2C3E50"
+
+    NODES_GRAPH_PORTAL:     "#88e66836"
+    NODES_FLOW:             "#88BBBBBB"
+    NODES_MATH:             "#883498DB"
+    NODES_LOGICAL:          "#88be9e36"
+    NODES_STRING:           "#8853ffcb"
+    NODES_CONVERSION:       "#887c55b6"
+    NODES_BASH_FUNCTION:    "#88e64ade"
+
+theme_detail: #Don't change or remove this line, required!
+# In this section you cherry pick every element. All supported selectors can be found in .../Vish/themes/dark.yml. Missing selectors will be read from the fallback file you choose with this theme file name.
+# You can either enter a color, "ACCENT" (system color) or a theme_main selector (including new custom selectors).

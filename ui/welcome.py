@@ -17,33 +17,18 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pathlib import Path
+from core.debug import Info
+from core.projects import ProjectManager
+from core.traduction import Traduction
 from datetime import datetime, timezone
-import json
-from PySide6.QtWidgets import (
-    QDialog, QVBoxLayout, QPushButton,
-    QListWidget, QLabel, QInputDialog,
-    QFileDialog, QMessageBox, QListWidgetItem,
-    QWidget, QHBoxLayout, QAbstractItemView,
-    QLineEdit
-)
+from pathlib import Path
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QFont, QKeySequence, QColor, QShortcut
-from ui.menu_style import apply_btn_style
-from core.traduction import Traduction
-from core.projects import ProjectManager
-from core.debug import Info
-from theme.theme import Theme
-
-
-def _format_last_modified(iso: str | None) -> str:
-    if not iso:
-        return Traduction.get_trad("never_modified", "Never saved")
-    try:
-        dt = datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
-        return dt.astimezone().strftime("%d %b %Y  %H:%M")
-    except Exception:
-        return ""
+from PySide6.QtWidgets import (QAbstractItemView, QDialog, QFileDialog, QHBoxLayout,
+                               QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem,
+                               QMessageBox, QPushButton, QVBoxLayout, QWidget)
+from themes.theme_manager import Theme
+import json
 
 
 class ClickableLabel(QLabel):
@@ -63,8 +48,6 @@ class ProjectListItem(QWidget):
         self._on_rename = on_rename
         self._renaming = False
 
-        self.setStyleSheet("background: transparent;")
-
         layout = QHBoxLayout(self)
         layout.setContentsMargins(10, 6, 8, 6)
         layout.setSpacing(10)
@@ -76,32 +59,17 @@ class ProjectListItem(QWidget):
         self._text_layout.setSpacing(2)
 
         self.name_label = ClickableLabel(name)
-        self.name_label.setStyleSheet(
-            f"color: {Theme.TEXT}; font-weight: 600; font-size: 10pt; background: transparent;"
-        )
         self.name_label.clicked.connect(self.start_rename)
         self._text_layout.addWidget(self.name_label)
 
         date_str = _format_last_modified(last_modified)
         if date_str:
             self.date_label = QLabel(date_str)
-            self.date_label.setStyleSheet("color: #777; font-size: 8pt; background: transparent;")
             self._text_layout.addWidget(self.date_label)
         else:
             self.date_label = None
 
         self.name_editor = QLineEdit(name)
-        self.name_editor.setStyleSheet(f"""
-            QLineEdit {{
-                color: {Theme.TEXT};
-                background: {Theme.PANEL};
-                border: 1px solid {Theme.BUTTON};
-                border-radius: 4px;
-                font-weight: 600;
-                font-size: 10pt;
-                padding: 1px 4px;
-            }}
-        """)
         self.name_editor.setVisible(False)
         self.name_editor.returnPressed.connect(self._commit_rename)
         self.name_editor.editingFinished.connect(self._commit_rename)
@@ -111,31 +79,13 @@ class ProjectListItem(QWidget):
 
         layout.addWidget(text_col, stretch=1)
 
-        delete_btn = QPushButton("✕")
-        delete_btn.setFixedSize(26, 26)
-        delete_btn.setToolTip(Traduction.get_trad("remove_recent", "Remove from recents"))
-        delete_btn.setCursor(Qt.PointingHandCursor)
-        delete_btn.setStyleSheet("""
-            QPushButton {
-                background: transparent;
-                color: #666;
-                border: none;
-                border-radius: 4px;
-                font-size: 10pt;
-                font-weight: bold;
-                padding: 0;
-            }
-            QPushButton:hover {
-                background-color: rgba(192, 57, 43, 0.85);
-                color: white;
-            }
-            QPushButton:pressed {
-                background-color: rgba(150, 40, 30, 0.95);
-                color: white;
-            }
-        """)
-        delete_btn.clicked.connect(lambda: on_delete(path_str))
-        layout.addWidget(delete_btn)
+        self.delete_button = QPushButton("✕")
+        self.delete_button.setFixedSize(26, 26)
+        self.delete_button.setToolTip(Traduction.get_trad("remove_recent", "Remove from recents"))
+        self.delete_button.setCursor(Qt.PointingHandCursor)
+        self.delete_button.clicked.connect(lambda: on_delete(path_str))
+        layout.addWidget(self.delete_button)
+        self._apply_theme()
 
     def start_rename(self):
         if self._renaming:
@@ -186,6 +136,14 @@ class ProjectListItem(QWidget):
                 return True
         return super().eventFilter(obj, event)
 
+    def _apply_theme(self):
+        self.delete_button.setStyleSheet(pushbutton_delete_style())
+        self.name_editor.setStyleSheet(lineedit_style())
+        self.name_label.setStyleSheet(label_name_style())
+        self.date_label.setStyleSheet(label_time_style())
+
+        self.setStyleSheet(f"background: {Theme.get_color("WELCOME-TOOLTIP_BACKGROUND")}")
+
 
 class WelcomeScreen(QDialog):
     def __init__(self, parent, project_manager: ProjectManager):
@@ -202,58 +160,24 @@ class WelcomeScreen(QDialog):
         else:
             self.setFixedSize(620, 480)
 
-        self.setStyleSheet(f"""
-            QDialog {{
-                background-color: {Theme.BACKGROUND};
-            }}
-            QLabel {{
-                color: {Theme.TEXT};
-                background: transparent;
-            }}
-            QListWidget {{
-                background-color: {Theme.PANEL};
-                border: 1px solid rgba(255,255,255,0.07);
-                border-radius: 10px;
-                padding: 6px;
-                color: {Theme.TEXT};
-                outline: none;
-            }}
-            QListWidget::item {{
-                padding: 0px;
-                border-radius: 7px;
-                margin: 2px 0px;
-            }}
-            QListWidget::item:selected {{
-                background-color: {Theme.BUTTON};
-            }}
-            QListWidget::item:hover:!selected {{
-                background-color: {Theme.BUTTON_HOVER};
-            }}
-            QScrollBar:vertical {{ width: 0px; }}
-            QScrollBar:horizontal {{ height: 0px; }}
-        """)
-
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(16)
-        main_layout.setContentsMargins(40, 32, 40, 32)
+        main_layout.setContentsMargins(40, 24, 40, 32)
 
-        title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user().capitalize()}")
+        self.title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user().capitalize()}")
         title_font = QFont()
         title_font.setPointSize(20)
         title_font.setBold(True)
-        title.setFont(title_font)
-        title.setAlignment(Qt.AlignCenter)
-        title.setStyleSheet(f"color: {Theme.TEXT}; background: transparent; font-size: 18pt;")
-        main_layout.addWidget(title)
+        self.title.setFont(title_font)
+        self.title.setAlignment(Qt.AlignCenter)
+        main_layout.addWidget(self.title)
 
-        separator = QWidget()
-        separator.setFixedHeight(1)
-        separator.setStyleSheet("background: rgba(255,255,255,0.08);")
-        main_layout.addWidget(separator)
+        self.separator = QWidget()
+        self.separator.setFixedHeight(1)
+        main_layout.addWidget(self.separator)
 
-        recent_label = QLabel(Traduction.get_trad("welcome_recent_projects", "Recent Projects"))
-        recent_label.setStyleSheet(f"color: {Theme.TEXT}; font-weight: bold; font-size: 9pt; letter-spacing: 1px;")
-        main_layout.addWidget(recent_label)
+        self.recent_label = QLabel(Traduction.get_trad("welcome_recent_projects", "Recent Projects"))
+        main_layout.addWidget(self.recent_label)
 
         self.recent_list = QListWidget()
         self.recent_list.setFocusPolicy(Qt.StrongFocus)
@@ -264,32 +188,26 @@ class WelcomeScreen(QDialog):
         self.recent_list.itemDoubleClicked.connect(self._on_item_double_click)
         main_layout.addWidget(self.recent_list)
 
-        self.populate_recent_projects()
-
         button_container = QWidget()
         button_container.setStyleSheet("background: transparent;")
         button_layout = QHBoxLayout(button_container)
         button_layout.setSpacing(16)
         button_layout.setContentsMargins(0, 4, 0, 0)
 
-        self.new_btn = QPushButton(Traduction.get_trad("welcome_new_project", "New Project"))
-        apply_btn_style(self.new_btn)
-        self.new_btn.clicked.connect(self.create_project)
-        self.new_btn.setMinimumHeight(38)
+        self.new_button = QPushButton(Traduction.get_trad("welcome_new_project", "New Project"))
+        self.new_button.clicked.connect(self.create_project)
+        self.new_button.setMinimumHeight(38)
 
-        self.open_btn = QPushButton(Traduction.get_trad("welcome_open_project", "Open Project"))
-        apply_btn_style(self.open_btn)
-        self.open_btn.clicked.connect(self.open_project)
-        self.open_btn.setMinimumHeight(38)
+        self.open_button = QPushButton(Traduction.get_trad("welcome_open_project", "Open Project"))
+        self.open_button.clicked.connect(self.open_project)
+        self.open_button.setMinimumHeight(38)
 
-        hover_style = f"QPushButton:hover {{ background-color: {Theme.BUTTON_HOVER}; }}"
-        self.open_btn.setStyleSheet(self.open_btn.styleSheet() + hover_style)
-        self.new_btn.setStyleSheet(self.new_btn.styleSheet() + hover_style)
-
-        button_layout.addWidget(self.new_btn)
-        button_layout.addWidget(self.open_btn)
+        button_layout.addWidget(self.new_button)
+        button_layout.addWidget(self.open_button)
         main_layout.addWidget(button_container)
 
+        self._apply_theme()
+        self.populate_recent_projects()
         self._setup_keyboard_nav()
 
     def _setup_keyboard_nav(self):
@@ -304,7 +222,7 @@ class WelcomeScreen(QDialog):
             self.recent_list.setCurrentRow(0)
             self.recent_list.setFocus()
         else:
-            self.new_btn.setFocus()
+            self.new_button.setFocus()
 
     def _handle_enter(self):
         focused = self.focusWidget()
@@ -317,10 +235,10 @@ class WelcomeScreen(QDialog):
             self.open_recent(self.recent_list.currentItem())
             return
 
-        if focused is self.new_btn:
-            self.new_btn.click()
-        elif focused is self.open_btn:
-            self.open_btn.click()
+        if focused is self.new_button:
+            self.new_button.click()
+        elif focused is self.open_button:
+            self.open_button.click()
 
     def _handle_rename(self):
         item = self.recent_list.currentItem()
@@ -420,7 +338,7 @@ class WelcomeScreen(QDialog):
             self.recent_list.setCurrentRow(0)
             self.recent_list.setFocus()
         else:
-            self.new_btn.setFocus()
+            self.new_button.setFocus()
 
         self.project_manager.remove_project(Path(path_str))
 
@@ -473,3 +391,136 @@ class WelcomeScreen(QDialog):
             self.accept()
         except Exception as e:
             QMessageBox.critical(self, "Error", str(e))
+
+    def _apply_theme(self):
+        self.recent_label.setStyleSheet(label_recent_style())
+        self.title.setStyleSheet(label_title_style())
+        self.recent_list.setStyleSheet(listwidget_style())
+        self.open_button.setStyleSheet(pushbutton_style())
+        self.new_button.setStyleSheet(pushbutton_style())
+
+        self.separator.setStyleSheet(f"background: {Theme.get_color("WELCOME-SEPARATOR")}")
+        self.setStyleSheet(f"background-color: {Theme.get_color("WELCOME-BACKGROUND")}")
+
+
+def _format_last_modified(iso: str | None) -> str:
+    if not iso:
+        return Traduction.get_trad("never_modified", "Never saved")
+    try:
+        dt = datetime.strptime(iso, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        return dt.astimezone().strftime("%d %b %Y  %H:%M")
+    except Exception:
+        return ""
+
+def lineedit_style() -> str:
+    return f"""
+            QLineEdit {{
+                WELCOME-PUSHDELETE_BACKGROUND
+                border: 1px solid {Theme.get_color("WELCOME-LINEEDIT_BORDER")};
+                border-radius: 5px;
+                padding: 3px 5px;
+                background: {Theme.get_color("WELCOME-LINEEDIT_BACKGROUND")};
+                selection-background-color: {Theme.get_color("WELCOME-LINEEDIT_SELECTION")};
+                selection-color: {Theme.get_color("WELCOME-LINEEDIT_SELECTION_TEXT")};
+            }}
+            QLineEdit:focus,
+            QLineEdit:selected,
+            QLineEdit:hover {{
+                border-color: {Theme.get_color("WELCOME-LINEEDIT_BORDER_HOVER")};
+            }}
+        """
+
+def pushbutton_delete_style() -> str:
+    return f"""
+            QPushButton {{
+                background: {Theme.get_color("WELCOME-DELETEBUTTON_BACKGROUND")};;
+                color: {Theme.get_color("WELCOME-DELETEBUTTON_TEXT")};
+                border: none;
+                border-radius: 4px;
+                font-size: 10pt;
+                font-weight: bold;
+                padding: 0;
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                background: {Theme.get_color("WELCOME-DELETEBUTTON_BACKGROUND_HOVER")};
+                color: {Theme.get_color("WELCOME-DELETEBUTTON_TEXT_HOVER")};
+                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("WELCOME-DELETEBUTTON_BACKGROUND_PRESSED")};
+                color: {Theme.get_color("WELCOME-DELETEBUTTON_TEXT_PRESSED")};
+            }}
+        """
+
+def label_name_style() -> str:
+    return f"""
+            color: {Theme.get_color("WELCOME-NAMELABEL_TEXT")};
+            font-weight: 600;
+            font-size: 11pt;
+            background: {Theme.get_color("WELCOME-NAMELABEL_BACKGROUND")};
+        """
+
+def label_time_style() -> str:
+    return f"""
+            color: {Theme.get_color("WELCOME-DATELABEL_TEXT")};
+            font-size: 8pt;
+            font-style: italic;
+            background: {Theme.get_color("WELCOME-DATELABEL_BACKGROUND")};
+        """
+
+def label_recent_style() -> str:
+    return f"""
+            color: {Theme.get_color("WELCOME-SUBLABEL_TEXT")};
+            background: {Theme.get_color("WELCOME-SUBLABEL_BACKGROUND")};
+            font-weight: bold;
+            font-size: 11pt;
+            letter-spacing: 1px;
+        """
+
+def label_title_style() -> str:
+    return f"""
+            color: {Theme.get_color("WELCOME-TITLELABEL_TEXT")};
+            background: {Theme.get_color("WELCOME-TITLELABEL_BACKGROUND")};
+            font-size: 18pt;
+        """
+
+def listwidget_style() -> str:
+    return f"""
+            QListWidget {{
+                background: {Theme.get_color("WELCOME-LISTWIDGET_BACKGROUND")};
+                border: 1px solid {Theme.get_color("WELCOME-LISTWIDGET_BORDER")};
+                border-radius: 10px;
+                padding: 6px;
+                outline: none;
+            }}
+            QListWidget::item {{
+                padding: 0px;
+                border-radius: 7px;
+                margin: 2px 0px;
+            }}
+            QListWidget::item:selected {{
+                background: {Theme.get_color("WELCOME-LISTWIDGET_BUTTON_SELECTION")};
+            }}
+            QListWidget::item:hover:!selected {{
+                background: {Theme.get_color("WELCOME-LISTWIDGET_BUTTON_HOVER")};
+            }}
+        """
+
+def pushbutton_style() -> str:
+    return f"""
+            QPushButton {{
+                color: {Theme.get_color("WELCOME-PUSHBUTTON_TEXT")};
+                border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER")};
+                font-size: 15px;
+                border-radius: 5px;
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                background: {Theme.get_color("WELCOME-PUSHBUTTON_BACKGROUND_HOVER")};
+                border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER_HOVER")};
+                outline: none;
+            }}
+        """

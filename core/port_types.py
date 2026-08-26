@@ -17,9 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from enum import Enum
 from dataclasses import dataclass
+from enum import Enum
+from themes.theme_manager import Theme
 from typing import Any
+
 
 class PortType(Enum):
     EXEC = "exec"
@@ -31,24 +33,27 @@ class PortType(Enum):
     VARIABLE = "variable"
     ANY = "any"
 
+
 class PortDirection(Enum):
     INPUT = "input"
     OUTPUT = "output"
+
 
 @dataclass
 class PortStyle:
     color: str
     size: int
     thickness: float = 3
-    
-EXEC_STYLE = PortStyle("#FFFFFF", 12, thickness=4.5)
-STRING_STYLE = PortStyle("#FF6B9D", 10)
-INT_STYLE = PortStyle("#4ECDC4", 10)
-BOOL_STYLE = PortStyle("#95E1D3", 10)
-PATH_STYLE = PortStyle("#F38181", 10)
-VARIABLE_STYLE = PortStyle("#FFA07A", 10)
-CONDITION_STYLE = PortStyle("#F7D046", 10)
-ANY_STYLE = PortStyle("#CCCCCC", 10)
+
+
+EXEC_STYLE = PortStyle(Theme.get_color("PORT_TYPES-EXEC"), 12, thickness=4.5)
+STRING_STYLE = PortStyle(Theme.get_color("PORT_TYPES-STRING"), 10)
+INT_STYLE = PortStyle(Theme.get_color("PORT_TYPES-INT"), 10)
+BOOL_STYLE = PortStyle(Theme.get_color("PORT_TYPES-BOOL"), 10)
+PATH_STYLE = PortStyle(Theme.get_color("PORT_TYPES-PATH"), 10)
+VARIABLE_STYLE = PortStyle(Theme.get_color("PORT_TYPES-VARIABLE"), 10)
+CONDITION_STYLE = PortStyle(Theme.get_color("PORT_TYPES-CONDITION"), 10)
+ANY_STYLE = PortStyle(Theme.get_color("PORT_TYPES-ANY"), 10)
 
 PORT_STYLES = {
     PortType.EXEC: EXEC_STYLE,
