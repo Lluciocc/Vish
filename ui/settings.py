@@ -284,10 +284,7 @@ class SettingsDialog(QDialog):
                 question.setWindowTitle("Theme already existing")
                 question.setText(f"Theme with file name {temp_file} exists.\n\n How do you want to approach?\n")
                 question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes | QMessageBox.Ok)
-                question.setStyleSheet(f"""
-                                        background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
-                                        color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-                                    """)
+                question.setStyleSheet(messagebox_style())
 
                 rename = question.button(QMessageBox.Ok)
                 rename.setStyleSheet(pushbutton_style())
@@ -344,10 +341,7 @@ class SettingsDialog(QDialog):
                 question.setWindowTitle("Delete Theme")
                 question.setText(f"Theme {name} will be deleted.\n\n Are you sure?\n")
                 question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes)
-                question.setStyleSheet(f"""
-                                        background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
-                                        color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-                                    """)
+                question.setStyleSheet(messagebox_style())
 
                 delete = question.button(QMessageBox.Yes)
                 delete.setStyleSheet(pushbutton_style())
@@ -524,6 +518,12 @@ class Switch(QWidget):
 
     offset = Property(int, getOffset, setOffset)
 
+
+def messagebox_style() -> str:
+    return f"""
+                background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
+                color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
+        """
 
 def label_style() -> str:
     return f"""
