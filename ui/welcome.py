@@ -311,7 +311,15 @@ class WelcomeScreen(QDialog):
             self.populate_recent_projects()
 
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            info = QMessageBox()
+            info.setIcon(QMessageBox.Critical)
+            info.setWindowTitle("Error")
+            info.setText(str(e))
+            info.setStandardButtons(QMessageBox.Ok)
+            info.setStyleSheet(messagebox_style())
+            ok = info.button(QMessageBox.Ok)
+            ok.setStyleSheet(pushbutton_style())
+            info.exec_()
 
     def _remove_recent(self, path_str: str):
         question = QMessageBox()
@@ -365,7 +373,15 @@ class WelcomeScreen(QDialog):
             self.project_manager.create_project(project_dir, name.textValue().strip())
             self.accept()
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            info = QMessageBox()
+            info.setIcon(QMessageBox.Critical)
+            info.setWindowTitle("Error")
+            info.setText(str(e))
+            info.setStandardButtons(QMessageBox.Ok)
+            info.setStyleSheet(messagebox_style())
+            ok = info.button(QMessageBox.Ok)
+            ok.setStyleSheet(pushbutton_style())
+            info.exec_()
 
     def open_project(self):
         directory = QFileDialog.getExistingDirectory(
@@ -380,7 +396,15 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(directory))
             self.accept()
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            info = QMessageBox()
+            info.setIcon(QMessageBox.Critical)
+            info.setWindowTitle("Error")
+            info.setText(str(e))
+            info.setStandardButtons(QMessageBox.Ok)
+            info.setStyleSheet(messagebox_style())
+            ok = info.button(QMessageBox.Ok)
+            ok.setStyleSheet(pushbutton_style())
+            info.exec_()
 
     def open_recent(self, item):
         if item is None or item.flags() == Qt.NoItemFlags:
@@ -396,7 +420,15 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(path))
             self.accept()
         except Exception as e:
-            QMessageBox.critical(self, "Error", str(e))
+            info = QMessageBox()
+            info.setIcon(QMessageBox.Critical)
+            info.setWindowTitle("Error")
+            info.setText(str(e))
+            info.setStandardButtons(QMessageBox.Ok)
+            info.setStyleSheet(messagebox_style())
+            ok = info.button(QMessageBox.Ok)
+            ok.setStyleSheet(pushbutton_style())
+            info.exec_()
 
     def _apply_theme(self):
         self.recent_label.setStyleSheet(label_recent_style())
