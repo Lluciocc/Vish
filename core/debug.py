@@ -27,6 +27,7 @@ import os
 import platform
 import sys
 
+
 class Debug:
     _parent = None
     init_error = False
@@ -62,22 +63,45 @@ class Debug:
         Debug._show(message, "info")
         Logger.LogMessage(message)
 
+
 class Info:
-    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish", "config.json")
+    CONFIG_FILE = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish", "config.json")
+    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish")
     @staticmethod
     def get_os():
         return platform.system()
-    
+
+    @staticmethod
+    def get_config_file():
+        Info.ensure_dir_exists(Info.CONFIG_FILE)
+        return Info.CONFIG_FILE
+
     @staticmethod
     def get_config_path():
-        Info.ensure_config_dir_exists()
+        Info.ensure_dir_exists(Info.CONFIG_PATH)
         return Info.CONFIG_PATH
-    
+
     @staticmethod
-    def ensure_config_dir_exists():
-        config_dir = os.path.dirname(Info.CONFIG_PATH)
-        if not os.path.exists(config_dir):
-            os.makedirs(config_dir)
+    def ensure_dir_exists(directory):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+    @staticmethod
+    def get_files_from_directory(base_directory, relative_path, name_filter):
+        if base_directory == "resource_path":
+            path = Info.resource_path(relative_path)
+        if base_directory == "config_path":
+            path = Path(Info.get_config_path()) / relative_path
+        if not os.path.exists(path):
+            return
+
+        if name_filter == None:
+            return os.listdir(path)
+        files = []
+        for file_name in os.listdir(path):
+            if name_filter in file_name:
+                files.append(file_name)
+        return files
 
     @staticmethod
     def resource_path(relative_path):

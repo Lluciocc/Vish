@@ -20,12 +20,14 @@
 from pathlib import Path
 import datetime
 
+
 class Colors:
     RESET  = "\033[0m"
     RED    = "\033[31m"
     YELLOW = "\033[33m"
     GREEN  = "\033[32m"
     CYAN   = "\033[36m"
+
 
 class Logger:
     logged_messages = []
@@ -60,7 +62,7 @@ class Logger:
         from core.debug import Info
 
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-        log_path = Path(Info.get_config_path()).parent / "logs" / f"vish_log_{timestamp}.log"
+        log_path = Path(Info.get_config_path()) / "logs" / f"vish_log_{timestamp}.log"
 
         log_path.parent.mkdir(parents=True, exist_ok=True)
 

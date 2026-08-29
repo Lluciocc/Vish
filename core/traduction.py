@@ -17,10 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from core.debug import Debug, Info
 import json
-from core.debug import Info, Debug
 import os
 import re
+
 
 class Traduction:
     langs_path = Info.resource_path('assets/models/lang')

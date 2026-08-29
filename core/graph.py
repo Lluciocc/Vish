@@ -17,13 +17,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import List, Optional, Dict, Any, TYPE_CHECKING
+from core.config import Config
+from core.logger import Logger
+from core.port_types import PortDirection, PortType
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from uuid import uuid4
 if TYPE_CHECKING:
     from core.bash_context import BashContext
-from uuid import uuid4
-from core.port_types import PortType, PortDirection
-from core.logger import Logger
-from core.config import Config
+
 
 class Port:
     def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node', tooltip=""):
@@ -35,7 +36,7 @@ class Port:
         self.value: Any = None
         self.connected_edges: List['Edge'] = []
         self.tooltip = tooltip
-        
+
     def can_connect_to(self, other: 'Port') -> bool:
         if self.direction == other.direction:
             return False
@@ -47,7 +48,7 @@ class Port:
             return True
 
         return self.port_type == other.port_type
-    
+
     def is_connected(self) -> bool:
         return len(self.connected_edges) > 0
 
@@ -55,7 +56,8 @@ class Port:
         if self.connected_edges:
             return self.connected_edges[0].source.node.emit_condition(context)
         return self.value
-    
+
+
 class Node:
     def __init__(self, node_type: str, title: str):
         self.id = str(uuid4())
@@ -67,31 +69,32 @@ class Node:
         self.y = 0.0
         self.z = 0.0
         self.properties: Dict[str, Any] = {}
-    
+
     def add_input(self, name: str, port_type: PortType, tooltip="") -> Port:
         port = Port(name, port_type, PortDirection.INPUT, self, tooltip)
         self.inputs.append(port)
         return port
-    
+
     def add_output(self, name: str, port_type: PortType, tooltip="") -> Port:
         port = Port(name, port_type, PortDirection.OUTPUT, self, tooltip)
         self.outputs.append(port)
         return port
-    
+
     def get_exec_output(self) -> Optional[Port]:
         for port in self.outputs:
             if port.port_type == PortType.EXEC:
                 return port
         return None
-    
+
     def get_exec_input(self) -> Optional[Port]:
         for port in self.inputs:
             if port.port_type == PortType.EXEC:
                 return port
         return None
-    
+
     def emit_bash(self, context: 'BashContext') -> str:
         return ""
+
 
 class Edge:
     def __init__(self, source: Port, target: Port):
@@ -100,19 +103,20 @@ class Edge:
         self.target = target
         source.connected_edges.append(self)
         target.connected_edges.append(self)
-    
+
     def disconnect(self):
         self.source.connected_edges.remove(self)
         self.target.connected_edges.remove(self)
+
 
 class Graph:
     def __init__(self):
         self.nodes: Dict[str, Node] = {}
         self.edges: Dict[str, Edge] = {}
-    
+
     def add_node(self, node: Node):
         self.nodes[node.id] = node
-    
+
     def remove_node(self, node_id: str):
         node = self.nodes.get(node_id)
         if not node:
@@ -129,14 +133,13 @@ class Graph:
 
         del self.nodes[node_id]
 
-    
     def add_edge(self, source: Port, target: Port) -> Optional[Edge]:
         if not source.can_connect_to(target):
             return None
         edge = Edge(source, target)
         self.edges[edge.id] = edge
         return edge
-    
+
     def remove_edge(self, edge_id: str):
         if edge_id in self.edges:
             edge = self.edges[edge_id]
@@ -157,7 +160,7 @@ class Graph:
             if node.node_type == "start":
                 return node
         return None
-    
+
     def get_execution_order(self):
         from core.port_types import PortType
 

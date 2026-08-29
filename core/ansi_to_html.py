@@ -17,8 +17,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import re
 from dataclasses import dataclass
+import re
+
 
 ANSI_REGEX = re.compile(r"\x1b\[([0-9;]*)m")
 
@@ -41,6 +42,7 @@ COLOR_MAP = {
     96: "#55ffff",
     97: "#ffffff",
 }
+
 
 @dataclass
 class Style:

@@ -20,7 +20,7 @@
 from commands.undo_commands import *
 from core.config import Config
 from core.clipboard import GraphClipboard
-from core.debug import Debug, Info
+from core.debug import Debug
 from core.graph import Port
 from core.icons import Icon
 from core.layout import GraphLayoutEngine
@@ -28,10 +28,10 @@ from core.port_types import PortType
 from core.serializer import Serializer
 from core.validator import GraphValidator
 from nodes.registry import create_node
-from PySide6.QtCore import Property, QEasingCurve, QEvent, QPointF, QPropertyAnimation, QRectF, Qt, QTimer, Signal
+from PySide6.QtCore import QEasingCurve, QEvent, QPointF, Property, QPropertyAnimation, QRectF, Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QKeySequence, QMouseEvent, QPainter, QUndoStack
 from PySide6.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsTextItem, QGraphicsView, QHBoxLayout, QLabel, QPushButton, QSlider, QWidget
-from theme.theme import Theme
+from themes.theme_manager import Theme
 from ui.comment_box import CommentBoxItem
 from ui.edge_item import EdgeItem
 from ui.graph_scene import GraphScene
@@ -73,7 +73,6 @@ class GraphView(QGraphicsView):
         self.setResizeAnchor(QGraphicsView.AnchorUnderMouse)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setBackgroundBrush(QColor(Theme.BACKGROUND))
 
         self.alt_lang = False
         self.node_items = {}
@@ -99,6 +98,7 @@ class GraphView(QGraphicsView):
                 else self.undo_stack.push(AddEdgeCommand(self, a, b))
             )
         )
+        self._apply_theme()
 
     def get_zoom(self):
         return self.scale_factor
@@ -536,45 +536,6 @@ class GraphView(QGraphicsView):
                 item.setPos(x, y)
                 self.graph_scene.update_edges_for_node(item)
 
-    def apply_theme(self):
-        self.setBackgroundBrush(QColor(Theme.BACKGROUND))
-        self.frame_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {Theme.BUTTON};
-                border: 1px solid #555;
-                border-radius: 6px;
-            }}
-            QPushButton:hover {{
-                background-color: {Theme.BUTTON_HOVER};
-            }}
-        """)
-        self.zoom_slider.setStyleSheet(f"""
-            QSlider::groove:horizontal {{
-                height: 6px;
-                background: {Theme.ACCENT};
-                border-radius: 3px;
-            }}
-
-            QSlider::sub-page:horizontal {{
-                background: {Theme.ACCENT};
-                border-radius: 3px;
-            }}
-
-            QSlider::add-page:horizontal {{
-                background: {Theme.PANEL};
-                border-radius: 3px;
-            }}
-
-            QSlider::handle:horizontal {{
-                background: {Theme.ACCENT};
-                width: 14px;
-                margin: -4px 0;
-                border-radius: 7px;
-            }}
-        """)
-        self.frame_btn.setIcon(self.get_icon("frame"))
-        self.viewport().update()
-
     # def centerOn(self, *args):
     #     super().centerOn(*args)
     #     if hasattr(self, "minimap"):
@@ -589,8 +550,8 @@ class GraphView(QGraphicsView):
     def resizeEvent(self, event):
         super().resizeEvent(event)
         if hasattr(self, "zoom_widget"):
-            self.zoom_widget.move(10, self.height() - 42)
-        if hasattr(self, "frame_btn"):
+            self.zoom_widget.move(5, self.height() - 42)
+        if hasattr(self, "frame_button"):
             self._update_frame_button_position()
         # if hasattr(self, "minimap"):
         #     self.minimap.move(self.width() - 190, self.height() - 150)
@@ -639,16 +600,17 @@ class GraphView(QGraphicsView):
 
     def _init_zoom_widget(self):
         self.zoom_widget = QWidget(self)
-        self.zoom_widget.setFixedHeight(32)
+        self.zoom_widget.setFixedHeight(36)
+        self.zoom_widget.setObjectName("zoomWidget")
 
         layout = QHBoxLayout(self.zoom_widget)
-        layout.setContentsMargins(6, 0, 6, 0)
+        layout.setContentsMargins(4, 0, 6, 0)
         layout.setSpacing(6)
 
-        self.zoom_out_btn = QPushButton("-")
-        self.zoom_in_btn = QPushButton("+")
-        self.zoom_out_btn.setFixedSize(28, 28)
-        self.zoom_in_btn.setFixedSize(28, 28)
+        self.zoom_out_button = QPushButton("-")
+        self.zoom_in_button = QPushButton("+")
+        self.zoom_out_button.setFixedSize(28, 28)
+        self.zoom_in_button.setFixedSize(28, 28)
 
         self.zoom_label = ZoomLabel("100%")
         self.zoom_label.setFixedWidth(32)
@@ -657,41 +619,17 @@ class GraphView(QGraphicsView):
 
         self.zoom_slider.setRange(20, 300)
         self.zoom_slider.setValue(100)
-        self.zoom_slider.setStyleSheet(f"""
-            QSlider::groove:horizontal {{
-                height: 6px;
-                background: {Theme.ACCENT};
-                border-radius: 3px;
-            }}
 
-            QSlider::sub-page:horizontal {{
-                background: {Theme.ACCENT};
-                border-radius: 3px;
-            }}
-
-            QSlider::add-page:horizontal {{
-                background: {Theme.PANEL};
-                border-radius: 3px;
-            }}
-
-            QSlider::handle:horizontal {{
-                background: {Theme.ACCENT};
-                width: 14px;
-                margin: -4px 0;
-                border-radius: 7px;
-            }}
-        """)
-
-        self.zoom_out_btn.clicked.connect(lambda: self._step_zoom(-1))
-        self.zoom_in_btn.clicked.connect(lambda: self._step_zoom(1))
+        self.zoom_out_button.clicked.connect(lambda: self._step_zoom(-1))
+        self.zoom_in_button.clicked.connect(lambda: self._step_zoom(1))
         self.zoom_slider.valueChanged.connect(self._on_zoom_slider_changed)
 
-        layout.addWidget(self.zoom_out_btn)
+        layout.addWidget(self.zoom_out_button)
         layout.addWidget(self.zoom_label)
-        layout.addWidget(self.zoom_in_btn)
+        layout.addWidget(self.zoom_in_button)
         layout.addWidget(self.zoom_slider)
 
-        self.zoom_widget.move(10, self.height() - 42)
+        self.zoom_widget.move(10, self.height() - 4)
         self.zoom_widget.show()
 
     def _sync_zoom_from_transform(self):
@@ -780,34 +718,107 @@ class GraphView(QGraphicsView):
                 NodeItem.update_traduction(item, Config.lang)
 
     def _init_frame_button(self):
-        self.frame_btn = QPushButton(self)
-        self.frame_btn.setFixedSize(36, 36)
-        self.frame_btn.setCursor(Qt.PointingHandCursor)
-        self.frame_btn.setIcon(self.get_icon("frame"))
-        self.frame_btn.setIconSize(self.frame_btn.size() * 0.8125)
+        self.frame_button = QPushButton(self)
+        self.frame_button.setFixedSize(36, 36)
+        self.frame_button.setCursor(Qt.PointingHandCursor)
+        self.frame_button.setIconSize(self.frame_button.size() * 0.8125)
 
-        self.frame_btn.setStyleSheet(f"""
-            QPushButton {{
-                background-color: {Theme.BUTTON};
-                border: 1px solid #555;
-                border-radius: 6px;
-            }}
-            QPushButton:hover {{
-                background-color: {Theme.BUTTON_HOVER};
-            }}
-        """)
-
-        self.frame_btn.clicked.connect(self.frame_all)
+        self.frame_button.clicked.connect(self.frame_all)
 
         self._update_frame_button_position()
-        self.frame_btn.show()
+        self.frame_button.show()
 
     def _update_frame_button_position(self):
-        margin = 10
-        x = self.width() - self.frame_btn.width() - margin
-        y = self.height() - self.frame_btn.height() - margin
-        self.frame_btn.move(x, y)
+        margin = 5
+        x = self.width() - self.frame_button.width() - margin
+        y = self.height() - self.frame_button.height() - margin
+        self.frame_button.move(x, y)
 
     def get_icon(self, name):
         icon = Icon.load_icon("main", name)
         return icon
+
+    def _apply_theme(self):
+        self.setBackgroundBrush(QColor("transparent"))
+        self.zoom_widget.setStyleSheet(zoom_widget_style())
+        self.frame_button.setStyleSheet(frame_button_style())
+        self.zoom_slider.setStyleSheet(zoom_slider_style())
+        self.zoom_in_button.setStyleSheet(zoom_button_style())
+        self.zoom_out_button.setStyleSheet(zoom_button_style())
+        self.zoom_label.setStyleSheet(zoom_label_style())
+        self.frame_button.setIcon(self.get_icon("frame"))
+#        self.frame_button.setIcon(self.get_icon("frame"))                  #TODO: required?
+#        self.viewport().update()
+
+
+def frame_button_style() -> str:
+    return f"""
+            QPushButton {{
+                background: {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BACKGROUND")};
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BORDER")};
+                border-radius: 6px;
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                background: {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BACKGROUND_HOVER")};
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BORDER_HOVER")};
+                outline: none;
+            }}
+        """
+
+def zoom_label_style() -> str:
+    return f"""
+                color: {Theme.get_color("GRAPH_VIEW-ZOOMLABEL_TEXT")};
+                background: transparent;
+        """
+
+def zoom_widget_style() -> str:
+    return f"""
+            QWidget#zoomWidget {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMWIDGET_BACKGROUND")};
+                border-radius: 6px;
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMWIDGET_BORDER")};
+                padding: 6px;
+            }}
+        """
+
+def zoom_button_style() -> str:
+    return f"""
+            QPushButton {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BACKGROUND")};
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BORDER")};
+                color: {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_TEXT")};
+                border-radius: 3px;
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BACKGROUND_HOVER")};
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BORDER_HOVER")};
+                border-radius: 3px;
+                outline: none;
+            }}
+        """
+
+def zoom_slider_style() -> str:
+    return f"""
+            QSlider::sub-page:horizontal {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_BACKGROUND_ACTIVE")};
+                border-radius: 3px;
+            }}
+            QSlider::add-page:horizontal {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_BACKGROUND")};
+                border-radius: 3px;
+            }}
+            QSlider::handle:horizontal {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE")};
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER")};
+                border-radius: 7px;
+            }}
+            QSlider::handle:horizontal:focus,
+            QSlider::handle:horizontal:selected,
+            QSlider::handle:horizontal:hover {{
+                border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_HOVER")};
+            }}
+        """

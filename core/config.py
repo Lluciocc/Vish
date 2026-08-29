@@ -17,9 +17,10 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-from pathlib import Path
 from core.debug import Debug, Info
+from pathlib import Path
+import json
+
 
 class Config:
     DEBUG = False
@@ -27,9 +28,10 @@ class Config:
     SYNC_NODES_AND_GEN = False
     AUTO_SAVE = False
     lang = "en"
-    theme = "dark"
+    theme = "dark.yml"
     CUSTOM_SHEBANG = "#!/usr/bin/env bash"
-    
+
+
 class ConfigManager:
     @staticmethod
     def serialize_config(config: Config):
@@ -40,7 +42,7 @@ class ConfigManager:
     @staticmethod
     def load_config():
         try:
-            with open(Info.get_config_path(), "r") as f:
+            with open(Info.get_config_file(), "r") as f:
                 config_dict = json.load(f)
                 for key, value in config_dict.items():
                     if hasattr(Config, key):
@@ -56,8 +58,9 @@ class ConfigManager:
     @staticmethod
     def save_config():
         config_dict = dict(ConfigManager.serialize_config(Config))
-        with open(Info.get_config_path(), "w") as f:
+        with open(Info.get_config_file(), "w") as f:
             json.dump(config_dict, f, indent=4)
+
 
 class MarkdownLoader:
     @staticmethod

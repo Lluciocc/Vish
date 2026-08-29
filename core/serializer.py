@@ -17,11 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import json
-from typing import Any, Dict
 from core.debug import Info
 from core.logger import Logger
-from .graph import Graph, Node, Port
+from core.graph import Graph, Node, Port
+from typing import Any, Dict
+import json
 
 
 class Serializer:
@@ -33,7 +33,7 @@ class Serializer:
         if Config.DEBUG:
             Logger.LogWarning("Could not load VERSION file")
         VERSION = "???"
-    
+
     def __init__(self, graph: Graph):
         self.graph = graph
 

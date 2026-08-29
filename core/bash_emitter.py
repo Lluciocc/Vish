@@ -17,10 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.graph import Graph
-from nodes.base_node import BaseNode
 from core.bash_context import BashContext
 from core.config import Config
+from core.graph import Graph
+from nodes.base_node import BaseNode
+
 
 class BashEmitter:
     def __init__(self, graph: Graph):

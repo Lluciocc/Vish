@@ -17,8 +17,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtGui import QSyntaxHighlighter, QTextCharFormat, QColor, QFont
 from PySide6.QtCore import QRegularExpression
+from PySide6.QtGui import QColor, QFont, QSyntaxHighlighter, QTextCharFormat
+from themes.theme_manager import Theme
 
 
 class BashHighlighter(QSyntaxHighlighter):
@@ -28,29 +29,29 @@ class BashHighlighter(QSyntaxHighlighter):
         self.rules = []
         self.known_functions = set()
         keyword = QTextCharFormat()
-        keyword.setForeground(QColor("#C792EA"))
+        keyword.setForeground(QColor(Theme.get_color("HIGHLIGHTS-KEYWORD")))
 
         function_def = QTextCharFormat()
-        function_def.setForeground(QColor("#D000FF"))
+        function_def.setForeground(QColor(Theme.get_color("HIGHLIGHTS-FUNCTION_DEF")))
 
         function_call = QTextCharFormat()
-        function_call.setForeground(QColor("#D000FF"))
+        function_call.setForeground(QColor(Theme.get_color("HIGHLIGHTS-FUNCTION_CALL")))
 
         command = QTextCharFormat()
-        command.setForeground(QColor("#82AAFF"))
+        command.setForeground(QColor(Theme.get_color("HIGHLIGHTS-COMMAND")))
 
         string = QTextCharFormat()
-        string.setForeground(QColor("#C3E88D"))
+        string.setForeground(QColor(Theme.get_color("HIGHLIGHTS-STRING")))
 
         comment = QTextCharFormat()
-        comment.setForeground(QColor("#616161"))
+        comment.setForeground(QColor(Theme.get_color("HIGHLIGHTS-COMMENT")))
         comment.setFontItalic(True)
 
         variable = QTextCharFormat()
-        variable.setForeground(QColor("#F78C6C"))
+        variable.setForeground(QColor(Theme.get_color("HIGHLIGHTS-VARIABLE")))
 
         number = QTextCharFormat()
-        number.setForeground(QColor("#FFCB6B"))
+        number.setForeground(QColor(Theme.get_color("HIGHLIGHTS-NUMBER")))
         keywords = [
             "if", "then", "else", "elif", "fi",
             "for", "while", "do", "done",
@@ -126,7 +127,6 @@ class BashHighlighter(QSyntaxHighlighter):
         self.function_def_format = function_def
         self.function_call_format = function_call
 
-    
     def highlightBlock(self, text: str):
         match = self.function_def_regex.match(text)
         if match.hasMatch():

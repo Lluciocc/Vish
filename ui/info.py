@@ -17,8 +17,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import QWidget, QLabel, QVBoxLayout
-from PySide6.QtCore import Qt, QPropertyAnimation, QPoint, QTimer, QEasingCurve
+from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt, QTimer
+from PySide6.QtWidgets import QLabel, QVBoxLayout, QWidget
 
 
 class MessageWidget(QWidget):
@@ -93,7 +93,6 @@ class MessageWidget(QWidget):
 
         self.adjustSize()
 
-
     def show_animated(self):
         parent = self.parent()
         if not parent:
@@ -126,4 +125,3 @@ class MessageWidget(QWidget):
         self.anim.setEasingCurve(QEasingCurve.InCubic)
         self.anim.finished.connect(self.close)
         self.anim.start()
-

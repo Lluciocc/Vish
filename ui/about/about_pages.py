@@ -17,14 +17,44 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QSizePolicy, QTextBrowser
-)
-from PySide6.QtCore import Qt
-from core.traduction import Traduction
+from core.icons import Icon
 from core.serializer import Serializer
+from core.traduction import Traduction
+from PySide6.QtCore import Qt
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QLabel, QMessageBox, QSizePolicy, QTextBrowser, QVBoxLayout, QWidget
+from themes.theme_manager import Theme
 import webbrowser
-from theme.theme import Theme
+
+
+def open_link_box(link_name, link):
+    question = QMessageBox()
+    question.setIcon(QMessageBox.Question)
+    question.setWindowTitle("Theme already existing")
+    question.setText(f"Do you want to open: {link_name}?\n\n{link}\n")
+    question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes | QMessageBox.Ok)
+    question.setStyleSheet(f"""
+                           background: {Theme.get_color("ABOUT_PAGES-MESSAGEBOX_BACKGROUND")};
+                           color: {Theme.get_color("ABOUT_PAGES-MESSAGEBOX_TEXT")};
+                        """)
+
+    copy = question.button(QMessageBox.Ok)
+    copy.setStyleSheet(message_pushbutton_style())
+    copy.setText("Copy Link")
+    open = question.button(QMessageBox.Yes)
+    open.setStyleSheet(message_pushbutton_style())
+    open.setText("Open Link")
+    cancel = question.button(QMessageBox.Cancel)
+    cancel.setStyleSheet(message_pushbutton_style())
+    cancel.setText("Cancel")
+
+    question.setDefaultButton(QMessageBox.Cancel)
+    question.exec_()
+
+    if question.clickedButton() == open:
+        webbrowser.open(link)
+    elif question.clickedButton() == copy:
+        QApplication.clipboard().setText(link)
 
 
 class AboutRow(QWidget):
@@ -48,24 +78,13 @@ class AboutRow(QWidget):
         layout.addStretch()
 
         arrow = QLabel(icon)
-        arrow.setStyleSheet("font-size: 16px; opacity: 0.7;")
         layout.addWidget(arrow)
 
         label.setAttribute(Qt.WA_TransparentForMouseEvents, True)
         arrow.setAttribute(Qt.WA_TransparentForMouseEvents, True)
 
-        self.setStyleSheet(f"""
-            QWidget#AboutRow {{
-                background-color: {Theme.BUTTON};
-            }}
-            QWidget#AboutRow:hover {{
-                background-color: {Theme.BUTTON_HOVER};
-            }}
-            QWidget#AboutRow QLabel {{
-                background: transparent;
-            }}
-        """)
-
+        self.setStyleSheet(pushbutton_style())
+        arrow.setStyleSheet(arrow_label_style())
 
     def mousePressEvent(self, event):
         if self.callback:
@@ -87,7 +106,7 @@ class AboutGroup(QWidget):
 
         self.setStyleSheet(f"""
             QWidget {{
-                background-color: rgba(255,255,255,0.04);
+                background-color: {Theme.get_color("ABOUT_PAGES-BUTTONGROUP_BACKGROUND")};
                 border-radius: {self.RADIUS}px;
             }}
         """)
@@ -122,13 +141,14 @@ def section_title(key, fallback):
     label = QLabel(Traduction.get_trad(key, fallback))
     label.setAlignment(Qt.AlignCenter)
     label.setStyleSheet("font-size: 22px; font-weight: 600;")
+    label.setWordWrap(True)
     return label
-
 
 def subtitle(key, fallback):
     label = QLabel(Traduction.get_trad(key, fallback))
     label.setAlignment(Qt.AlignCenter)
     label.setStyleSheet("opacity: 0.75;")
+    label.setWordWrap(True)
     return label
 
 
@@ -137,36 +157,35 @@ class AboutMainPage(QWidget):
         super().__init__()
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(0, 0, 0, 0)
+        root.setContentsMargins(0, 11, 0, 0)
         root.setSpacing(18)
 
-        root.addWidget(section_title("app_name", "Visual Bash Editor"))
-        root.addWidget(subtitle(
-            "app_tagline",
-            "A visual way to build Bash scripts"
-        ))
+        icon = QSvgWidget(Icon.load_widget(self, None, "Vish", 128, 128))
+        icon.setMinimumWidth(128)
+        icon.setStyleSheet("background: transparent")
+
+        title_key = "app_name"
+        title_fallback = "Visual Bash Editor"
+        subtitle_key = "app_tagline"
+        subtitle_fallback = "A visual way to build Bash scripts"
 
         version = QLabel(Serializer.VERSION)
         version.setAlignment(Qt.AlignCenter)
-        version.setStyleSheet(f"""
-            QLabel {{
-                padding: 4px 14px;
-                min-height: 28px;
-                border-radius: 9px;
-                background-color: {Theme.ACCENT};
-                color: {Theme.TEXT if Theme.type == 'dark' else Theme.TEXT_INV}; /*ensure good contrast*/
-                font-size: 13px;
-                font-weight: 600;
-            }}
-        """)
+        version.setStyleSheet(version_label_style())
 
         vrow = QHBoxLayout()
-        vrow.addStretch()
         vrow.addWidget(version)
         vrow.addStretch()
-        root.addLayout(vrow)
 
-        root.addSpacing(8)
+        header_text = QVBoxLayout()
+        header = QHBoxLayout()
+        header.addWidget(icon)
+        header_text.addWidget(section_title(title_key, title_fallback))
+        header_text.addWidget(subtitle(subtitle_key,subtitle_fallback))
+        header_text.addLayout(vrow)
+        header.addLayout(header_text)
+        header.addStretch(1)
+        root.addLayout(header)
 
         g1 = AboutGroup()
         g1.add_row(AboutRow(
@@ -177,34 +196,32 @@ class AboutMainPage(QWidget):
         g1.add_row(AboutRow(
             Traduction.get_trad("about_website", "Website"),
             "↗",
-            lambda: webbrowser.open("https://lluciocc.fr")
+            lambda: open_link_box(Traduction.get_trad("about_website", "Website"), "https://lluciocc.fr")
         ))
         g1.finalize()
-        root.addWidget(g1)
 
         g2 = AboutGroup()
         g2.add_row(AboutRow(
             Traduction.get_trad("about_theme_repo", "Themes Collection Repository"),
             "↗",
-            lambda: webbrowser.open("https://github.com/Lluciocc/vish-theme-collection")
+            lambda: open_link_box(Traduction.get_trad("about_theme_repo", "Themes Collection Repository"), "https://github.com/Lluciocc/vish-theme-collection")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_questions", "Frequently Asked Questions"),
             "↗",
-            lambda: webbrowser.open("https://github.com/Lluciocc/Vish/wiki#faqs")
+            lambda: open_link_box(Traduction.get_trad("about_questions", "Frequently Asked Questions"), "https://github.com/Lluciocc/Vish/wiki#faqs")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_report", "Report an Issue"),
             "↗",
-            lambda: webbrowser.open("https://github.com/Lluciocc/Vish/issues")
+            lambda: open_link_box(Traduction.get_trad("about_report", "Report an Issue"), "https://github.com/Lluciocc/Vish/issues")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_support", "Support the project"),
             "↗",
-            lambda: webbrowser.open("https://github.com/Lluciocc/Vish?sponsor=1")
+            lambda: open_link_box(Traduction.get_trad("about_support", "Support the project"), "https://github.com/Lluciocc/Vish?sponsor=1")
         ))
         g2.finalize()
-        root.addWidget(g2)
 
         g3 = AboutGroup()
         g3.add_row(AboutRow(
@@ -220,11 +237,14 @@ class AboutMainPage(QWidget):
         g3.add_row(AboutRow(
             Traduction.get_trad("about_matrix", "Join our Matrix room"),
             "↗",
-            lambda: webbrowser.open("https://matrix.to/#/%23vish-support%3Amatrix.org")
+            lambda: open_link_box(Traduction.get_trad("about_matrix", "Join our Matrix room"), "https://matrix.to/#/%23vish-support%3Amatrix.org")
         ))
         g3.finalize()
-        root.addWidget(g3)
 
+        root.addSpacing(8)
+        root.addWidget(g1)
+        root.addWidget(g2)
+        root.addWidget(g3)
         root.addStretch()
 
 
@@ -238,7 +258,6 @@ class AboutTextPage(QWidget):
 
         title = QLabel(Traduction.get_trad(title_key, fallback))
         title.setStyleSheet("font-size: 18px; font-weight: 600;")
-        layout.addWidget(title)
 
         content = QTextBrowser()
         content.setMarkdown(text)
@@ -250,42 +269,99 @@ class AboutTextPage(QWidget):
         content.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         content.document().setDocumentMargin(0)
 
-        content.setStyleSheet(f"""
-        QTextBrowser {{
-            background: transparent;
-            border: none;
-            color: {Theme.TEXT};
-            padding: 0;
-            opacity: 0.85;
-        }}
+        content.setStyleSheet(content_browser_style())
 
-        QScrollBar:vertical {{
-            background: transparent;
-            width: 10px;
-            margin: 2px 0;
-        }}
-
-        QScrollBar::handle:vertical {{
-            background: {Theme.BUTTON_PRESSED};
-            min-height: 34px;
-            border-radius: 5px;
-        }}
-
-        QScrollBar::handle:vertical:hover {{
-            background: {Theme.ACCENT};
-        }}
-
-        QScrollBar::add-line:vertical,
-        QScrollBar::sub-line:vertical {{
-            height: 0;
-            background: none;
-            border: none;
-        }}
-
-        QScrollBar::add-page:vertical,
-        QScrollBar::sub-page:vertical {{
-            background: transparent;
-        }}
-        """)
-
+        layout.addWidget(title)
         layout.addWidget(content)
+
+
+def pushbutton_style() -> str:
+    return f"""
+            QWidget#AboutRow {{
+                background: {Theme.get_color("ABOUT_PAGES-PUSHBUTTON_BACKGROUND")};
+            }}
+            QWidget#AboutRow:hover {{
+                background: {Theme.get_color("ABOUT_PAGES-PUSHBUTTON_BACKGROUND_HOVER")};
+            }}
+            QWidget#AboutRow QLabel {{
+                background: transparent;
+                color: {Theme.get_color("ABOUT_PAGES-LABEL_TEXT")};
+            }}
+        """
+
+def message_pushbutton_style() -> str:
+    return f"""
+            QPushButton {{
+                color: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_TEXT")};
+                border: 1px solid {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER")};
+                border-radius: 5px;
+                min-width: 60px;
+                padding: 3px 5px;
+                background: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND")};
+            }}
+            QPushButton:focus,
+            QPushButton:selected,
+            QPushButton:hover {{
+                border-color: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER_HOVER")};
+                background: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND_HOVER")};
+                outline: none;
+            }}
+        """
+
+def content_browser_style() -> str:
+    return f"""
+            QTextBrowser {{
+                border: none;
+                color: {Theme.get_color("ABOUT_PAGES-BROWSER_TEXT")};
+                padding: 0;
+                opacity: 0.85;
+            }}
+            QScrollArea#SettingsScrollArea {{
+                background: {Theme.get_color("SCROLL_AREA")};
+                border: none;
+            }}
+            QScrollArea#SettingsScrollArea > QWidget > QWidget {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                margin: 2px 0px;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {Theme.get_color("SCROLL_HANDLE")};
+                min-height: 34px;
+                border-radius: 5px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {Theme.get_color("SCROLL_HANDLE_HOVER")};
+            }}
+            QScrollBar::add-line:vertical,
+            QScrollBar::sub-line:vertical {{
+                height: 0px;
+                border: none;
+            }}
+            QScrollBar::add-page:vertical,
+            QScrollBar::sub-page:vertical {{
+                background: {Theme.get_color("SCROLL_SUB_BAR")};
+            }}
+        """
+
+def arrow_label_style() -> str:
+    return f"""
+                font-size: 16px;
+                opacity: 0.7;
+                color: {Theme.get_color("ABOUT_PAGES-ARROWLABEL_TEXT")};
+        """
+
+def version_label_style() -> str:
+    return f"""
+            QLabel {{
+                padding: 4px 14px;
+                min-height: 28px;
+                border-radius: 9px;
+                background-color: {Theme.get_color("ABOUT_PAGES-VERSIONLABEL_BACKGROUND")};;
+                color: {Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT") if Theme.icons == 'dark' else Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT_INVERT")}; /*ensure good contrast*/
+                font-size: 13px;
+                font-weight: 600;
+            }}
+        """

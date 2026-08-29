@@ -17,20 +17,22 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.port_types import PortType
 from core.bash_context import BashContext
-from nodes.registry import register_node
 from core.debug import Debug
+from core.port_types import PortType
 from nodes.base_node import BaseNode
+from nodes.registry import register_node
+
 
 @register_node("start", category="Flow", label="Start", description="The starting point of the flow")
 class StartNode(BaseNode):
     def __init__(self):
         super().__init__("start", "Start")
         self.add_output("Exec", PortType.EXEC, "Start of the flow")
-    
+
     def emit_bash(self, context: BashContext) -> str:
         return ""
+
 
 @register_node("sequencer",category="Flow",label="Sequencer",description="Executes connected nodes sequentially from top to bottom")
 class SequencerNode(BaseNode):
@@ -60,8 +62,8 @@ class SequencerNode(BaseNode):
             if output.connected_edges:
                 next_node = output.connected_edges[0].target.node
                 BaseNode.emit_exec_chain(next_node, context)
-
         return ""
+
 
 @register_node("if", category="Flow", label="If Condition", description="Evaluates a condition and branches the flow")
 class IfNode(BaseNode):
@@ -96,7 +98,6 @@ class IfNode(BaseNode):
                 next_port.connected_edges[0].target.node,
                 context
             )
-
         return ""
 
     def _emit_branch(self, context: BashContext, output_index: int):
@@ -148,7 +149,8 @@ class ForNode(BaseNode):
             start_node = next_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
         return ""
-    
+
+
 @register_node("while", category="Flow", label="While Loop", description="Repeats execution while a condition is true")
 class WhileNode(BaseNode):
     def __init__(self):
@@ -184,12 +186,12 @@ class WhileNode(BaseNode):
                 next_port.connected_edges[0].target.node,
                 context
             )
-
         return ""
 
     def get_next_exec_node(self):
         return None
-    
+
+
 @register_node("function", category="Flow", label="Function", description="Defines a bash function")
 class FunctionNode(BaseNode):
     def __init__(self):
@@ -219,7 +221,7 @@ class FunctionNode(BaseNode):
 
         return ""
 
-    
+
 @register_node("call",category="Flow",label="Call Function",description="Calls a bash function")
 class CallNode(BaseNode):
     def __init__(self):
@@ -232,7 +234,8 @@ class CallNode(BaseNode):
 
     def emit_bash(self, context: BashContext) -> str:
         return self.properties.get("function", "")
-    
+
+
 @register_node("return", category="Flow", label="Return", description="Return the result of a fonction")
 class ReturnNode(BaseNode):
     def __init__(self):

@@ -24,7 +24,6 @@ from core.validator import GraphValidator
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QCursor, QPen
 from PySide6.QtWidgets import QApplication, QGraphicsScene
-from ui import edge_item
 from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 
@@ -343,7 +342,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
         if Config.SYNC_NODES_AND_GEN:
             self.graph_changed.emit()
 
-
     def _show_invalid_feedback(self):
         if not self.drag_edges:
             return
@@ -383,7 +381,6 @@ class GraphScene(QGraphicsScene):                                          #TODO
                 self.colorize_port(edges[0].target_port, False)
 
             QTimer.singleShot(180, restore_edges)
-
 
         elif not edge0.target_port or edge0.source_port != edge0.target_port:
             edges = []

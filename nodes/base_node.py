@@ -18,27 +18,28 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from abc import abstractmethod
-from core.graph import Node, PortType
 from core.bash_context import BashContext
-from core.node_color import NodeColor
 from core.debug import Debug
+from core.graph import Node, PortType
+from themes.theme_manager import Theme
+
 
 class BaseNode(Node):
     def __init__(self, node_type: str, title: str):
         super().__init__(node_type, title)
-        color = NodeColor.get_color(node_type)
+        color = Theme.get_color(f"BASE_NODE-{node_type.upper()}")
         if not color:
             color = "#9d9d9d"
             Debug.Warn(f"no color for node type '{node_type}' found.")
         self.color = color
-    
+
     @abstractmethod
     def emit_bash(self, context: BashContext) -> str:
         pass
 
     def emit_bash_value(self, context):
         return None
-    
+
     def emit_condition(self, context):
         return None
 
@@ -51,7 +52,7 @@ class BaseNode(Node):
             return None
 
         return exec_outputs[0].connected_edges[0].target.node
-    
+
     @staticmethod
     def emit_exec_chain(start_node, context, stop_at=None):
         current = start_node

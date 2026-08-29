@@ -17,16 +17,18 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from nodes.base_node import BaseNode
-from core.port_types import PortType
 from core.bash_context import BashContext
+from core.port_types import PortType
+from nodes.base_node import BaseNode
 from nodes.registry import register_node
+
 
 class MathNode(BaseNode):
     def _resolve(self, port, context: BashContext, default="0"):
         if port.connected_edges:
             return port.connected_edges[0].source.node.emit_bash_value(context)
         return default
+
 
 @register_node("number_constant", category="Constants", label="Number Constant", description="Represents a number constant value")
 class NumberConstant(MathNode):
@@ -37,6 +39,7 @@ class NumberConstant(MathNode):
 
     def emit_bash_value(self, context: BashContext) -> str:
         return str(self.properties.get("value", 0))
+
 
 @register_node("addition", category="Math", label="Addition")
 class Addition(MathNode):
@@ -51,6 +54,7 @@ class Addition(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} + {b}))"
 
+
 @register_node("subtraction", category="Math", label="Subtraction")
 class Subtraction(MathNode):
     def __init__(self):
@@ -63,6 +67,7 @@ class Subtraction(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} - {b}))"
+
 
 @register_node("multiplication", category="Math", label="Multiplication")
 class Multiplication(MathNode):
@@ -77,6 +82,7 @@ class Multiplication(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} * {b}))"
 
+
 @register_node("division", category="Math", label="Division")
 class Division(MathNode):
     def __init__(self):
@@ -89,6 +95,7 @@ class Division(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} / {b}))"
+
 
 @register_node("modulo", category="Math", label="Modulo", description="Calculates the remainder of the division")
 class Modulo(MathNode):
@@ -103,6 +110,7 @@ class Modulo(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"$(({a} % {b}))"
 
+
 @register_node("less_than", category="Logic", label="Less Than", description="Is A less than B?")
 class LessThan(MathNode):
     def __init__(self):
@@ -115,6 +123,7 @@ class LessThan(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} < {b} ))"
+
 
 @register_node("greater_than", category="Logic", label="Greater Than", description="Is A greater than B?")
 class GreaterThan(MathNode):
@@ -129,6 +138,7 @@ class GreaterThan(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} > {b} ))"
 
+
 @register_node("equals", category="Logic", label="Equals (numeric)")
 class EqualsNumeric(MathNode):
     def __init__(self):
@@ -141,6 +151,7 @@ class EqualsNumeric(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"(( {a} == {b} ))"
+
 
 @register_node("equals_string", category="Logic", label="Equals (string)")
 class EqualsString(MathNode):
@@ -155,6 +166,7 @@ class EqualsString(MathNode):
         b = self._resolve(self.inputs[1], context)
         return f"[ {a} = {b} ]"
 
+
 @register_node("equals_variable", category="Logic", label="Equals (variable)")
 class EqualsVariable(MathNode):
     def __init__(self):
@@ -167,6 +179,7 @@ class EqualsVariable(MathNode):
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
         return f"[ \"{a}\" = {b} ]"
+
 
 @register_node("logical_and", category="Logic", label="AND")
 class LogicalAnd(MathNode):
@@ -185,6 +198,7 @@ class LogicalAnd(MathNode):
             b = "false"
         return f"{a} && {b}"
 
+
 @register_node("logical_or", category="Logic", label="OR")
 class LogicalOr(MathNode):
     def __init__(self):
@@ -202,6 +216,7 @@ class LogicalOr(MathNode):
             b = "false"
         return f"{a} || {b}"
 
+
 @register_node("logical_not", category="Logic", label="NOT")
 class LogicalNot(MathNode):
     def __init__(self):
@@ -214,6 +229,7 @@ class LogicalNot(MathNode):
         if not a:
             a = "false"
         return f"! {a}"
+
 
 @register_node("command_condition", category="Logic", label="Command Condition", description="Uses a custom command as a condition")
 class CommandConditionNode(BaseNode):
