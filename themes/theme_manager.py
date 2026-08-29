@@ -19,6 +19,7 @@
 
 from core.config import Config, ConfigManager
 from core.debug import Debug, Info
+from core.logger import Logger
 from pathlib import Path
 from PySide6.QtGui import QColor, QGuiApplication, QPalette
 
@@ -71,7 +72,7 @@ class Theme:
                     Theme.description = Theme.colors.get("description").get("EN")
                     if Theme.description == None:
                         Theme.description = ""
-            Debug.Log(f"THEME_MANAGER: Theme {Theme.theme} loaded.")
+            Logger.LogMessage(f"THEME_MANAGER: Theme {Theme.theme} loaded.")
 
     @staticmethod
     def get_color(selector):
