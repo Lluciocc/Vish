@@ -193,6 +193,8 @@ theme_detail:
     PALETTE-BACKGROUND:                         "BACKGROUND"
     PALETTE-BACKGROUND_ALTERNATE:               "BACKGROUND"
     PALETTE-BACKGROUND_HOVER:                   "CUSTOM_ACCENT"
+    PALETTE-BORDER_SELECTION:                   "CUSTOM_ACCENT"
+    PALETTE-TEXT_SELECTION:                     "FONT"
     PALETTE-BORDER:                             "CONTRAST"
     PALETTE-SEPARATOR:                          "FONT"
 

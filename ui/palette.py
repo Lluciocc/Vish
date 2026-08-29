@@ -249,7 +249,8 @@ def tree_style() -> str:
             }}
             CustomQTreeWidget::item:focus,
             CustomQTreeWidget::item:selected {{
-                border: 1px solid {Theme.get_color("PALETTE-BACKGROUND_HOVER")};
+                border: 1px solid {Theme.get_color("PALETTE-BORDER_SELECTION")};
+                color: {Theme.get_color("PALETTE-TEXT_SELECTION")};
                 border-radius: 6px;
             }}
             CustomQTreeWidget::item:hover{{
