@@ -36,7 +36,7 @@ from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
 from PySide6.QtGui import QIcon, QKeySequence
 from nodes.variable_nodes import FileExistsNode
 from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog, QHBoxLayout,
-                               QMainWindow, QMenu, QMessageBox, QPushButton, QSplitter,
+                               QMainWindow, QMenu, QPushButton, QSplitter,
                                QTextEdit, QToolButton, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
 from ui.about.about import AboutDialog
@@ -44,6 +44,7 @@ from ui.comment_box import CommentBoxItem, COMMENT_Z_BASE
 from ui.graph_view import GraphView
 from ui.keyboard_shortcuts import KeyboardShortcutsDialog
 from ui.main_style import Style
+from ui.modal import Modal
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
 from ui.welcome import WelcomeScreen
@@ -338,13 +339,8 @@ class VisualBashEditor(QMainWindow):
         try:
             self.graph, comments, viewport = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
-            msg_box = QMessageBox()
-            msg_box.setText(
-                f"Project contains unknown node type: '{e.args[0][1]}'\n"
-                "Please check if a newer version of this tool is available."
-            )
-            msg_box.setIcon(QMessageBox.Icon.Critical)
-            msg_box.exec()
+            text = f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available."
+            Modal.create("unknown_nodes", None, text)
             raise
 
         splitter = self.graph_view.parent()

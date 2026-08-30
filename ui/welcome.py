@@ -25,11 +25,11 @@ from pathlib import Path
 from PySide6.QtCore import Qt, QSize, Signal
 from PySide6.QtGui import QFont, QKeySequence, QColor, QShortcut
 from PySide6.QtWidgets import (QAbstractItemView, QDialog, QFileDialog, QHBoxLayout,
-                               QInputDialog, QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QMessageBox, QPushButton, QVBoxLayout, QWidget)
+                               QLabel, QLineEdit, QListWidget, QListWidgetItem,
+                               QPushButton, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
 import json
-
+from ui.modal import Modal
 
 class ClickableLabel(QLabel):
     clicked = Signal()
@@ -311,34 +311,12 @@ class WelcomeScreen(QDialog):
             self.populate_recent_projects()
 
         except Exception as e:
-            info = QMessageBox()
-            info.setIcon(QMessageBox.Critical)
-            info.setWindowTitle("Error")
-            info.setText(str(e))
-            info.setStandardButtons(QMessageBox.Ok)
-            info.setStyleSheet(messagebox_style())
-            ok = info.button(QMessageBox.Ok)
-            ok.setStyleSheet(pushbutton_style())
-            info.exec_()
+            Modal.create("critical_exception", None, str(e))
 
     def _remove_recent(self, path_str: str):
-        question = QMessageBox()
-        question.setIcon(QMessageBox.Warning)
-        question.setWindowTitle(Traduction.get_trad("remove_recent", "Remove from recents"))
-        question.setText(Traduction.get_trad("remove_recent_question", "Do you want to remove this project from the recent list?"))
-        question.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        question.setStyleSheet(messagebox_style())
-
-        no = question.button(QMessageBox.No)
-        no.setStyleSheet(pushbutton_style())
-        yes = question.button(QMessageBox.Yes)
-        yes.setStyleSheet(pushbutton_style())
-
-        question.setDefaultButton(QMessageBox.No)
-        question.exec_()
-
-        if question.clickedButton() == no:
+        if Modal.create("remove_project") != "yes":
             return
+
         recents = self.project_manager.get_recent_projects()
         if path_str in recents:
             recents.remove(path_str)
@@ -356,32 +334,18 @@ class WelcomeScreen(QDialog):
         self.project_manager.remove_project(Path(path_str))
 
     def create_project(self):
-
-        name = QInputDialog()
-        name.setWindowTitle(Traduction.get_trad("new_project_name", "Project Name"))
-        name.setLabelText(Traduction.get_trad("new_project_enter_name", "Enter project name:"))
-        name.setFixedWidth(500)
-        name.setStyleSheet(input_dialog_style())
-
-        if name.exec_() != QInputDialog.Accepted or not name.textValue().strip():
+        name = Modal.create("create_project")
+        if not name.strip() or name == "interrupt":
             return
 
         base_dir = Path(self.project_manager.config_dir) / "projects"
-        project_dir = base_dir / name.textValue().strip()
+        project_dir = base_dir / name.strip()
 
         try:
-            self.project_manager.create_project(project_dir, name.textValue().strip())
+            self.project_manager.create_project(project_dir, name.strip())
             self.accept()
         except Exception as e:
-            info = QMessageBox()
-            info.setIcon(QMessageBox.Critical)
-            info.setWindowTitle("Error")
-            info.setText(str(e))
-            info.setStandardButtons(QMessageBox.Ok)
-            info.setStyleSheet(messagebox_style())
-            ok = info.button(QMessageBox.Ok)
-            ok.setStyleSheet(pushbutton_style())
-            info.exec_()
+            Modal.create("critical_exception", None, str(e))
 
     def open_project(self):
         directory = QFileDialog.getExistingDirectory(
@@ -396,15 +360,7 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(directory))
             self.accept()
         except Exception as e:
-            info = QMessageBox()
-            info.setIcon(QMessageBox.Critical)
-            info.setWindowTitle("Error")
-            info.setText(str(e))
-            info.setStandardButtons(QMessageBox.Ok)
-            info.setStyleSheet(messagebox_style())
-            ok = info.button(QMessageBox.Ok)
-            ok.setStyleSheet(pushbutton_style())
-            info.exec_()
+            Modal.create("critical_exception", None, str(e))
 
     def open_recent(self, item):
         if item is None or item.flags() == Qt.NoItemFlags:
@@ -420,15 +376,7 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(path))
             self.accept()
         except Exception as e:
-            info = QMessageBox()
-            info.setIcon(QMessageBox.Critical)
-            info.setWindowTitle("Error")
-            info.setText(str(e))
-            info.setStandardButtons(QMessageBox.Ok)
-            info.setStyleSheet(messagebox_style())
-            ok = info.button(QMessageBox.Ok)
-            ok.setStyleSheet(pushbutton_style())
-            info.exec_()
+            Modal.create("critical_exception", None, str(e))
 
     def _apply_theme(self):
         self.recent_label.setStyleSheet(label_recent_style())
@@ -562,51 +510,5 @@ def pushbutton_style() -> str:
                 background: {Theme.get_color("WELCOME-PUSHBUTTON_BACKGROUND_HOVER")};
                 border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER_HOVER")};
                 outline: none;
-            }}
-        """
-
-def messagebox_style() -> str:
-    return f"""
-                background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
-                color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-        """
-
-def input_dialog_style() -> str:
-    return f"""
-            QInputDialog {{
-                background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
-            }}
-            QLabel {{
-                color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-            }}
-            QPushButton {{
-                color: {Theme.get_color("WELCOME-PUSHBUTTON_TEXT")};
-                border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER")};
-                outline: none;
-                font-size: 15px;
-                border-radius: 5px;
-                min-width: 60px;
-                padding: 3px 5px;
-            }}
-            QPushButton:focus,
-            QPushButton:selected,
-            QPushButton:hover {{
-                background: {Theme.get_color("WELCOME-PUSHBUTTON_BACKGROUND_HOVER")};
-                border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER_HOVER")};
-                outline: none;
-            }}
-            QLineEdit {{
-                border: 1px solid {Theme.get_color("WELCOME-LINEEDIT_BORDER")};
-                border-radius: 5px;
-                padding: 3px 5px;
-                color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-                background: {Theme.get_color("WELCOME-LINEEDIT_BACKGROUND")};
-                selection-background-color: {Theme.get_color("WELCOME-LINEEDIT_SELECTION")};
-                selection-color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-            }}
-            QLineEdit:focus,
-            QLineEdit:selected,
-            QLineEdit:hover {{
-                border-color: {Theme.get_color("WELCOME-LINEEDIT_BORDER_HOVER")};
             }}
         """

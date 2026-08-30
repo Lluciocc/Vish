@@ -24,9 +24,10 @@ from core.traduction import Traduction
 from PySide6.QtCore import Property, QPropertyAnimation, Qt, Signal
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout,
-                               QLabel, QPushButton, QLineEdit, QMessageBox,
+                               QLabel, QPushButton, QLineEdit,
                                QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
+from ui.modal import Modal
 import os
 import shutil
 
@@ -279,27 +280,9 @@ class SettingsDialog(QDialog):
 
         for temp_file in temp_list:
             if file_name == temp_file:
-                question = QMessageBox()
-                question.setIcon(QMessageBox.Question)
-                question.setWindowTitle("Theme already existing")
-                question.setText(f"Theme with file name {temp_file} exists.\n\n How do you want to approach?\n")
-                question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes | QMessageBox.Ok)
-                question.setStyleSheet(messagebox_style())
-
-                rename = question.button(QMessageBox.Ok)
-                rename.setStyleSheet(pushbutton_style())
-                rename.setText("Rename File")
-                overwrite = question.button(QMessageBox.Yes)
-                overwrite.setStyleSheet(pushbutton_style())
-                overwrite.setText("Overwrite File")
-                cancel = question.button(QMessageBox.Cancel)
-                cancel.setStyleSheet(pushbutton_style())
-                cancel.setText("Cancel")
-
-                question.setDefaultButton(QMessageBox.Cancel)
-                question.exec_()
-
-                if question.clickedButton() == rename:
+                text = f"Theme with file name {temp_file} exists.\n\n How do you want to approach?\n"
+                question = Modal.create("import_theme_exist", None, text)
+                if question == "ok":
                     index = 0
                     terms = temp_file.rsplit("_")
                     while index < len(temp_list):
@@ -316,7 +299,7 @@ class SettingsDialog(QDialog):
                     self.theme_combo.setCurrentIndex(self.theme_combo.count() - 1)
                     return
 
-                elif question.clickedButton() == overwrite:
+                elif question == "yes":
                     try:
                         shutil.copy(path, config_theme_path+file_name)
                     except Exception as exception:
@@ -336,45 +319,18 @@ class SettingsDialog(QDialog):
 
         for theme in themes:
             if name == theme:
-                question = QMessageBox()
-                question.setIcon(QMessageBox.Warning)
-                question.setWindowTitle("Delete Theme")
-                question.setText(f"Theme {name} will be deleted.\n\n Are you sure?\n")
-                question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes)
-                question.setStyleSheet(messagebox_style())
-
-                delete = question.button(QMessageBox.Yes)
-                delete.setStyleSheet(pushbutton_style())
-                delete.setText("Delete File")
-                cancel = question.button(QMessageBox.Cancel)
-                cancel.setStyleSheet(pushbutton_style())
-                cancel.setText("Cancel")
-
-                question.setDefaultButton(QMessageBox.Cancel)
-                question.exec_()
-
-                if question.clickedButton() == delete:
+                text = f"Theme {name} will be deleted.\n\n Are you sure?\n"
+                if Modal.create("delete_theme", None, text) == "yes":
                     os.remove(Info.get_config_path()+"/themes/"+theme)
                     self._populate_theme_combo(True)
                     self.theme_combo.setCurrentIndex(0)
-                    return
+                return
 
-        information = QMessageBox()
-        information.setIcon(QMessageBox.Information)
-        information.setWindowTitle("Delete Theme")
         if "_" in name:
-            information.setText(f"Theme {name} not found in config directory.\n")
+            text = f"Theme {name} not found in config directory.\n"
         else:
-            information.setText(f"Standard theme {name} cannot be deleted.\n")
-        information.setStandardButtons(QMessageBox.Ok)
-        information.setStyleSheet(f"background: {Theme.get_color("SETTINGS-BACKGROUND")}")
-
-        ok = information.button(QMessageBox.Ok)
-        ok.setStyleSheet(pushbutton_style())
-        ok.setText("Okay")
-
-        information.setDefaultButton(QMessageBox.Ok)
-        information.exec_()
+            text = f"Standard theme {name} cannot be deleted.\n"
+        Modal.create("delete_theme_not_exist", None, text)
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
@@ -394,20 +350,14 @@ class SettingsDialog(QDialog):
             return
         if new_value == Config.CUSTOM_SHEBANG:
             return
-        reply = QMessageBox.warning(
-            self, "Warning",
-            "Changing the shebang may break script execution on some systems.\n\n"
-            "Are you sure you know what you are doing?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-        if reply == QMessageBox.No:
-            self.shebang_input.setText(Config.CUSTOM_SHEBANG)
-            Logger.LogWarning(f"Custom shebang change cancelled.")
+
+        if Modal.create("shebang_change") == "yes":
+            Config.CUSTOM_SHEBANG = new_value
+            ConfigManager.save_config()
+            Logger.LogMessage(f"Custom shebang changed to: {new_value}")
             return
-        Config.CUSTOM_SHEBANG = new_value
-        ConfigManager.save_config()
-        Logger.LogMessage(f"Custom shebang changed to: {new_value}")
+        self.shebang_input.setText(Config.CUSTOM_SHEBANG)
+        Logger.LogWarning(f"Custom shebang change cancelled.")
 
     def refresh_ui_texts(self):
         self.setWindowTitle(Traduction.get_trad("settings", "Settings"))
@@ -518,12 +468,6 @@ class Switch(QWidget):
 
     offset = Property(int, getOffset, setOffset)
 
-
-def messagebox_style() -> str:
-    return f"""
-                background: {Theme.get_color("SETTINGS-MESSAGEBOX_BACKGROUND")};
-                color: {Theme.get_color("SETTINGS-MESSAGEBOX_TEXT")};
-        """
 
 def label_style() -> str:
     return f"""

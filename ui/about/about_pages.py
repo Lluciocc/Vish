@@ -22,38 +22,19 @@ from core.serializer import Serializer
 from core.traduction import Traduction
 from PySide6.QtCore import Qt
 from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import QApplication, QHBoxLayout, QLabel, QMessageBox, QSizePolicy, QTextBrowser, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QLabel, QSizePolicy, QTextBrowser, QVBoxLayout, QWidget
 from themes.theme_manager import Theme
+from ui.modal import Modal
 import webbrowser
 
 
 def open_link_box(link_name, link):
-    question = QMessageBox()
-    question.setIcon(QMessageBox.Question)
-    question.setWindowTitle("Theme already existing")
-    question.setText(f"Do you want to open: {link_name}?\n\n{link}\n")
-    question.setStandardButtons(QMessageBox.Cancel | QMessageBox.Yes | QMessageBox.Ok)
-    question.setStyleSheet(f"""
-                           background: {Theme.get_color("ABOUT_PAGES-MESSAGEBOX_BACKGROUND")};
-                           color: {Theme.get_color("ABOUT_PAGES-MESSAGEBOX_TEXT")};
-                        """)
+    text = f"Do you want to open: {link_name}?\n\n{link}\n"
+    question = Modal.create("open_link", None, text)
 
-    copy = question.button(QMessageBox.Ok)
-    copy.setStyleSheet(message_pushbutton_style())
-    copy.setText("Copy Link")
-    open = question.button(QMessageBox.Yes)
-    open.setStyleSheet(message_pushbutton_style())
-    open.setText("Open Link")
-    cancel = question.button(QMessageBox.Cancel)
-    cancel.setStyleSheet(message_pushbutton_style())
-    cancel.setText("Cancel")
-
-    question.setDefaultButton(QMessageBox.Cancel)
-    question.exec_()
-
-    if question.clickedButton() == open:
+    if question == "yes":
         webbrowser.open(link)
-    elif question.clickedButton() == copy:
+    elif question == "ok":
         QApplication.clipboard().setText(link)
 
 
@@ -286,25 +267,6 @@ def pushbutton_style() -> str:
             QWidget#AboutRow QLabel {{
                 background: transparent;
                 color: {Theme.get_color("ABOUT_PAGES-LABEL_TEXT")};
-            }}
-        """
-
-def message_pushbutton_style() -> str:
-    return f"""
-            QPushButton {{
-                color: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_TEXT")};
-                border: 1px solid {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER")};
-                border-radius: 5px;
-                min-width: 60px;
-                padding: 3px 5px;
-                background: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND")};
-            }}
-            QPushButton:focus,
-            QPushButton:selected,
-            QPushButton:hover {{
-                border-color: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BORDER_HOVER")};
-                background: {Theme.get_color("ABOUT_PAGES-MESSAGE_PUSHBUTTON_BACKGROUND_HOVER")};
-                outline: none;
             }}
         """
 
