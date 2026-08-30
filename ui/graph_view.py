@@ -747,8 +747,6 @@ class GraphView(QGraphicsView):
         self.zoom_out_button.setStyleSheet(zoom_button_style())
         self.zoom_label.setStyleSheet(zoom_label_style())
         self.frame_button.setIcon(self.get_icon("frame"))
-#        self.frame_button.setIcon(self.get_icon("frame"))                  #TODO: required?
-#        self.viewport().update()
 
 
 def frame_button_style() -> str:
