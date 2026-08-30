@@ -99,7 +99,7 @@
     "modal_title_error": "Error",
     "modal_title_remove_recent": "Remove from recents",
     "modal_remove_recent_question": "Do you want to remove this project from the recent list?",
-    "modal_new_project_name": "New Project",
+    "modal_new_project": "New Project",
     "modal_new_project_enter_name": "Enter project name:",
     "modal_title_import_theme_exist": "Theme is already existing",
     "modal_rename_file": "Rename File",

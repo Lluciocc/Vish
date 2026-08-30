@@ -5,6 +5,7 @@
     "error_cannot_save_empty_graph": "Impossibile salvare un grafico vuoto.",
     "graph_saved_successfully": "Grafico salvato su {file_path} con {node_count} nodi e {edge_count} lati.",
     "graph_loaded_successfully": "Grafico caricato da {file_path} con {node_count} nodi e {edge_count} lati.",
+
     "running_windows": "Non è possibile eseguire lo script su Windows.",
     "no_bash_script": "Nessun script bash trovato per eseguire il grafico.",
     "running_generated_bash_script": "Eseguendo script bash generato...",
@@ -16,6 +17,15 @@
     "button_load": "Carica",
     "button_run_bash": "Esegui Script Bash",
     "button_copy_clipboard": "Copia negli appunto",
+
+
+
+
+
+
+
+
+
 
     "settings": "Impostazioni",
     "appearance": "Aspetto",
@@ -30,6 +40,11 @@
     "full_screen": "Schermo intero",
     "close": "Chiudi",
 
+
+
+
+
+
     "about": "Informazioni",
     "app_name": "Visual Bash Editor",
     "app_tagline": "Un modo visuale per costruzione script in Bash",
@@ -38,9 +53,12 @@
     "about_report": "Riporta un problema",
     "about_credits": "Crediti",
     "about_legal": "Informazioni legalii",
+
     "about_whats_new": "Che c'è di nuovo?",
     "about_questions": "FAQ",
     "about_support": "Supporta il progetto",
+
+
 
     "keyboard_shortcuts": "Scorciatoie da tastiera",
     "general": "Generale",
@@ -62,6 +80,38 @@
     "shortcut_comment_box": "Crea casella dei commenti",
     "shortcut_auto_layout": "Organizza grafico automaticamente",
     "shortcut_rebuild_graph": "Ricostruisci grafico",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     "Commands": "Comandi",
     "Flow": "Flusso",
@@ -211,5 +261,50 @@
     "to_int": "Converti in intero",
     "to_int_label": "Converti in intero",
     "to_int_desc": "Converti un valore in un numero intero.",
-    "to_int_tooltip": "Trasforma un valore in un intero."
+    "to_int_tooltip": "Trasforma un valore in un intero.",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

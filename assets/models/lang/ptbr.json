@@ -20,15 +20,11 @@
     "more_options": "Mais opções",
 
     "never_modified": "Nunca salvo",
-    "remove_recent": "Remover de recentes",
     "welcome_title": "Bem-vindo",
     "welcome_recent_projects": "Projetos Recentes",
-    "welcome_new_project": "Novo Projeto",
     "welcome_open_project": "Abrir Projeto",
     "no_recent_projects": "Nenhum projeto recente",
-    "remove_recent_question": "Deseja remover esse projeto da lista de recentes?",
     "new_project_name": "Nome do Projeto",
-    "new_project_enter_name": "Informe o nome do projeto:",
     "select_project_folder": "Selecionar Pasta do Projeto",
 
     "settings": "Configurações",
@@ -43,6 +39,9 @@
     "custom_shebang": "Shebang Personalizado",
     "full_screen": "Tela Cheia",
     "close": "Fechar",
+
+
+
     "import_theme": "Importar",
     "delete_theme": "Excluir",
 
@@ -92,6 +91,27 @@
     "shortcut_removing_mode": "Modo de remoção",
     "shortcut_reset_zoom": "Redefinir zoom",
     "shortcut_save_log_file": "Salvar arquivo de log",
+
+
+
+
+
+
+    "modal_title_remove_recent": "Remover de recentes",
+    "modal_remove_recent_question": "Deseja remover esse projeto da lista de recentes?",
+    "modal_new_project": "Novo Projeto",
+    "modal_new_project_enter_name": "Informe o nome do projeto:",
+
+
+
+
+
+
+
+
+
+
+
 
     "Commands": "Comandos",
     "Flow": "Fluxo",
@@ -286,5 +306,5 @@
     "open_website": "Abrir website",
     "open_website_label": "Abrir website",
     "open_website_desc": "Abre uma URL especificada no navegador padrão.",
-    "open_website_tooltip": "Abre uma URL no navegador."
+    "open_website_tooltip": "Abre uma URL no navegador.",
 }

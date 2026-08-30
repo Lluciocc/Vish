@@ -5,6 +5,7 @@
     "error_cannot_save_empty_graph": "No se puede guardar un grafo vacío.",
     "graph_saved_successfully": "Grafo guardado en {file_path} con {node_count} nodos y {edge_count} aristas.",
     "graph_loaded_successfully": "Grafo cargado desde {file_path} con {node_count} nodos y {edge_count} aristas.",
+
     "running_windows": "No es posible ejecutar el script en Windows.",
     "no_bash_script": "No se encontró ningún script bash para ejecutar el grafo.",
     "running_generated_bash_script": "Ejecutando el script bash generado...",
@@ -17,7 +18,15 @@
     "button_run_bash": "Ejecutar script Bash",
     "button_copy_clipboard": "Copiar al portapapeles",
 
-    "about": "Acerca de",
+
+
+
+
+
+
+
+
+
     "settings": "Configuración",
     "appearance": "Apariencia",
     "theme": "Tema",
@@ -31,8 +40,15 @@
     "full_screen": "Pantalla completa",
     "close": "Cerrar",
 
+
+
+
+
+
+    "about": "Acerca de",
     "app_name": "Visual Bash Editor",
     "app_tagline": "Una forma visual de crear scripts Bash",
+
     "about_website": "Sitio web",
     "about_report": "Reportar un problema",
     "about_credits": "Créditos",
@@ -41,6 +57,8 @@
     "about_whats_new": "Novedades",
     "about_questions": "Preguntas frecuentes",
     "about_support": "Apoya el proyecto",
+
+
 
     "keyboard_shortcuts": "Atajos de teclado",
     "general": "General",
@@ -62,6 +80,38 @@
     "shortcut_comment_box": "Crear cuadro de comentario",
     "shortcut_auto_layout": "Organizar automáticamente el grafo",
     "shortcut_rebuild_graph": "Reconstruir grafo",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     "Commands": "Comandos",
     "Flow": "Flujo",
@@ -211,5 +261,50 @@
     "to_int": "Convertir a entero",
     "to_int_label": "Convertir a entero",
     "to_int_desc": "Convierte un valor en un número entero.",
-    "to_int_tooltip": "Transforma un valor en entero."
+    "to_int_tooltip": "Transforma un valor en entero.",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

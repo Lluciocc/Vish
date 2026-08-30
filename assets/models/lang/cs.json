@@ -20,15 +20,11 @@
     "more_options": "Další možnosti",
 
     "never_modified": "Nikdy uloženo",
-    "remove_recent": "Odebrat z posledních",
     "welcome_title": "Vítejte",
     "welcome_recent_projects": "Poslední projekty",
-    "welcome_new_project": "Nový projekt",
     "welcome_open_project": "Otevřít projekt",
     "no_recent_projects": "Žádné poslední projekty",
-    "remove_recent_question": "Chcete odebrat tento projekt ze seznamu posledních?",
     "new_project_name": "Název projektu",
-    "new_project_enter_name": "Zadejte název projektu:",
     "select_project_folder": "Vyberte složku projektu",
 
     "settings": "Nastavení",
@@ -44,6 +40,11 @@
     "full_screen": "Celá obrazovka",
     "close": "Zavřít",
 
+
+
+
+
+
     "about": "O aplikaci",
     "app_name": "Vizuální Bash Editor",
     "app_tagline": "Vizuální způsob vytváření Bash skriptů",
@@ -52,10 +53,12 @@
     "about_report": "Nahlásit problém",
     "about_credits": "Zásluhy",
     "about_legal": "Právní informace",
+
     "about_whats_new": "Co je nového?",
     "about_questions": "Časté dotazy",
     "about_support": "Podpořit projekt",
     "about_theme_repo": "Repozitář témat",
+
 
     "keyboard_shortcuts": "Klávesové zkratky",
     "general": "Obecné",
@@ -86,6 +89,29 @@
     "shortcut_zoom_out": "Oddálit",
     "shortcut_reconnection_mode": "Režim připojování",
     "shortcut_removing_mode": "Režim odstraňování",
+
+
+
+
+
+
+
+
+    "modal_title_remove_recent": "Odebrat z posledních",
+    "modal_remove_recent_question": "Chcete odebrat tento projekt ze seznamu posledních?",
+    "modal_new_project": "Nový projekt",
+    "modal_new_project_name": "Zadejte název projektu:",
+
+
+
+
+
+
+
+
+
+
+
 
     "Commands": "Příkazy",
     "Flow": "Tok",
@@ -235,5 +261,50 @@
     "to_int": "Převést na celé číslo",
     "to_int_label": "Převést na celé číslo",
     "to_int_desc": "Převede hodnotu na celé číslo.",
-    "to_int_tooltip": "Transformuje hodnotu na celé číslo."
+    "to_int_tooltip": "Transformuje hodnotu na celé číslo.",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

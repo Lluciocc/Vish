@@ -9,7 +9,7 @@
     "running_windows": "Il n'est pas possible d'exécuter le script sur Windows.",
     "no_bash_script": "Aucun script bash trouvé pour exécuter le graphe.",
     "running_generated_bash_script": "Exécution du script bash généré...",
-    "add_node":"Ajouter un noeud",
+    "add_node": "Ajouter un noeud",
     "search_nodes": "Rechercher...",
     "lang_set": "La langue a été mise à jour vers {lang}",
     "button_generate_bash": "Générer le script Bash",
@@ -19,17 +19,12 @@
     "button_copy_clipboard": "Copier dans le presse-papiers",
     "more_options": "Plus d'options",
 
-    "about": "À propos",
     "never_modified": "Jamais enregistré",
-    "remove_recent": "Retirer des récents",
     "welcome_title": "Bienvenue",
     "welcome_recent_projects": "Projets récents",
-    "welcome_new_project": "Nouveau projet",
     "welcome_open_project": "Ouvrir un projet",
     "no_recent_projects": "Aucun projet récent",
-    "remove_recent_question": "Voulez-vous retirer ce projet de la liste des récents ?",
     "new_project_name": "Nom du projet",
-    "new_project_enter_name": "Saisir le nom du projet :",
     "select_project_folder": "Sélectionner le dossier du projet",
 
     "settings": "Paramètres",
@@ -44,9 +39,13 @@
     "custom_shebang": "Shebang personnalisé",
     "full_screen": "Plein écran",
     "close": "Fermer",
+
+
+
     "import_theme": "Importer",
     "delete_theme": "Supprimer",
 
+    "about": "À propos",
     "app_name": "Visual Bash Editor",
     "app_tagline": "Une manière visuelle de créer des scripts Bash",
 
@@ -54,12 +53,12 @@
     "about_report": "Signaler un problème",
     "about_credits": "Crédits",
     "about_legal": "Mentions légales",
+    "about_legal_text": "Ce logiciel est fourni tel quel, sans aucune garantie.",
     "about_whats_new": "Quoi de neuf?",
     "about_questions": "FAQs",
     "about_support": "Soutenir le projet",
     "about_theme_repo": "Dépôt de collection de thèmes",
     "about_matrix": "Rejoindre notre salon Matrix",
-    "about_legal_text": "Ce logiciel est fourni tel quel, sans aucune garantie.",
 
     "keyboard_shortcuts": "Raccourcis clavier",
     "general": "Général",
@@ -92,6 +91,26 @@
     "shortcut_removing_mode": "Mode suppression",
     "shortcut_reset_zoom": "Réinitialiser le zoom",
     "shortcut_save_log_file": "Enregistrer le fichier journal",
+
+
+
+
+
+
+    "modal_title_remove_recent": "Retirer des récents",
+    "modal_remove_recent_question": "Voulez-vous retirer ce projet de la liste des récents ?",
+    "modal_new_project": "Nouveau projet",
+    "modal_new_project_enter_name": "Saisir le nom du projet :",
+
+
+
+
+
+
+
+
+
+
 
 
     "Commands": "Commandes",

@@ -5,6 +5,7 @@
     "error_cannot_save_empty_graph": ".لا يمكن حفظ رسم بياني فارغ",
     "graph_saved_successfully": "الرسم البياني حفظ في{file_path} مع {node_count} عقد و {edge_count} حواف.",
     "graph_loaded_successfully": "تم تحميل المخطط من {file_path} بـ {node_count} عقدة و {edge_count} حافة.",
+
     "running_windows": "لا يمكن تشغيل البرمجية على نظام ويندوز.",
     "no_bash_script": ".لم يتم العثور على ملف لتشغيل المخطط",
     "running_generated_bash_script": "...جاري تشغيل نص البرمجي المُنشأ",
@@ -16,6 +17,15 @@
     "button_load": "تحميل",
     "button_run_bash": "تشغيل Bash Script",
     "button_copy_clipboard": "Clipboard نسخ إلى",
+
+
+
+
+
+
+
+
+
 
     "settings": "الإعدادات",
     "appearance": "المظهر",
@@ -30,6 +40,11 @@
     "full_screen": "ملء الشاشة",
     "close": "إغلاق",
 
+
+
+
+
+
     "about": "حول",
     "app_name": "Bashالمحرر المرئي ل",
     "app_tagline": "Bashطريقة مرئية لبناء البرامج النصية ل",
@@ -38,9 +53,12 @@
     "about_report": "الإبلاغ عن مشكلة",
     "about_credits": "المشاركين",
     "about_legal": "القانوني",
+
     "about_whats_new": "ما الجديد ؟",
     "about_questions": "الأسئلة الشائعة",
     "about_support": "ادعم المشروع",
+
+
 
     "keyboard_shortcuts": "اختصارات لوحة المفاتيح",
     "general": "عام",
@@ -54,6 +72,7 @@
     "shortcut_paste": "لصق",
     "shortcut_cut_selection": "قص التحديد",
     "shortcut_undo": "تراجع",
+
     "shortcut_select_all": "تحديد كل العقد",
     "shortcut_duplicate": "تكرار التحديد",
     "shortcut_delete": "حذف العُقد المحددة",
@@ -61,6 +80,38 @@
     "shortcut_comment_box": "إنشاء مربع تعليقات",
     "shortcut_auto_layout": "تخطيط تلقائي للرسم البياني",
     "shortcut_rebuild_graph": "إعادة بناء الرسم البياني",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     "Commands": "الأوامر",
     "Flow": "عمليات",
@@ -210,5 +261,50 @@
     "to_int": "تحويل إلى عدد صحيح",
     "to_int_label": "تحويل إلى عدد صحيح",
     "to_int_desc": ".تحويل قيمة إلى عدد صحيح",
-    "to_int_tooltip": ".تحويل قيمة إلى عدد صحيح"
+    "to_int_tooltip": ".تحويل قيمة إلى عدد صحيح",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

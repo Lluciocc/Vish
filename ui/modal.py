@@ -53,7 +53,7 @@ MODALS = {
     },
     "create_project": {
         "type": "input",
-        "title": ("modal_title_new_project_name", "Project Name"),
+        "title": ("modal_title_new_project", "Project Name"),
         "message": ("new_project_enter_name", "Enter project name:"),
     },
     "import_theme_exist": {
