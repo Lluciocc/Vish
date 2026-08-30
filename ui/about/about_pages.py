@@ -28,9 +28,9 @@ from ui.modal import Modal
 import webbrowser
 
 
-def open_link_box(link_name, link):
+def open_link_box(parent, link_name, link):
     text = f"Do you want to open: {link_name}?\n\n{link}\n"
-    question = Modal.create("open_link", None, text)
+    question = Modal.create("open_link", parent, text)
 
     if question == "yes":
         webbrowser.open(link)
@@ -177,7 +177,7 @@ class AboutMainPage(QWidget):
         g1.add_row(AboutRow(
             Traduction.get_trad("about_website", "Website"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_website", "Website"), "https://lluciocc.fr")
+            lambda: open_link_box(self, Traduction.get_trad("about_website", "Website"), "https://lluciocc.fr")
         ))
         g1.finalize()
 
@@ -185,22 +185,22 @@ class AboutMainPage(QWidget):
         g2.add_row(AboutRow(
             Traduction.get_trad("about_theme_repo", "Themes Collection Repository"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_theme_repo", "Themes Collection Repository"), "https://github.com/Lluciocc/vish-theme-collection")
+            lambda: open_link_box(self, Traduction.get_trad("about_theme_repo", "Themes Collection Repository"), "https://github.com/Lluciocc/vish-theme-collection")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_questions", "Frequently Asked Questions"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_questions", "Frequently Asked Questions"), "https://github.com/Lluciocc/Vish/wiki#faqs")
+            lambda: open_link_box(self, Traduction.get_trad("about_questions", "Frequently Asked Questions"), "https://github.com/Lluciocc/Vish/wiki#faqs")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_report", "Report an Issue"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_report", "Report an Issue"), "https://github.com/Lluciocc/Vish/issues")
+            lambda: open_link_box(self, Traduction.get_trad("about_report", "Report an Issue"), "https://github.com/Lluciocc/Vish/issues")
         ))
         g2.add_row(AboutRow(
             Traduction.get_trad("about_support", "Support the project"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_support", "Support the project"), "https://github.com/Lluciocc/Vish?sponsor=1")
+            lambda: open_link_box(self, Traduction.get_trad("about_support", "Support the project"), "https://github.com/Lluciocc/Vish?sponsor=1")
         ))
         g2.finalize()
 
@@ -218,7 +218,7 @@ class AboutMainPage(QWidget):
         g3.add_row(AboutRow(
             Traduction.get_trad("about_matrix", "Join our Matrix room"),
             "↗",
-            lambda: open_link_box(Traduction.get_trad("about_matrix", "Join our Matrix room"), "https://matrix.to/#/%23vish-support%3Amatrix.org")
+            lambda: open_link_box(self, Traduction.get_trad("about_matrix", "Join our Matrix room"), "https://matrix.to/#/%23vish-support%3Amatrix.org")
         ))
         g3.finalize()
 

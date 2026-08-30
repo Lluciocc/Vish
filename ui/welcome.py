@@ -311,10 +311,10 @@ class WelcomeScreen(QDialog):
             self.populate_recent_projects()
 
         except Exception as e:
-            Modal.create("critical_exception", None, str(e))
+            Modal.create("critical_exception", self, str(e))
 
     def _remove_recent(self, path_str: str):
-        if Modal.create("remove_project") != "yes":
+        if Modal.create("remove_project", self) != "yes":
             return
 
         recents = self.project_manager.get_recent_projects()
@@ -334,7 +334,7 @@ class WelcomeScreen(QDialog):
         self.project_manager.remove_project(Path(path_str))
 
     def create_project(self):
-        name = Modal.create("create_project")
+        name = Modal.create("create_project", self)
         if not name.strip() or name == "interrupt":
             return
 
@@ -345,7 +345,7 @@ class WelcomeScreen(QDialog):
             self.project_manager.create_project(project_dir, name.strip())
             self.accept()
         except Exception as e:
-            Modal.create("critical_exception", None, str(e))
+            Modal.create("critical_exception", self, str(e))
 
     def open_project(self):
         directory = QFileDialog.getExistingDirectory(
@@ -360,7 +360,7 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(directory))
             self.accept()
         except Exception as e:
-            Modal.create("critical_exception", None, str(e))
+            Modal.create("critical_exception", self, str(e))
 
     def open_recent(self, item):
         if item is None or item.flags() == Qt.NoItemFlags:
@@ -376,7 +376,7 @@ class WelcomeScreen(QDialog):
             self.project_manager.load_project(Path(path))
             self.accept()
         except Exception as e:
-            Modal.create("critical_exception", None, str(e))
+            Modal.create("critical_exception", self, str(e))
 
     def _apply_theme(self):
         self.recent_label.setStyleSheet(label_recent_style())

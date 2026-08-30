@@ -281,7 +281,7 @@ class SettingsDialog(QDialog):
         for temp_file in temp_list:
             if file_name == temp_file:
                 text = f"Theme with file name {temp_file} exists.\n\n How do you want to approach?\n"
-                question = Modal.create("import_theme_exist", None, text)
+                question = Modal.create("import_theme_exist", self, text)
                 if question == "ok":
                     index = 0
                     terms = temp_file.rsplit("_")
@@ -320,7 +320,7 @@ class SettingsDialog(QDialog):
         for theme in themes:
             if name == theme:
                 text = f"Theme {name} will be deleted.\n\n Are you sure?\n"
-                if Modal.create("delete_theme", None, text) == "yes":
+                if Modal.create("delete_theme", self, text) == "yes":
                     os.remove(Info.get_config_path()+"/themes/"+theme)
                     self._populate_theme_combo(True)
                     self.theme_combo.setCurrentIndex(0)
@@ -330,7 +330,7 @@ class SettingsDialog(QDialog):
             text = f"Theme {name} not found in config directory.\n"
         else:
             text = f"Standard theme {name} cannot be deleted.\n"
-        Modal.create("delete_theme_not_exist", None, text)
+        Modal.create("delete_theme_not_exist", self, text)
 
     def on_lang_changed(self):
         lang = self.lang_combo.currentData()
@@ -351,7 +351,7 @@ class SettingsDialog(QDialog):
         if new_value == Config.CUSTOM_SHEBANG:
             return
 
-        if Modal.create("shebang_change") == "yes":
+        if Modal.create("shebang_change", self) == "yes":
             Config.CUSTOM_SHEBANG = new_value
             ConfigManager.save_config()
             Logger.LogMessage(f"Custom shebang changed to: {new_value}")

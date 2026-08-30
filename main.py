@@ -340,7 +340,7 @@ class VisualBashEditor(QMainWindow):
             self.graph, comments, viewport = Serializer.deserialize(json_data, self.node_factory)
         except ValueError as e:
             text = f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available."
-            Modal.create("unknown_nodes", None, text)
+            Modal.create("unknown_nodes", self, text)
             raise
 
         splitter = self.graph_view.parent()
