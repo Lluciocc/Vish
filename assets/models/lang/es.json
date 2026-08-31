@@ -261,7 +261,7 @@
     "to_int": "Convertir a entero",
     "to_int_label": "Convertir a entero",
     "to_int_desc": "Convierte un valor en un número entero.",
-    "to_int_tooltip": "Transforma un valor en entero.",
+    "to_int_tooltip": "Transforma un valor en entero."
 
 
 
