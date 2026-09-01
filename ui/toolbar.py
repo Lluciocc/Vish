@@ -32,6 +32,7 @@ class Toolbar(QHBoxLayout):
 
         self.editor = editor
         self.setup_buttons()
+        # icon name + type (also used as config identifier) | setup_button | traduction | signal
         self.TOOLS = {
             "generate_button": [self.generate_button, ("button_generate_bash", "Generate Bash"), self.editor.generate_bash],
             "save_button": [self.save_button, ("button_save", "Save"), self.editor.save_graph],
