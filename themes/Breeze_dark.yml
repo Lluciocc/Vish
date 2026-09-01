@@ -80,7 +80,7 @@ theme_main:
 
 
 theme_detail:
-    MAIN-PUSHBUTTON_BORDER:                     "transparent"
-    MAIN-BUTTON_BORDER:                         "transparent"
+    TOOLBAR-PUSHBUTTON_BORDER:                  "transparent"
+    TOOLBAR-TOOLBUTTON_BORDER:                  "transparent"
     SCROLL_HANDLE:                              "#494B4C"
 

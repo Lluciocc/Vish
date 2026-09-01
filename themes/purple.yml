@@ -65,7 +65,7 @@ theme_detail:
     MAIN-BASHPANEL_BACKGROUND:                  "DARK_BACKGROUND"
     MAIN-BASHPANEL_BORDER:                      "PANEL_BORDER"
 
-    MAIN-TOOLPANALS_BACKGROUND:                 "BACKGROUND"
+    MAIN-TOOLPANELS_BACKGROUND:                 "BACKGROUND"
     MAIN-TOOLPANELS_TEXT:                       "FONT"
     MAIN-TOOLPANELS_SELECT_BACKGROUND:          "CUSTOM_ACCENT"
 
