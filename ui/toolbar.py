@@ -108,8 +108,10 @@ class Toolbar(QHBoxLayout):
             elif isinstance(self.TOOLS[items][0], QPushButton):
                 if text == True:
                     self.TOOLS[items][0].setText(Traduction.get_trad(*self.TOOLS[items][1]))
+                    self.TOOLS[items][0].setToolTip("")
                 else:
                     self.TOOLS[items][0].setText("")
+                    self.TOOLS[items][0].setToolTip(Traduction.get_trad(*self.TOOLS[items][1]))
             else:
                 self.TOOLS[items][0].setText(Traduction.get_trad(*self.TOOLS[items][1]))
 
