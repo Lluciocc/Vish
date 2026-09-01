@@ -77,31 +77,45 @@ class Theme:
     @staticmethod
     def get_color(selector):
         Theme.get_data()
-        color = Theme.colors.get("theme_detail").get(selector)
-        if color == None:
 
+        color = Theme.colors.get("theme_detail").get(selector)
+        if selector == "MAIN-TOOLPANALS_BACKGROUND":
+            print(color)
+        if color == None:
             color = Theme.fallback_colors.get("theme_detail").get(selector)
             if color == None:
                 return None
 
         if QColor.isValidColor(str(color)):
             return color
-        if color == "ACCENT":
-            color = QGuiApplication.palette().accent().color().name()
+        if color.split("-")[0] == "ACCENT":
+            color = Theme.apply_accent_alpha(color)
             return color
         fallback_color = Theme.colors.get("theme_main").get(color)
         if QColor.isValidColor(str(fallback_color)):
             return fallback_color
-        if fallback_color == "ACCENT":
-            fallback_color = QGuiApplication.palette().accent().color().name()
-            return fallback_color
+        if fallback_color.split("-")[0] == "ACCENT":
+            color = Theme.apply_accent_alpha(fallback_color)
+            return color
         fallback_color = Theme.fallback_colors.get("theme_main").get(color)
         if QColor.isValidColor(str(fallback_color)):
             return fallback_color
-        if fallback_color == "ACCENT":
-            fallback_color = QGuiApplication.palette().accent().color().name()
-            return fallback_color
+        if fallback_color.split("-")[0] == "ACCENT":
+            color = Theme.apply_accent_alpha(fallback_color)
+            return color
         return None
+
+    def apply_accent_alpha(color_code):
+        color = QGuiApplication.palette().accent().color().name()
+
+        alpha = 1
+        if "-" in color_code:
+            alpha = float(color_code.split("-")[1])
+            if alpha != 1:
+                alpha = int(round(alpha * 256 - 1))
+                hex_alpha = f"{alpha:02x}"
+                color = "#" + hex_alpha + color.split("#")[1]
+        return color
 
     @staticmethod
     def get_properties(properties, selector):
