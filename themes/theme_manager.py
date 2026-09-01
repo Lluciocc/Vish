@@ -77,43 +77,30 @@ class Theme:
     @staticmethod
     def get_color(selector):
         Theme.get_data()
-
         color = Theme.colors.get("theme_detail").get(selector)
         if color == None:
 
             color = Theme.fallback_colors.get("theme_detail").get(selector)
             if color == None:
                 return None
-            if QColor.isValidColor(str(color)):
-                return color
-            if color == "ACCENT":
-                color = QGuiApplication.palette().accent().color().name()
-                return color
-            color = Theme.colors.get("theme_main").get(color)
-            if QColor.isValidColor(str(color)):
-                return color
-            if color == "ACCENT":
-                color = QGuiApplication.palette().accent().color().name()
-                return color
-            color = Theme.fallback_colors.get("theme_main").get(color)
-            if QColor.isValidColor(str(color)):
-                return color
-            if color == "ACCENT":
-                color = QGuiApplication.palette().accent().color().name()
-                return color
-            return None
 
         if QColor.isValidColor(str(color)):
             return color
         if color == "ACCENT":
             color = QGuiApplication.palette().accent().color().name()
             return color
-        color = Theme.colors.get("theme_main").get(color)
-        if QColor.isValidColor(str(color)):
-            return color
-        if color == "ACCENT":
-            color = QGuiApplication.palette().accent().color().name()
-            return color
+        fallback_color = Theme.colors.get("theme_main").get(color)
+        if QColor.isValidColor(str(fallback_color)):
+            return fallback_color
+        if fallback_color == "ACCENT":
+            fallback_color = QGuiApplication.palette().accent().color().name()
+            return fallback_color
+        fallback_color = Theme.fallback_colors.get("theme_main").get(color)
+        if QColor.isValidColor(str(fallback_color)):
+            return fallback_color
+        if fallback_color == "ACCENT":
+            fallback_color = QGuiApplication.palette().accent().color().name()
+            return fallback_color
         return None
 
     @staticmethod
