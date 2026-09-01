@@ -755,13 +755,14 @@ def frame_button_style() -> str:
                 background: {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BACKGROUND")};
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BORDER")};
                 border-radius: 6px;
+                outline: none;
             }}
-            QPushButton:focus,
-            QPushButton:selected,
             QPushButton:hover {{
                 background: {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BACKGROUND_HOVER")};
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BORDER_HOVER")};
-                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("GRAPH_VIEW-FRAMEBUTTON_BACKGROUND_PRESSED")};
             }}
         """
 
@@ -788,14 +789,14 @@ def zoom_button_style() -> str:
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BORDER")};
                 color: {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_TEXT")};
                 border-radius: 3px;
+                outline: none;
             }}
-            QPushButton:focus,
-            QPushButton:selected,
             QPushButton:hover {{
                 background: {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BACKGROUND_HOVER")};
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMBUTTON_BORDER_HOVER")};
-                border-radius: 3px;
-                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("GRAPH_VIEW-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """
 
@@ -814,9 +815,10 @@ def zoom_slider_style() -> str:
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER")};
                 border-radius: 7px;
             }}
-            QSlider::handle:horizontal:focus,
-            QSlider::handle:horizontal:selected,
             QSlider::handle:horizontal:hover {{
                 border: 1px solid {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_HOVER")};
+            }}
+            QSlider::handle:horizontal:pressed {{
+                background: {Theme.get_color("GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_PRESSED")};
             }}
         """

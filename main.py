@@ -66,7 +66,6 @@ class NodeFactory:
         return entry["class"]() if entry else None
 
 
-
 class VisualBashEditor(QMainWindow):
     def __init__(self):
         super().__init__()

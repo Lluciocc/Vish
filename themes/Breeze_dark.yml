@@ -65,6 +65,7 @@ theme_main:
     FONT_INVERT:            "#030303"
     DISABLED:               "#5e5e5e"
     CUSTOM_ACCENT:          "ACCENT"
+    CUSTOM_ALPHA_ACCENT:    "ACCENT-0.45"
     INVALID:                "#d4001c"
 
     # NODES DEFAULT COLORS
@@ -83,4 +84,5 @@ theme_detail:
     TOOLBAR-PUSHBUTTON_BORDER:                  "transparent"
     TOOLBAR-TOOLBUTTON_BORDER:                  "transparent"
     SCROLL_HANDLE:                              "#494B4C"
+    GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_PRESSED: "#672141"
 

@@ -93,7 +93,8 @@ class PropertyPanel(QWidget):
                 widget.deleteLater()
 
     def _apply_theme(self):
-        self.title.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-TITLELABEL_TEXT")}")
+        if self.findChild(QLabel):
+            self.title.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-TITLELABEL_TEXT")}")
         for widget in self.layout.parent().children():
             if isinstance(widget, QLabel):
                 widget.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-LABEL_TEXT")}")
@@ -106,10 +107,14 @@ class PropertyPanel(QWidget):
 def lineedit_style() -> str:
     return f"""
             QLineEdit {{
-                selection-background-color: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_SELECT_BACKGROUND")};
+                color: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_TEXT")};
+                border: 1px solid {Theme.get_color("PROPERTY_PANEL-LINEEDIT_BORDER")};
+                border-radius: 5px;
+                padding: 3px 5px;
+                background: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_BACKGROUND")};
+                selection-background-color: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_SELECTION")};
+                selection-color: {Theme.get_color("PROPERTY_PANEL-LINEEDIT_SELECTION_TEXT")};
             }}
-            QLineEdit:focus,
-            QLineEdit:selected,
             QLineEdit:hover {{
                 border: 1px solid {Theme.get_color("PROPERTY_PANEL-LINEEDIT_BORDER_HOVER")};
             }}

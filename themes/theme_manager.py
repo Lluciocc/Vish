@@ -79,8 +79,6 @@ class Theme:
         Theme.get_data()
 
         color = Theme.colors.get("theme_detail").get(selector)
-        if selector == "MAIN-TOOLPANALS_BACKGROUND":
-            print(color)
         if color == None:
             color = Theme.fallback_colors.get("theme_detail").get(selector)
             if color == None:

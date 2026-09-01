@@ -503,12 +503,13 @@ def pushbutton_style() -> str:
                 border-radius: 5px;
                 min-width: 60px;
                 padding: 3px 5px;
+                outline: none;
             }}
-            QPushButton:focus,
-            QPushButton:selected,
             QPushButton:hover {{
                 background: {Theme.get_color("WELCOME-PUSHBUTTON_BACKGROUND_HOVER")};
                 border: 1px solid {Theme.get_color("WELCOME-PUSHBUTTON_BORDER_HOVER")};
-                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("WELCOME-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """

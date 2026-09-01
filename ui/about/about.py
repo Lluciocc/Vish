@@ -160,18 +160,19 @@ def pushbutton_style() -> str:
             QPushButton {{
                 color: {Theme.get_color("ABOUT-PUSHBUTTON_TEXT")};
                 border-radius: 16px;
-                background: {Theme.get_color("ABOUT-PUSHBUTTON")};
+                background: {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND")};
                 border: 1px solid {Theme.get_color("ABOUT-PUSHBUTTON_BORDER")};
                 font-size: 15px;
                 border-radius: 5px;
                 margin-left: 10px;
+                outline: none;
             }}
-            QPushButton:focus,
-            QPushButton:selected,
             QPushButton:hover {{
                 background: {Theme.get_color("ABOUT-PUSHBUTTON_HOVER")};
                 border: 1px solid {Theme.get_color("ABOUT-PUSHBUTTON_BORDER_HOVER")};
-                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """
 

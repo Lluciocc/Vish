@@ -148,11 +148,6 @@ def apply_menu_style() -> str:
         QMenu::item:selected {{
             background: {Theme.get_color("TOOLBAR-MENU_ITEM_SELECTION")};
         }}
-        QMenu::separator {{
-            height: 1px;
-            background: {Theme.get_color("TOOLBAR-MENU_SEPARATOR")};
-            margin: 8px 10px;
-        }}
     """
 
 def toolbutton_style() -> str:
@@ -164,11 +159,12 @@ def toolbutton_style() -> str:
                 padding: 4px 8px;
                 border-radius: 5px;
             }}
-            QToolButton:focus,
-            QToolButton:selected,
             QToolButton:hover {{
                 background: {Theme.get_color("TOOLBAR-TOOLBUTTON_BACKGROUND_HOVER")};
                 border: 1px solid {Theme.get_color("TOOLBAR-TOOLBUTTON_BORDER_HOVER")};
+            }}
+            QToolButton:pressed {{
+                background: {Theme.get_color("TOOLBAR-TOOLBUTTON_BACKGROUND_PRESSED")};
             }}
             QToolButton::menu-indicator {{
                 image: none;
@@ -185,15 +181,13 @@ def pushbutton_style() -> str:
                 min-height: 26px;
                 padding: 3px 5px;
                 background: {Theme.get_color("TOOLBAR-PUSHBUTTON_BACKGROUND")};
+                outline: none;
             }}
-            QPushButton:focus,
             QPushButton:hover {{
                 border-color: {Theme.get_color("TOOLBAR-PUSHBUTTON_BORDER_HOVER")};
                 background: {Theme.get_color("TOOLBAR-PUSHBUTTON_BACKGROUND_HOVER")};
-                outline: none;
-            }}/*
+            }}
             QPushButton:pressed {{
                 background: {Theme.get_color("TOOLBAR-PUSHBUTTON_BACKGROUND_PRESSED")};
-                opacity: 0.5;
-            }}*/
+            }}
         """

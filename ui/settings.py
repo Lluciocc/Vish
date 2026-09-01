@@ -420,6 +420,7 @@ class SettingsDialog(QDialog):
             self.parent().graph_view._apply_theme()
             self.parent().toolbar._apply_theme()
             self.parent().refresh_ui_colors()
+            self.parent().property_panel._apply_theme()
 
         self.theme_description.setText(Theme.description)
         if Theme.author.count(" ") > 0:
@@ -530,8 +531,6 @@ def combobox_style() -> str:
                 background: {Theme.get_color("SETTINGS-COMBOBOX_BACKGROUND")};
                 combobox-popup: 0;
             }}
-            QComboBox:focus,
-            QComboBox:selected,
             QComboBox:hover {{
                 border-color: {Theme.get_color("SETTINGS-COMBOBOX_BORDER_HOVER")};
                 background: {Theme.get_color("SETTINGS-COMBOBOX_BACKGROUND_HOVER")};
@@ -560,13 +559,14 @@ def pushbutton_style() -> str:
                 min-width: 60px;
                 padding: 3px 5px;
                 background: {Theme.get_color("SETTINGS-PUSHBUTTON_BACKGROUND")};
+                outline: none;
             }}
-            QPushButton:focus,
-            QPushButton:selected,
             QPushButton:hover {{
                 border-color: {Theme.get_color("SETTINGS-PUSHBUTTON_BORDER_HOVER")};
                 background: {Theme.get_color("SETTINGS-PUSHBUTTON_BACKGROUND_HOVER")};
-                outline: none;
+            }}
+            QPushButton:pressed {{
+                background: {Theme.get_color("SETTINGS-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """
 
@@ -581,8 +581,6 @@ def lineedit_style() -> str:
                 selection-background-color: {Theme.get_color("SETTINGS-LINEEDIT_SELECTION")};
                 selection-color: {Theme.get_color("SETTINGS-LINEEDIT_SELECTION_TEXT")};
             }}
-            QLineEdit:focus,
-            QLineEdit:selected,
             QLineEdit:hover {{
                 border-color: {Theme.get_color("SETTINGS-LINEEDIT_BORDER_HOVER")};
             }}
