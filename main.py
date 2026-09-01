@@ -23,6 +23,7 @@ from core.config import Config, ConfigManager
 from core.debug import Debug, Info
 from core.graph import Graph
 from core.highlights import BashHighlighter
+from core.icons import Icon
 from core.logger import Logger
 from core.projects import ProjectManager
 from core.serializer import Serializer
@@ -47,6 +48,7 @@ from ui.main_style import Style
 from ui.modal import Modal
 from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
+from ui.toolbar import Toolbar
 from ui.welcome import WelcomeScreen
 import os
 import subprocess
@@ -70,14 +72,13 @@ class VisualBashEditor(QMainWindow):
         super().__init__()
         self.setWindowTitle("Visual Bash Editor")
         self.resize(1400, 900)
-        if Info.get_device_type() == "phone":
-            self.setMinimumSize(360, 294)
 
         self.graph = Graph()
         self.node_factory = NodeFactory()
         self.project_manager = ProjectManager()
 
         self.setup_ui()
+        self.setMinimumSize(self.toolbar.min_width, 294)
         self.create_initial_graph()
 
     def setup_ui(self):
@@ -85,72 +86,9 @@ class VisualBashEditor(QMainWindow):
         self.central_widget.setStyleSheet(Style.toolpanels_style())
         self.setCentralWidget(self.central_widget)
         main_layout = QVBoxLayout(self.central_widget)
-        toolbar = QHBoxLayout()
 
-        self.generate_button = QPushButton(Traduction.get_trad("button_generate_bash", "Generate Bash"))
-        self.generate_button.clicked.connect(self.generate_bash)
-        Style.apply_icon_for_button(self.generate_button, "generate")
-        toolbar.addWidget(self.generate_button)
-
-        self.save_button = QPushButton(Traduction.get_trad("button_save", "Save"))
-        Style.apply_icon_for_button(self.save_button, "save")
-        self.save_button.clicked.connect(self.save_graph)
-        toolbar.addWidget(self.save_button)
-
-        self.load_button = QPushButton(Traduction.get_trad("button_load", "Load"))
-        self.load_button.clicked.connect(self.load_graph)
-        Style.apply_icon_for_button(self.load_button, "load")
-        toolbar.addWidget(self.load_button)
-
-        toolbar.addStretch()
-
-        self.run_bash_button = QPushButton(Traduction.get_trad("button_run_bash", "Run Bash Script"))
-        self.run_bash_button.clicked.connect(self.run_bash)
-        Style.apply_icon_for_button(self.run_bash_button, "play")
-        toolbar.addWidget(self.run_bash_button)
-
-        self.copy_button = QPushButton(Traduction.get_trad("button_copy_clipboard", "Copy to Clipboard"))
-        Style.apply_icon_for_button(self.copy_button, "clipboard")
-        self.copy_button.clicked.connect(
-            lambda: QApplication.clipboard().setText(self.output_text.toPlainText())
-        )
-        toolbar.addWidget(self.copy_button)
-
-        self.more_button = QToolButton()
-        self.more_button.setText("☰")
-        self.more_button.setPopupMode(QToolButton.InstantPopup)
-        self.more_button.setStyleSheet(Style.apply_button_style())
-
-        self.more_menu = QMenu(self)
-        self.more_menu.setStyleSheet(Style.apply_menu_style())
-
-        self.settings_action = self.more_menu.addAction(
-            Traduction.get_trad("settings", "Settings")
-        )
-        self.settings_action.triggered.connect(self.open_settings)
-        Style.apply_icon_for_button(self.settings_action, "settings")
-
-        self.keyboard = self.more_menu.addAction(
-            Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts")
-        )
-        self.keyboard.triggered.connect(self.open_keyboard_shortcuts)
-        Style.apply_icon_for_button(self.keyboard, "keyboard")
-
-        self.full_screenfs = self.more_menu.addAction(
-            Traduction.get_trad("full_screen", "Full Screen")
-        )
-        self.full_screenfs.triggered.connect(self.full_screen_action)
-        Style.apply_icon_for_button(self.full_screenfs, "fullscreen")
-        self.about_action = self.more_menu.addAction(
-            Traduction.get_trad("about", "About")
-        )
-        self.about_action.triggered.connect(self.open_about)
-        Style.apply_icon_for_button(self.about_action, "about")
-
-        self.more_button.setMenu(self.more_menu)
-        toolbar.addWidget(self.more_button)
-
-        main_layout.addLayout(toolbar)
+        self.toolbar = Toolbar(self)
+        main_layout.addLayout(self.toolbar)
 
         self.splitter = QSplitter(Qt.Horizontal)
         self.splitter.setHandleWidth(12)
@@ -195,19 +133,11 @@ class VisualBashEditor(QMainWindow):
             if self.splitter.orientation() is self.splitter.orientation().Horizontal:
                 if event.size().width() < event.size().height():
                     self.splitter.setOrientation(Qt.Vertical)
-                    self.generate_button.setText("")
-                    self.save_button.setText("")
-                    self.load_button.setText("")
-                    self.run_bash_button.setText("")
-                    self.copy_button.setText("")
+                    self.toolbar.apply_ui_texts(self.toolbar, False)
             else:
                 if event.size().width() > event.size().height():
                     self.splitter.setOrientation(Qt.Horizontal)
-                    self.generate_button.setText(Traduction.get_trad("button_generate_bash", "Generate Bash"))
-                    self.save_button.setText(Traduction.get_trad("button_save", "Save"))
-                    self.load_button.setText(Traduction.get_trad("button_load", "Load"))
-                    self.run_bash_button.setText(Traduction.get_trad("button_run_bash", "Run Bash Script"))
-                    self.copy_button.setText(Traduction.get_trad("button_copy_clipboard", "Copy to Clipboard"))
+                    self.toolbar.apply_ui_texts(self.toolbar)
 
         super().resizeEvent(event)
 
@@ -242,13 +172,17 @@ class VisualBashEditor(QMainWindow):
     def open_about(self):
         AboutDialog(self).exec()
 
-    def full_screen_action(self):
+    def toggle_full_screen(self):
         if self.windowState() & Qt.WindowState.WindowFullScreen:
             self.setWindowState(Qt.WindowState.WindowNoState)
-            Style.apply_icon_for_button(self.full_screenfs, "fullscreen")
+            self.toolbar.fullscreen_action.setIcon(Icon.load_icon("menu_app", "fullscreen"))
+            if "fullscreen_button" in self.toolbar.toolbar:
+                self.toolbar.fullscreen_button.setIcon(Icon.load_icon("menu_app", "fullscreen"))
         else:
             self.setWindowState(Qt.WindowState.WindowFullScreen)
-            Style.apply_icon_for_button(self.full_screenfs, "windowmode")
+            self.toolbar.fullscreen_action.setIcon(Icon.load_icon("menu_app", "windowmode"))
+            if "fullscreen_button" in self.toolbar.toolbar:
+                self.toolbar.fullscreen_button.setIcon(Icon.load_icon("menu_app", "windowmode"))
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
@@ -555,35 +489,10 @@ class VisualBashEditor(QMainWindow):
         else:
             self.output_splitter.setSizes([200, 150])
 
-    def refresh_ui_texts(self):
-        self.generate_button.setText(Traduction.get_trad("button_generate_bash", "Generate Bash"))
-        self.save_button.setText(Traduction.get_trad("button_save", "Save"))
-        self.load_button.setText(Traduction.get_trad("button_load", "Load"))
-        self.run_bash_button.setText(Traduction.get_trad("button_run_bash", "Run Bash Script"))
-        self.copy_button.setText(Traduction.get_trad("button_copy_clipboard", "Copy to Clipboard"))
-
-        self.more_button.setToolTip(Traduction.get_trad("more_options", "More options"))
-        self.settings_action.setText(Traduction.get_trad("settings", "Settings"))
-        self.about_action.setText(Traduction.get_trad("about", "About"))
-        self.keyboard.setText(Traduction.get_trad("keyboard_shortcuts", "Keyboard Shortcuts"))
-
-    def refresh_ui_icons(self):
-        Style.apply_icon_for_button(self.settings_action, "settings")
-        Style.apply_icon_for_button(self.about_action, "about")
-        Style.apply_icon_for_button(self.keyboard, "keyboard")
-        Style.apply_icon_for_button(self.generate_button, "generate")
-        Style.apply_icon_for_button(self.load_button, "load")
-        Style.apply_icon_for_button(self.run_bash_button, "play")
-        Style.apply_icon_for_button(self.copy_button, "clipboard")
-        Style.apply_icon_for_button(self.save_button, "save")
-        Style.apply_icon_for_button(self.full_screenfs, "fullscreen")
-
     def refresh_ui_colors(self):
         self.graph_view.setStyleSheet(Style.apply_viewport_style())
         self.output_splitter.setStyleSheet(Style.apply_bash_textedit_style())
         self.central_widget.setStyleSheet(Style.toolpanels_style())
-        self.more_menu.setStyleSheet(Style.apply_menu_style())
-        self.more_button.setStyleSheet(Style.apply_button_style())
         self.output_text.setStyleSheet(f"color: {Theme.get_color("MAIN-BASH_TEXT")}")
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
@@ -599,7 +508,7 @@ class VisualBashEditor(QMainWindow):
         elif event.key() == Qt.Key_W and event.modifiers() & Qt.ControlModifier: # Ctrl+W
             self.open_welcome_screen()
         elif event.key() == Qt.Key_F11: # F11
-            self.full_screen_action()
+            self.toggle_full_screen()
         elif event.key() == Qt.Key_F1: # F1
             self.open_keyboard_shortcuts()
         elif event.key() == Qt.Key_F9: # F9

@@ -30,6 +30,7 @@ class Config:
     lang = "en"
     theme = "dark.yml"
     CUSTOM_SHEBANG = "#!/usr/bin/env bash"
+    TOOLBAR = ["generate_button", "save_button",  "load_button", "stretch", "run_bash_button", "clipboard_button", "hamburger_menu_button"]
 
 
 class ConfigManager:

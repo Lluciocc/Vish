@@ -393,7 +393,7 @@ class SettingsDialog(QDialog):
             self.theme_combo.setItemText(idx, themes_names[1][i])
 
         if self.parent():
-            self.parent().refresh_ui_texts()
+            self.parent().toolbar.apply_ui_texts()
 
     def _apply_theme(self):
         self.scroll_area.setStyleSheet(scroll_style())
@@ -418,7 +418,7 @@ class SettingsDialog(QDialog):
 
         if self.parent():
             self.parent().graph_view._apply_theme()
-            self.parent().refresh_ui_icons()
+            self.parent().toolbar._apply_theme()
             self.parent().refresh_ui_colors()
 
         self.theme_description.setText(Theme.description)

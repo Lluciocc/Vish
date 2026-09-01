@@ -69,22 +69,24 @@ theme_detail:
     MAIN-TOOLPANELS_TEXT:                       "FONT"
     MAIN-TOOLPANELS_SELECT_BACKGROUND:          "CUSTOM_ACCENT"
 
-    MAIN-MENU_BACKGROUND:                       "BACKGROUND"
-    MAIN-MENU_TEXT:                             "FONT"
-    MAIN-MENU_BORDER:                           "CONTRAST"
-    MAIN-MENU_ITEM_SELECTION:                   "CUSTOM_ACCENT"
-    MAIN-MENU_SEPARATOR:                        "CONTRAST"
+    # TOOLBAR
+    TOOLBAR-MENU_BACKGROUND:                    "BACKGROUND"
+    TOOLBAR-MENU_TEXT:                          "FONT"
+    TOOLBAR-MENU_BORDER:                        "CONTRAST"
+    TOOLBAR-MENU_ITEM_SELECTION:                "CUSTOM_ACCENT"
+    TOOLBAR-MENU_SEPARATOR:                     "CONTRAST"
 
-    MAIN-BUTTON_TEXT:                           "FONT"
-    MAIN-BUTTON_BORDER:                         "CONTRAST"
-    MAIN-BUTTON_BACKGROUND_HOVER:               "transparent"
-    MAIN-BUTTON_BORDER_HOVER:                   "CUSTOM_ACCENT"
+    TOOLBAR-TOOLBUTTON_TEXT:                    "FONT"
+    TOOLBAR-TOOLBUTTON_BORDER:                  "CONTRAST"
+    TOOLBAR-TOOLBUTTON_BACKGROUND_HOVER:        "transparent"
+    TOOLBAR-TOOLBUTTON_BORDER_HOVER:            "CUSTOM_ACCENT"
 
-    MAIN-PUSHBUTTON_TEXT:                       "FONT"
-    MAIN-PUSHBUTTON_BORDER:                     "CONTRAST"
-    MAIN-PUSHBUTTON_BACKGROUND:                 "transparent"
-    MAIN-PUSHBUTTON_BORDER_HOVER:               "CUSTOM_ACCENT"
-    MAIN-PUSHBUTTON_BACKGROUND_HOVER:           "transparent"
+    TOOLBAR-PUSHBUTTON_TEXT:                    "FONT"
+    TOOLBAR-PUSHBUTTON_BORDER:                  "CONTRAST"
+    TOOLBAR-PUSHBUTTON_BACKGROUND:              "transparent"
+    TOOLBAR-PUSHBUTTON_BORDER_HOVER:            "CUSTOM_ACCENT"
+    TOOLBAR-PUSHBUTTON_BACKGROUND_HOVER:        "transparent"
+    TOOLBAR-PUSHBUTTON_BACKGROUND_PRESSED:      "CUSTOM_ACCENT"
 
     # PROPERTY PANAL
     PROPERTY_PANEL-TITLELABEL_TEXT:             "CUSTOM_ACCENT"
