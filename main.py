@@ -72,13 +72,13 @@ class VisualBashEditor(QMainWindow):
         super().__init__()
         self.setWindowTitle("Visual Bash Editor")
         self.resize(1400, 900)
+        self.setMinimumSize(360, 294)
 
         self.graph = Graph()
         self.node_factory = NodeFactory()
         self.project_manager = ProjectManager()
 
         self.setup_ui()
-        self.setMinimumSize(self.toolbar.min_width, 294)
         self.create_initial_graph()
 
     def setup_ui(self):
@@ -129,15 +129,14 @@ class VisualBashEditor(QMainWindow):
         self._connect_signals()
 
     def resizeEvent(self, event):
+        self.toolbar.resize_buttons(event.size().width())
         if Info.get_device_type() == "phone":
             if self.splitter.orientation() is self.splitter.orientation().Horizontal:
                 if event.size().width() < event.size().height():
                     self.splitter.setOrientation(Qt.Vertical)
-                    self.toolbar.apply_ui_texts(self.toolbar, False)
             else:
                 if event.size().width() > event.size().height():
                     self.splitter.setOrientation(Qt.Horizontal)
-                    self.toolbar.apply_ui_texts(self.toolbar)
 
         super().resizeEvent(event)
 

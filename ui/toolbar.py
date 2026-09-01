@@ -62,9 +62,6 @@ class Toolbar(QHBoxLayout):
                 self.min_width += self.TOOLS[button][0].sizeHint().width() + 8
                 self.addWidget(self.TOOLS[button][0])
 
-        if self.min_width < 360:
-            self.min_width = 360
-
     def setup_buttons(self):
         self.generate_button = QPushButton()
         self.save_button = QPushButton()
@@ -94,6 +91,12 @@ class Toolbar(QHBoxLayout):
                 self.TOOLS[items][0].clicked.connect(self.TOOLS[items][2])
             elif isinstance(self.TOOLS[items][0], QAction):
                 self.TOOLS[items][0].triggered.connect(self.TOOLS[items][2])
+
+    def resize_buttons(self, width):
+        if self.min_width > width:
+            self.apply_ui_texts(False)
+        else:
+            self.apply_ui_texts()
 
     def copy_to_clipboard(self):
         return lambda: QApplication.clipboard().setText(self.editor.output_text.toPlainText())
@@ -176,7 +179,7 @@ def pushbutton_style() -> str:
                 color: {Theme.get_color("TOOLBAR-PUSHBUTTON_TEXT")};
                 border: 1px solid {Theme.get_color("TOOLBAR-PUSHBUTTON_BORDER")};
                 border-radius: 5px;
-                min-width: 60px;
+                min-width: 26px;
                 min-height: 26px;
                 padding: 3px 5px;
                 background: {Theme.get_color("TOOLBAR-PUSHBUTTON_BACKGROUND")};
