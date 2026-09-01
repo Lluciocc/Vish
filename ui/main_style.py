@@ -37,7 +37,7 @@ class Style:
 
     def toolpanels_style() -> str:
         return f"""
-                    background: {Theme.get_color("MAIN-PPANALS_BACKGROUND")};
+                    background: {Theme.get_color("MAIN-TOOLPANELS_BACKGROUND")};
                     color: {Theme.get_color("MAIN-TOOLPANELS_TEXT")};
                     selection-background-color: {Theme.get_color("MAIN-TOOLPANELS_SELECT_BACKGROUND")};
             """
