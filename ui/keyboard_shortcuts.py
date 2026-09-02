@@ -21,7 +21,7 @@ from core.debug import Info
 from core.icons import Icon
 from core.traduction import Traduction
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QLinearGradient, QPainter
+from PySide6.QtGui import QColor, QLinearGradient, QPainter, QWindow
 from PySide6.QtSvgWidgets import QSvgWidget
 from PySide6.QtWidgets import (QDialog, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
                                QScroller, QSizePolicy, QVBoxLayout, QWidget)
@@ -81,6 +81,7 @@ DESCRIPTION_SHORTCUT_SPACING = 10
 DESCRIPTION_MIN_WIDTH = 120
 DESCRIPTION_TARGET_WIDTH = 180
 COLUMN_MIN_WIDTH = DESCRIPTION_TARGET_WIDTH + 100
+COLUMN_MAX_WIDTH = COLUMN_MIN_WIDTH * 2
 COLUMN_SPACING = 24
 CATEGORY_SPACING = 22
 SCROLL_FADE_HEIGHT = 18
@@ -223,7 +224,7 @@ class ShortcutColumn(QWidget):
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setContentsMargins(12, 12, 12, -10)
         layout.setSpacing(ROW_SPACING)
 
         label = QLabel(Traduction.get_trad(*section["title"]))
@@ -244,63 +245,55 @@ class ResponsiveShortcutsWidget(QWidget):
     def __init__(self):
         super().__init__()
         self.key_area_width = get_shortcut_area_width()
-        self.column_count = 0
+        self.column_count = 1
+        self.row_count = 1
         self.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.grid = QGridLayout(self)
-        self.grid.setContentsMargins(0, 0, 0, 0)
-        self.grid.setHorizontalSpacing(COLUMN_SPACING)
-        self.grid.setVerticalSpacing(CATEGORY_SPACING)
-        self._rebuild_layout(1)
+        self.base_layout = QHBoxLayout(self)
+        self.base_layout.setContentsMargins(0, 0, 0, 0)
+        self.base_layout.setSpacing(0)
 
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self._rebuild_layout(self._column_count_for_width(event.size().width()))
-
-    def _column_count_for_width(self, width):
-        category_count = len(SHORTCUTS)
-        if width <= 0:
-            return 1
-
-        for count in range(category_count, 0, -1):
-            needed = count * COLUMN_MIN_WIDTH + (count - 1) * COLUMN_SPACING
-            if width >= needed:
-                return count
-        return 1
-
-    def _section_weight(self, section):
-        return 1 + sum(len(item["shortcuts"]) for item in section["items"])
-
-    def _rebuild_layout(self, column_count):
-        column_count = max(1, min(column_count, len(SHORTCUTS)))
-        if column_count == self.column_count:
-            return
-
-        self.column_count = column_count
-        _clear_layout(self.grid)
-
-        stacks = []
-        stack_weights = []
-        for column in range(column_count):
-            stack = QWidget()
-            stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-            stack_layout = QVBoxLayout(stack)
-            stack_layout.setContentsMargins(0, 0, 0, 0)
-            stack_layout.setSpacing(CATEGORY_SPACING)
-
-            self.grid.addWidget(stack, 0, column)
-            self.grid.setColumnStretch(column, 1)
-            stacks.append(stack_layout)
-            stack_weights.append(0)
+        self.category_count = len(SHORTCUTS)
+        self.stacks = []
 
         for section in SHORTCUTS.values():
-            target = min(range(column_count), key=lambda index: stack_weights[index])
-            stacks[target].addWidget(ShortcutColumn(section, self.key_area_width))
-            stack_weights[target] += self._section_weight(section)
+            self.stacks.append(self.create_stack(section))
+        for index in range(self.category_count):
+            self.base_layout.addLayout(self.create_column_space())
 
-        for stack in stacks:
-            stack.addStretch()
+    def create_column_space(self):
+        layout = QVBoxLayout()
+        layout.addSpacing(ROW_SPACING)
+        layout.setContentsMargins(0, 0, 0, 0)
+
+        shrink_widget = QWidget()
+        shrink_widget.setFixedSize(0, 0)
+        layout.addStretch()
+        layout.addWidget(shrink_widget)
+        return layout
+
+    def create_stack(self, section):
+        stack = ShortcutColumn(section, self.key_area_width)
+        stack.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Minimum)
+        return stack
+
+    def resizeEvent(self, event):
+        max_columns = int((event.size().width() - 24) / COLUMN_MIN_WIDTH)
+
+        if self.column_count != max_columns:
+            if max_columns <= self.category_count:
+                self.column_count = max_columns
+                self.row_count = max(int(round(self.category_count / self.column_count)), 1)
+                self.format_grid()
+
+    def format_grid(self):
+        grid = []
+        for column in range(self.column_count):
+            for row in range(self.row_count):
+                grid.append([column, row])
+
+        for index in range(len(self.stacks)):
+            self.base_layout.children()[grid[index][0]].insertWidget(grid[index][1], self.stacks[index])
 
 
 class ScrollFade(QWidget):
@@ -387,7 +380,7 @@ class KeyboardShortcutsDialog(QDialog):
         self.setStyleSheet(f"QDialog {{background: {Theme.get_color("SHORTCUTS-BACKGROUND")}}}")
 
         root = QVBoxLayout(self)
-        root.setContentsMargins(12, 12, 12, 12)
+        root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
         scroll = ShortcutScrollArea()
