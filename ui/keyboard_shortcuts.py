@@ -268,7 +268,7 @@ class ResponsiveShortcutsWidget(QWidget):
 
         shrink_widget = QWidget()
         shrink_widget.setFixedSize(0, 0)
-        layout.addStretch()
+        layout.setAlignment(Qt.AlignTop)
         layout.addWidget(shrink_widget)
         return layout
 
