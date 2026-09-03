@@ -17,12 +17,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtGui import QAction
+from PySide6.QtWidgets import QApplication, QHBoxLayout, QMenu, QPushButton, QToolButton
+
 from core.config import Config
 from core.icons import Icon
 from core.traduction import Traduction
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QAction
-from PySide6.QtWidgets import QApplication, QHBoxLayout, QMenu, QPushButton, QToolButton
 from themes.theme_manager import Theme
 
 

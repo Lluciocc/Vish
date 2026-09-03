@@ -17,8 +17,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from pathlib import Path
 import datetime
+from pathlib import Path
 
 
 class Colors:

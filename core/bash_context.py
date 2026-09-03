@@ -17,14 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from typing import List, Dict
 
 
 class BashContext:
     def __init__(self):
-        self.variables: Dict[str, str] = {}
+        self.variables: dict[str, str] = {}
         self.indent_level = 0
-        self.lines: List[str] = []
+        self.lines: list[str] = []
         self.function_lines = []
         self.emitted_nodes = set()
         self._current_buffer = "main"

@@ -17,16 +17,24 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QLinearGradient, QPainter
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QLabel,
+    QScrollArea,
+    QScroller,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.debug import Info
 from core.icons import Icon
 from core.traduction import Traduction
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QLinearGradient, QPainter, QWindow
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import (QDialog, QGridLayout, QHBoxLayout, QLabel, QScrollArea,
-                               QScroller, QSizePolicy, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
-
 
 SHORTCUTS = {
     "general": {

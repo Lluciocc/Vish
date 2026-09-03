@@ -17,9 +17,8 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from dataclasses import dataclass
 import re
-
+from dataclasses import dataclass
 
 ANSI_REGEX = re.compile(r"\x1b\[([0-9;]*)m")
 

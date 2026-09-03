@@ -17,15 +17,25 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import webbrowser
+
+from PySide6.QtCore import Qt
+from PySide6.QtSvgWidgets import QSvgWidget
+from PySide6.QtWidgets import (
+    QApplication,
+    QHBoxLayout,
+    QLabel,
+    QSizePolicy,
+    QTextBrowser,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.icons import Icon
 from core.serializer import Serializer
 from core.traduction import Traduction
-from PySide6.QtCore import Qt
-from PySide6.QtSvgWidgets import QSvgWidget
-from PySide6.QtWidgets import QApplication, QHBoxLayout, QLabel, QSizePolicy, QTextBrowser, QVBoxLayout, QWidget
 from themes.theme_manager import Theme
 from ui.modal import Modal
-import webbrowser
 
 
 def open_link_box(parent, link_name, link):

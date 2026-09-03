@@ -17,9 +17,9 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.debug import Debug, Info
-from pathlib import Path
 import json
+
+from core.debug import Debug, Info
 
 
 class Config:

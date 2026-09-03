@@ -18,13 +18,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from __future__ import annotations
-from collections import defaultdict,deque
-from core.port_types import PortType
+
+from collections import defaultdict, deque
 from dataclasses import dataclass
-from typing import Dict, List, Set, Tuple
 
+from core.port_types import PortType
 
-PORT_PRIORITY:Dict[PortType,int]={PortType.EXEC:100,PortType.CONDITION:80,getattr(PortType,"DATA",PortType.STRING):60,PortType.STRING:50,getattr(PortType,"INT",PortType.STRING):45,getattr(PortType,"FLOAT",PortType.STRING):45}
+PORT_PRIORITY:dict[PortType,int]={PortType.EXEC:100,PortType.CONDITION:80,getattr(PortType,"DATA",PortType.STRING):60,PortType.STRING:50,getattr(PortType,"INT",PortType.STRING):45,getattr(PortType,"FLOAT",PortType.STRING):45}
 BASE_X_SPACING=260
 BASE_Y_SPACING=140
 DATA_PROXIMITY_PULL=0.25
@@ -40,7 +40,7 @@ class _LEdge:
 
 
 class _LNode:
-    __slots__=("id","node","in_edges","out_edges","x","y","w_hint","h_hint")
+    __slots__=("h_hint", "id", "in_edges", "node", "out_edges", "w_hint", "x", "y")
     def __init__(self,node):
         self.node=node
         self.id=node.id
@@ -59,10 +59,10 @@ class GraphLayoutEngine:
         self.graph=graph
         self.x_spacing=int(x_spacing)
         self.y_spacing=int(y_spacing)
-        self.nodes:Dict[str,_LNode]={}
-        self.edges:List[_LEdge]=[]
+        self.nodes:dict[str,_LNode]={}
+        self.edges:list[_LEdge]=[]
 
-    def compute(self)->Dict[str,Tuple[int,int]]:
+    def compute(self)->dict[str,tuple[int,int]]:
         self._build()
         self._compute_x()
         self._compute_y()
@@ -102,8 +102,7 @@ class GraphLayoutEngine:
                 tgt=self.nodes[e.tgt]
                 step=1 if e.port_type==PortType.EXEC else max(1,e.weight//40)
                 px=n.x+step*self.x_spacing
-                if px>tgt.x:
-                    tgt.x=px
+                tgt.x = max(tgt.x, px)
                 indegree[e.tgt]-=1
                 if indegree[e.tgt]==0:
                     q.append(e.tgt)
@@ -173,7 +172,7 @@ class GraphLayoutEngine:
             cols[n.x].append(n)
         for x,col in cols.items():
             col.sort(key=lambda n:(n.y,str(n.id)))
-            used:Set[int]=set()
+            used:set[int]=set()
             it=0
             for n in col:
                 row=int(round(n.y/self.y_spacing))

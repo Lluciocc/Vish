@@ -17,14 +17,21 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+
+from PySide6.QtCore import Qt, Signal
+from PySide6.QtWidgets import (
+    QFrame,
+    QLineEdit,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.icons import Icon
 from core.traduction import Traduction
 from nodes.registry import NODE_REGISTRY
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtWidgets import QLineEdit, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget, QFrame
 from themes.theme_manager import Theme
-import os
-
 
 links = {}
 
@@ -103,7 +110,6 @@ class NodePalette(QWidget):
 
     def keyPressEventArrow(self, event):
         self.tree.keyPressEvent(event)
-        return
 
     def populate_tree(self):
         self.tree.clear()

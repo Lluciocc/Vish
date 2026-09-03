@@ -19,8 +19,8 @@
 
 from dataclasses import dataclass
 from enum import Enum
+
 from themes.theme_manager import Theme
-from typing import Any
 
 
 class PortType(Enum):

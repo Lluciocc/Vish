@@ -17,6 +17,24 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
+import subprocess
+import sys
+import time
+
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
+from PySide6.QtGui import QIcon, QKeySequence
+from PySide6.QtWidgets import (
+    QApplication,
+    QDialog,
+    QFileDialog,
+    QMainWindow,
+    QSplitter,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.ansi_to_html import ansi_to_html
 from core.bash_emitter import BashEmitter
 from core.config import Config, ConfigManager
@@ -28,20 +46,11 @@ from core.logger import Logger
 from core.projects import ProjectManager
 from core.serializer import Serializer
 from core.traduction import Traduction
-from nodes.command_nodes import EchoNode
 from nodes.flow_nodes import StartNode
-from nodes.operation_nodes import Addition
 from nodes.registry import NODE_REGISTRY
-from nodes.utils_node import ToString
-from PySide6.QtCore import QPointF, QRectF, Qt, QTimer
-from PySide6.QtGui import QIcon, QKeySequence
-from nodes.variable_nodes import FileExistsNode
-from PySide6.QtWidgets import (QApplication, QDialog, QFileDialog, QHBoxLayout,
-                               QMainWindow, QMenu, QPushButton, QSplitter,
-                               QTextEdit, QToolButton, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
 from ui.about.about import AboutDialog
-from ui.comment_box import CommentBoxItem, COMMENT_Z_BASE
+from ui.comment_box import COMMENT_Z_BASE, CommentBoxItem
 from ui.graph_view import GraphView
 from ui.keyboard_shortcuts import KeyboardShortcutsDialog
 from ui.main_style import Style
@@ -50,10 +59,7 @@ from ui.property_panel import PropertyPanel
 from ui.settings import SettingsDialog
 from ui.toolbar import Toolbar
 from ui.welcome import WelcomeScreen
-import os
-import subprocess
-import sys
-import time
+
 IS_WINDOWS = sys.platform == "win32"
 if not IS_WINDOWS:
     import pty

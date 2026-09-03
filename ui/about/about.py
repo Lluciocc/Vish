@@ -17,12 +17,20 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt
+from PySide6.QtWidgets import (
+    QDialog,
+    QHBoxLayout,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QStackedWidget,
+    QVBoxLayout,
+)
+
 from core.config import MarkdownLoader
 from core.debug import Info
 from core.traduction import Traduction
-from PySide6.QtCore import QEasingCurve, QPoint, QPropertyAnimation, Qt
-from PySide6.QtWidgets import (QDialog, QGraphicsOpacityEffect, QHBoxLayout, QPushButton,
-                               QScrollArea, QSizePolicy, QStackedWidget, QVBoxLayout)
 from themes.theme_manager import Theme
 from ui.about.about_pages import AboutMainPage, AboutTextPage
 

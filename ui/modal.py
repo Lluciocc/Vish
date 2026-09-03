@@ -17,13 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QPushButton
+
 from core.config import Config
 from core.icons import Icon
 from core.logger import Logger
 from core.traduction import Traduction
-from PySide6.QtWidgets import QInputDialog, QLineEdit, QMessageBox, QPushButton
 from themes.theme_manager import Theme
-
 
 # Supported dict entries:
 #   ENTRY           DATA-TYPE               HINTS

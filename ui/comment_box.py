@@ -17,14 +17,28 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import QPointF, QRectF, QSizeF, Qt
+from PySide6.QtGui import (
+    QBrush,
+    QColor,
+    QFont,
+    QLinearGradient,
+    QPainter,
+    QPainterPath,
+    QPen,
+)
+from PySide6.QtWidgets import (
+    QGraphicsItem,
+    QGraphicsRectItem,
+    QGraphicsTextItem,
+    QGraphicsView,
+    QMenu,
+)
+
 from commands.undo_commands import *
 from core.config import Config
 from core.logger import Logger
-from PySide6.QtCore import QPointF, QRectF, QSizeF, Qt
-from PySide6.QtGui import QBrush, QColor, QCursor, QFont, QKeySequence, QLinearGradient, QPainter, QPen, QPainterPath
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsRectItem, QGraphicsTextItem, QGraphicsView, QMenu
 from themes.theme_manager import Theme
-
 
 ACCENT_COLORS = [
     QColor(Theme.get_color("COMMENT_BOX-ACCENT_0")),

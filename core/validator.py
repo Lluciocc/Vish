@@ -19,7 +19,7 @@
 
 from core.config import Config
 from core.logger import Logger
-from core.port_types import PortDirection, PortType
+from core.port_types import PortDirection
 
 
 class GraphValidator:

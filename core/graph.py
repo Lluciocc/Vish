@@ -17,11 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from typing import TYPE_CHECKING, Any
+from uuid import uuid4
+
 from core.config import Config
 from core.logger import Logger
 from core.port_types import PortDirection, PortType
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
-from uuid import uuid4
+
 if TYPE_CHECKING:
     from core.bash_context import BashContext
 
@@ -34,7 +36,7 @@ class Port:
         self.direction = direction
         self.node = node
         self.value: Any = None
-        self.connected_edges: List['Edge'] = []
+        self.connected_edges: list[Edge] = []
         self.tooltip = tooltip
 
     def can_connect_to(self, other: 'Port') -> bool:
@@ -63,12 +65,12 @@ class Node:
         self.id = str(uuid4())
         self.node_type = node_type
         self.title = title
-        self.inputs: List[Port] = []
-        self.outputs: List[Port] = []
+        self.inputs: list[Port] = []
+        self.outputs: list[Port] = []
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
-        self.properties: Dict[str, Any] = {}
+        self.properties: dict[str, Any] = {}
 
     def add_input(self, name: str, port_type: PortType, tooltip="") -> Port:
         port = Port(name, port_type, PortDirection.INPUT, self, tooltip)
@@ -80,13 +82,13 @@ class Node:
         self.outputs.append(port)
         return port
 
-    def get_exec_output(self) -> Optional[Port]:
+    def get_exec_output(self) -> Port | None:
         for port in self.outputs:
             if port.port_type == PortType.EXEC:
                 return port
         return None
 
-    def get_exec_input(self) -> Optional[Port]:
+    def get_exec_input(self) -> Port | None:
         for port in self.inputs:
             if port.port_type == PortType.EXEC:
                 return port
@@ -111,8 +113,8 @@ class Edge:
 
 class Graph:
     def __init__(self):
-        self.nodes: Dict[str, Node] = {}
-        self.edges: Dict[str, Edge] = {}
+        self.nodes: dict[str, Node] = {}
+        self.edges: dict[str, Edge] = {}
 
     def add_node(self, node: Node):
         self.nodes[node.id] = node
@@ -133,7 +135,7 @@ class Graph:
 
         del self.nodes[node_id]
 
-    def add_edge(self, source: Port, target: Port) -> Optional[Edge]:
+    def add_edge(self, source: Port, target: Port) -> Edge | None:
         if not source.can_connect_to(target):
             return None
         edge = Edge(source, target)
@@ -155,7 +157,7 @@ class Graph:
             self.edges[edge_id] = edge
             return edge
 
-    def get_start_node(self) -> Optional[Node]:
+    def get_start_node(self) -> Node | None:
         for node in self.nodes.values():
             if node.node_type == "start":
                 return node

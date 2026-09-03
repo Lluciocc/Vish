@@ -17,12 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.config import Config
-from core.debug import Info
-from PySide6.QtSvgWidgets import QGraphicsSvgItem, QSvgWidget
-from PySide6.QtGui import QIcon
-from themes.theme_manager import Theme
 import os
+
+from PySide6.QtGui import QIcon
+from PySide6.QtSvgWidgets import QGraphicsSvgItem, QSvgWidget
+
+from core.debug import Info
+from themes.theme_manager import Theme
 
 
 class Path:

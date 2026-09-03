@@ -17,19 +17,32 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import os
+import shutil
+
+from PySide6.QtCore import Property, QPropertyAnimation, Qt, Signal
+from PySide6.QtGui import QColor, QPainter
+from PySide6.QtWidgets import (
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QFrame,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QScrollArea,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.config import Config, ConfigManager
 from core.debug import Debug, Info
 from core.logger import Logger
 from core.traduction import Traduction
-from PySide6.QtCore import Property, QPropertyAnimation, Qt, Signal
-from PySide6.QtGui import QColor, QPainter
-from PySide6.QtWidgets import (QComboBox, QDialog, QFileDialog, QFrame, QHBoxLayout,
-                               QLabel, QPushButton, QLineEdit,
-                               QScrollArea, QSizePolicy, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
 from ui.modal import Modal
-import os
-import shutil
 
 
 def set_config_bool(attr_name: str, value: bool) -> None:
@@ -357,7 +370,7 @@ class SettingsDialog(QDialog):
             Logger.LogMessage(f"Custom shebang changed to: {new_value}")
             return
         self.shebang_input.setText(Config.CUSTOM_SHEBANG)
-        Logger.LogWarning(f"Custom shebang change cancelled.")
+        Logger.LogWarning("Custom shebang change cancelled.")
 
     def refresh_ui_texts(self):
         self.setWindowTitle(Traduction.get_trad("settings", "Settings"))

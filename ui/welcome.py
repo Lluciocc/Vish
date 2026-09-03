@@ -17,19 +17,32 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QFont, QKeySequence, QShortcut
+from PySide6.QtWidgets import (
+    QAbstractItemView,
+    QDialog,
+    QFileDialog,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+)
+
 from core.debug import Info
 from core.projects import ProjectManager
 from core.traduction import Traduction
-from datetime import datetime, timezone
-from pathlib import Path
-from PySide6.QtCore import Qt, QSize, Signal
-from PySide6.QtGui import QFont, QKeySequence, QColor, QShortcut
-from PySide6.QtWidgets import (QAbstractItemView, QDialog, QFileDialog, QHBoxLayout,
-                               QLabel, QLineEdit, QListWidget, QListWidgetItem,
-                               QPushButton, QVBoxLayout, QWidget)
 from themes.theme_manager import Theme
-import json
 from ui.modal import Modal
+
 
 class ClickableLabel(QLabel):
     clicked = Signal()

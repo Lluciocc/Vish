@@ -17,23 +17,44 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import (
+    Property,
+    QEasingCurve,
+    QEvent,
+    QPropertyAnimation,
+    Qt,
+    Signal,
+)
+from PySide6.QtGui import (
+    QColor,
+    QCursor,
+    QKeySequence,
+    QMouseEvent,
+    QPainter,
+    QUndoStack,
+)
+from PySide6.QtWidgets import (
+    QGraphicsTextItem,
+    QGraphicsView,
+    QHBoxLayout,
+    QLabel,
+    QPushButton,
+    QSlider,
+    QWidget,
+)
+
 from commands.undo_commands import *
-from core.config import Config
 from core.clipboard import GraphClipboard
+from core.config import Config
 from core.debug import Debug
 from core.graph import Port
 from core.icons import Icon
 from core.layout import GraphLayoutEngine
-from core.port_types import PortType
 from core.serializer import Serializer
 from core.validator import GraphValidator
 from nodes.registry import create_node
-from PySide6.QtCore import QEasingCurve, QEvent, QPointF, Property, QPropertyAnimation, QRectF, Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QCursor, QKeySequence, QMouseEvent, QPainter, QUndoStack
-from PySide6.QtWidgets import QApplication, QGraphicsRectItem, QGraphicsTextItem, QGraphicsView, QHBoxLayout, QLabel, QPushButton, QSlider, QWidget
 from themes.theme_manager import Theme
 from ui.comment_box import CommentBoxItem
-from ui.edge_item import EdgeItem
 from ui.graph_scene import GraphScene
 from ui.node_item import NodeItem
 from ui.palette import NodePalette

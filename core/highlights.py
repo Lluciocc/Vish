@@ -18,7 +18,8 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from PySide6.QtCore import QRegularExpression
-from PySide6.QtGui import QColor, QFont, QSyntaxHighlighter, QTextCharFormat
+from PySide6.QtGui import QColor, QSyntaxHighlighter, QTextCharFormat
+
 from themes.theme_manager import Theme
 
 

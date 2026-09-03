@@ -17,11 +17,13 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.config import Config, ConfigManager
+from pathlib import Path
+
+from PySide6.QtGui import QColor, QGuiApplication
+
+from core.config import Config
 from core.debug import Debug, Info
 from core.logger import Logger
-from pathlib import Path
-from PySide6.QtGui import QColor, QGuiApplication, QPalette
 
 
 class Theme:
@@ -41,11 +43,11 @@ class Theme:
             Theme.theme = Config.theme
             theme_path = Theme.get_path(Theme.theme)
             if theme_path == None:
-                return None
+                return
             if "_" in Theme.theme:
                 fallback_theme_path = Theme.get_fallback_path(theme_path)
                 if fallback_theme_path == None:
-                    return None
+                    return
 
                 with open(fallback_theme_path) as fallback_theme_data:
                     Theme.fallback_colors = Theme.parse_yaml(fallback_theme_data.read())
@@ -153,7 +155,7 @@ class Theme:
         if path.exists():
             return path
 
-        path = Path(Info.resource_path(f"themes/dark.yml"))
+        path = Path(Info.resource_path("themes/dark.yml"))
         if path.exists():
             if Config.DEBUG:
                 Debug.Warn("THEME_MANAGER: Custom theme not found! Loading standard theme.")

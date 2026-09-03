@@ -17,15 +17,17 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.logger import Logger
-from pathlib import Path
-from PySide6.QtCore import QStandardPaths
-from PySide6.QtGui import QGuiApplication
-from ui.info import MessageWidget
 import getpass
 import os
 import platform
 import sys
+from pathlib import Path
+
+from PySide6.QtCore import QStandardPaths
+from PySide6.QtGui import QGuiApplication
+
+from core.logger import Logger
+from ui.info import MessageWidget
 
 
 class Debug:
@@ -39,7 +41,7 @@ class Debug:
     @staticmethod
     def _show(message: str, level: str):
         if not Debug._parent:
-            from core.config import Config 
+            from core.config import Config
             if Config.DEBUG:
                 Logger.LogError("Debug not initialized with parent widget, using console for output.")
                 Debug.init_error = True

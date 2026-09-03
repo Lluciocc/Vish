@@ -17,11 +17,11 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.graph import Edge
-from core.port_types import PORT_STYLES, PortType
 from PySide6.QtCore import QPointF, Qt
 from PySide6.QtGui import QColor, QPainterPath, QPen
 from PySide6.QtWidgets import QGraphicsPathItem
+
+from core.port_types import PORT_STYLES, PortType
 from themes.theme_manager import Theme
 
 

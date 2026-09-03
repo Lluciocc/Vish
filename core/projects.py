@@ -17,11 +17,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.debug import Info
-from core.logger import Logger
+import json
 from datetime import datetime, timezone
 from pathlib import Path
-import json
+
+from core.debug import Info
+from core.logger import Logger
 
 
 class Project:

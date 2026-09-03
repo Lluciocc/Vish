@@ -17,16 +17,16 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from core.debug import Info
-from core.logger import Logger
-from core.graph import Graph, Node, Port
-from typing import Any, Dict
 import json
+
+from core.debug import Info
+from core.graph import Graph
+from core.logger import Logger
 
 
 class Serializer:
     try:
-        version_path = Info.resource_path(f"VERSION")
+        version_path = Info.resource_path("VERSION")
         VERSION = open(version_path).read().strip()
     except:
         from core.config import Config

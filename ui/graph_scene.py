@@ -17,13 +17,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QCursor
+from PySide6.QtWidgets import QApplication, QGraphicsScene
+
 from core.config import Config
 from core.logger import Logger
-from core.port_types import PortDirection, PortType
+from core.port_types import PortType
 from core.validator import GraphValidator
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QCursor, QPen
-from PySide6.QtWidgets import QApplication, QGraphicsScene
 from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 

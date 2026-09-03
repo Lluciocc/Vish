@@ -18,6 +18,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from abc import abstractmethod
+
 from core.bash_context import BashContext
 from core.debug import Debug
 from core.graph import Node, PortType
