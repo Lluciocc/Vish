@@ -1,25 +1,35 @@
-name: Ruff
+name: Python
 
 on:
   push:
+    branches:
+      - main
+
   pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
 
 jobs:
-  ruff:
-    runs-on: docker
+  test:
+    name: Lint and Test
+    runs-on: codeberg-tiny-lazy
 
     container:
-      image: python:3.13-slim
+      image: ghcr.io/catthehacker/ubuntu:act-latest
 
     steps:
       - name: Checkout repository
         uses: https://code.forgejo.org/actions/checkout@v4
+        with:
+          fetch-depth: 1
 
-      - name: Install Ruff
-        run: pip install ruff
+      - name: Install uv
+        run: pip install uv
 
       - name: Ruff check
-        run: ruff check .
+        run: uvx ruff check .
 
       - name: Ruff format check
-        run: ruff format --check .
+        run: uvx ruff format --check .
