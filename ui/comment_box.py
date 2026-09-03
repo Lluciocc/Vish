@@ -54,18 +54,24 @@ ACCENT_COLORS = [
 ]
 
 SIZE_PRESETS = [
-    8.0,   # small
+    8.0,  # small
     10.0,  # medium (base)
     16.0,  # medium-large
     28.0,  # large
     48.0,  # extra large
 ]
 
-COLOR_BG = QColor(Theme.get_color("COMMENT_BOX-DARK_BACKGROUND"))           # dark body background
-COLOR_HEADER_BG = QColor(Theme.get_color("COMMENT_BOX-HEADER_TINT"))        # subtle header tint
-COLOR_BORDER = QColor(Theme.get_color("COMMENT_BOX-BORDER"))                # default border
-COLOR_BORDER_SEL = QColor(Theme.get_color("COMMENT_BOX-BORDER_SELECTION"))  # selected border
-COLOR_TITLE = QColor(Theme.get_color("COMMENT_BOX-LABEL_TITLE"))            # title text
+COLOR_BG = QColor(
+    Theme.get_color("COMMENT_BOX-DARK_BACKGROUND")
+)  # dark body background
+COLOR_HEADER_BG = QColor(
+    Theme.get_color("COMMENT_BOX-HEADER_TINT")
+)  # subtle header tint
+COLOR_BORDER = QColor(Theme.get_color("COMMENT_BOX-BORDER"))  # default border
+COLOR_BORDER_SEL = QColor(
+    Theme.get_color("COMMENT_BOX-BORDER_SELECTION")
+)  # selected border
+COLOR_TITLE = QColor(Theme.get_color("COMMENT_BOX-LABEL_TITLE"))  # title text
 COLOR_BODY_TEXT = QColor(Theme.get_color("COMMENT_BOX-TEXT_BODY"))
 
 RADIUS = 10
@@ -90,7 +96,9 @@ class CommentTextItem(QGraphicsTextItem):
     def paint(self, painter: QPainter, option, widget=None):
         if self._clip_size.width() > 0 and self._clip_size.height() > 0:
             painter.save()
-            painter.setClipRect(QRectF(0, 0, self._clip_size.width(), self._clip_size.height()))
+            painter.setClipRect(
+                QRectF(0, 0, self._clip_size.width(), self._clip_size.height())
+            )
             super().paint(painter, option, widget)
             painter.restore()
             return
@@ -100,7 +108,9 @@ class CommentTextItem(QGraphicsTextItem):
     def shape(self):
         if self._clip_size.width() > 0 and self._clip_size.height() > 0:
             path = QPainterPath()
-            path.addRect(QRectF(0, 0, self._clip_size.width(), self._clip_size.height()))
+            path.addRect(
+                QRectF(0, 0, self._clip_size.width(), self._clip_size.height())
+            )
             return path
 
         return super().shape()
@@ -119,12 +129,17 @@ class CommentTextItem(QGraphicsTextItem):
 
 
 class CommentBoxItem(QGraphicsRectItem):
-    def __init__(self, rect: QRectF = QRectF(0, 0, 320, 200), title: str = "Comment", body_text: str = "", accent_index: int = 0):
+    def __init__(
+        self,
+        rect: QRectF = QRectF(0, 0, 320, 200),
+        title: str = "Comment",
+        body_text: str = "",
+        accent_index: int = 0,
+    ):
         super().__init__(rect)
 
         self.setFlags(
-            QGraphicsItem.ItemIsSelectable |
-            QGraphicsItem.ItemSendsGeometryChanges
+            QGraphicsItem.ItemIsSelectable | QGraphicsItem.ItemSendsGeometryChanges
         )
         self.setAcceptHoverEvents(True)
         self.setFlag(QGraphicsItem.ItemIsFocusable)
@@ -176,10 +191,12 @@ class CommentBoxItem(QGraphicsRectItem):
         return ACCENT_COLORS[self._accent_index]
 
     # https://noobtomaster.com/computer-graphics/color-blending-and-color-interpolation/
-    def blend_colors(self, c1: QColor, c2: QColor, ratio: float) -> QColor: # Blends two colors together by a given ratio (0.0 - 1.0)
-        r = c1.red()   * (1 - ratio) + c2.red()   * ratio
+    def blend_colors(
+        self, c1: QColor, c2: QColor, ratio: float
+    ) -> QColor:  # Blends two colors together by a given ratio (0.0 - 1.0)
+        r = c1.red() * (1 - ratio) + c2.red() * ratio
         g = c1.green() * (1 - ratio) + c2.green() * ratio
-        b = c1.blue()  * (1 - ratio) + c2.blue()  * ratio
+        b = c1.blue() * (1 - ratio) + c2.blue() * ratio
         a = c1.alpha() * (1 - ratio) + c2.alpha() * ratio
         return QColor(int(r), int(g), int(b), int(a))
 
@@ -198,8 +215,7 @@ class CommentBoxItem(QGraphicsRectItem):
             return []
 
         return [
-            item for item in self.scene().items()
-            if isinstance(item, CommentBoxItem)
+            item for item in self.scene().items() if isinstance(item, CommentBoxItem)
         ]
 
     def normalize_comment_z_order(self):
@@ -249,7 +265,7 @@ class CommentBoxItem(QGraphicsRectItem):
         text_width = max(24.0, r.width() - 52)
         self.title_item.setTextWidth(text_width)
         text_rect = self.title_item.boundingRect()
-        padding = 12 
+        padding = 12
 
         self.header_height = max(36, text_rect.height() + padding)
 
@@ -350,7 +366,11 @@ class CommentBoxItem(QGraphicsRectItem):
         self.update()
 
     def itemChange(self, change, value):
-        if change == QGraphicsItem.ItemPositionChange and self._dragging_header and self.move_children:
+        if (
+            change == QGraphicsItem.ItemPositionChange
+            and self._dragging_header
+            and self.move_children
+        ):
             delta = value - self.pos()
 
             for node in self._captured_nodes:
@@ -376,7 +396,9 @@ class CommentBoxItem(QGraphicsRectItem):
         header_path = QPainterPath()
         header_path.addRoundedRect(header_rect, RADIUS, RADIUS)
         clip = QPainterPath()
-        clip.addRect(QRectF(r.x(), r.y() + RADIUS, r.width(), self.header_height - RADIUS))
+        clip.addRect(
+            QRectF(r.x(), r.y() + RADIUS, r.width(), self.header_height - RADIUS)
+        )
         header_path = header_path.united(clip)
         painter.setBrush(QBrush(COLOR_HEADER_BG))
         painter.drawPath(header_path)
@@ -394,7 +416,7 @@ class CommentBoxItem(QGraphicsRectItem):
             r.right() - 26,
             r.y() + (self.header_height - pin_size) / 2,
             pin_size,
-            pin_size
+            pin_size,
         )
         self._pin_rect = pin_rect
         center = pin_rect.center()
@@ -555,7 +577,7 @@ class CommentBoxItem(QGraphicsRectItem):
                 self.set_title_size_index(size_actions.index(action))
             elif action == delete_action:
                 self._delete_self()
-        finally: # always call graph_changed after context self.menu actions
+        finally:  # always call graph_changed after context self.menu actions
             self._call_auto_save()
 
         event.accept()
@@ -675,7 +697,9 @@ class CommentBoxItem(QGraphicsRectItem):
         elif self.resize_corner == "tl":
             w = max(min_w, orig.width() - delta.x())
             h = max(min_h, orig.height() - delta.y())
-            self.setPos(orig_pos.x() + orig.width() - w, orig_pos.y() + orig.height() - h)
+            self.setPos(
+                orig_pos.x() + orig.width() - w, orig_pos.y() + orig.height() - h
+            )
             self.setRect(QRectF(0, 0, w, h))
 
         self._update_text_layout()

@@ -19,6 +19,7 @@
 
 NODE_REGISTRY = {}
 
+
 def register_node(node_type: str, *, label=None, category="Other", description=""):
     def decorator(cls):
         NODE_REGISTRY[node_type] = {
@@ -28,7 +29,9 @@ def register_node(node_type: str, *, label=None, category="Other", description="
             "description": description,
         }
         return cls
+
     return decorator
+
 
 def create_node(node_type):
     entry = NODE_REGISTRY.get(node_type)

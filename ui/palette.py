@@ -42,7 +42,7 @@ class CustomQLineEdit(QLineEdit):
 
     def keyPressEvent(self, event):
         key_code = event.key()
-        if (key_code == Qt.Key_Up or key_code == Qt.Key_Down):
+        if key_code == Qt.Key_Up or key_code == Qt.Key_Down:
             self.parent().parent().keyPressEventArrow(event)
 
         super().keyPressEvent(event)
@@ -55,9 +55,9 @@ class CustomQTreeWidget(QTreeWidget):
     def keyPressEvent(self, event):
         super().keyPressEvent(event)
 
-        # if the user manually switches into the tree we want to 
-        # allow selection of the category 
-        if (not self.parent().parent().search_input.hasFocus()):
+        # if the user manually switches into the tree we want to
+        # allow selection of the category
+        if not self.parent().parent().search_input.hasFocus():
             return
 
         # if a category is selected after the keyPressEvent,
@@ -65,7 +65,7 @@ class CustomQTreeWidget(QTreeWidget):
         current_item = self.currentItem()
         for i in range(self.topLevelItemCount()):
             category = self.topLevelItem(i)
-            if (current_item == category):
+            if current_item == category:
                 super().keyPressEvent(event)
                 return
 
@@ -83,7 +83,9 @@ class NodePalette(QWidget):
         self.background.resize(320, 420)
 
         self.search_input = CustomQLineEdit(self)
-        self.search_input.setPlaceholderText(Traduction.get_trad("search_nodes", "Search nodes..."))
+        self.search_input.setPlaceholderText(
+            Traduction.get_trad("search_nodes", "Search nodes...")
+        )
         self.search_input.textChanged.connect(self.filter_nodes)
 
         self.tree = CustomQTreeWidget()
@@ -121,9 +123,11 @@ class NodePalette(QWidget):
             links[cat] = meta["category"]
             categories.setdefault(cat, []).append(
                 (
-                    Traduction.get_trad(f"{meta["label"]}_label", meta["label"]),
+                    Traduction.get_trad(f"{meta['label']}_label", meta["label"]),
                     node_type,
-                    Traduction.get_trad(f"{meta["label"]}_desc",meta.get("description", ""))
+                    Traduction.get_trad(
+                        f"{meta['label']}_desc", meta.get("description", "")
+                    ),
                 )
             )
 
@@ -135,9 +139,13 @@ class NodePalette(QWidget):
             cat_item.setIcon(0, icon)
 
             for label, node_type, description in sorted(categories[category]):
-                item = QTreeWidgetItem([Traduction.get_trad(f"{node_type}_label", label)])
+                item = QTreeWidgetItem(
+                    [Traduction.get_trad(f"{node_type}_label", label)]
+                )
                 item.setData(0, Qt.UserRole, node_type)
-                item.setToolTip(0, Traduction.get_trad(f"{node_type}_desc",description))
+                item.setToolTip(
+                    0, Traduction.get_trad(f"{node_type}_desc", description)
+                )
                 cat_item.addChild(item)
 
             self.tree.addTopLevelItem(cat_item)
@@ -145,7 +153,7 @@ class NodePalette(QWidget):
     def filter_nodes(self, text):
         text = text.lower()
 
-        first_Visible_item = None; 
+        first_Visible_item = None
         for i in range(self.tree.topLevelItemCount()):
             category = self.tree.topLevelItem(i)
             visible_category = False
@@ -173,7 +181,7 @@ class NodePalette(QWidget):
         self.close()
 
     def focusOutEvent(self, event):
-        if(not (self.search_input.hasFocus())):
+        if not (self.search_input.hasFocus()):
             self.close()
         super().focusOutEvent(event)
 
@@ -236,6 +244,7 @@ def separator_style() -> str:
                 background: {Theme.get_color("PALETTE-SEPARATOR")};
             }}
         """
+
 
 def tree_style() -> str:
     return f"""

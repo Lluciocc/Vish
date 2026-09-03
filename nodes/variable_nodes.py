@@ -23,7 +23,12 @@ from nodes.base_node import BaseNode
 from nodes.registry import register_node
 
 
-@register_node("set_variable", category="Variables", label="Set Variable", description="Sets a variable to a specific value")
+@register_node(
+    "set_variable",
+    category="Variables",
+    label="Set Variable",
+    description="Sets a variable to a specific value",
+)
 class SetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("set_variable", "Set Variable")
@@ -38,7 +43,13 @@ class SetVariableNode(BaseNode):
         var_name = self.properties.get("variable", "VAR")
 
         raw_value = self.properties.get("value", "")
-        if raw_value.isdigit() or raw_value.startswith("$") or raw_value.startswith('"') or raw_value.startswith("'") or raw_value.startswith('`'):
+        if (
+            raw_value.isdigit()
+            or raw_value.startswith("$")
+            or raw_value.startswith('"')
+            or raw_value.startswith("'")
+            or raw_value.startswith("`")
+        ):
             value_expr = raw_value
         else:
             value_expr = f'"{raw_value}"'
@@ -52,10 +63,15 @@ class SetVariableNode(BaseNode):
                 value_expr = emitted
 
         context.variables[var_name] = value_expr
-        return f'{var_name}={value_expr}'
+        return f"{var_name}={value_expr}"
 
 
-@register_node("get_variable", category="Variables", label="Get Variable", description="Gets the value of a variable")
+@register_node(
+    "get_variable",
+    category="Variables",
+    label="Get Variable",
+    description="Gets the value of a variable",
+)
 class GetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("get_variable", "Get Variable")
@@ -70,7 +86,12 @@ class GetVariableNode(BaseNode):
         return f"${self.properties['variable']}"
 
 
-@register_node("file_exists", category="Variables", label="File Exists", description="Checks if a file exists")
+@register_node(
+    "file_exists",
+    category="Variables",
+    label="File Exists",
+    description="Checks if a file exists",
+)
 class FileExistsNode(BaseNode):
     def __init__(self):
         super().__init__("file_exists", "File Exists")
@@ -89,7 +110,12 @@ class FileExistsNode(BaseNode):
         return f'[ -f "{path}" ]'
 
 
-@register_node("string_constant", category="Constants", label="String Constant", description="Represents a string constant value")
+@register_node(
+    "string_constant",
+    category="Constants",
+    label="String Constant",
+    description="Represents a string constant value",
+)
 class StringConstantNode(BaseNode):
     def __init__(self):
         super().__init__("string_constant", "String Constant")

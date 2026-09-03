@@ -109,13 +109,14 @@ class GraphView(QGraphicsView):
         self._zoom_anim.setEasingCurve(QEasingCurve.OutCubic)
         self._zoom_anim.setDuration(120)
 
-    #     self._init_minimap()
+        #     self._init_minimap()
         self._init_frame_button()
         self._suspend_edge_undo = False
         self.undo_stack = QUndoStack(self)
         self.graph_scene.connection_created.connect(
             lambda a, b: (
-                None if self._suspend_edge_undo
+                None
+                if self._suspend_edge_undo
                 else self.undo_stack.push(AddEdgeCommand(self, a, b))
             )
         )
@@ -127,11 +128,7 @@ class GraphView(QGraphicsView):
     def _set_zoom_anim_value(self, value):
         self._apply_zoom(value)
 
-    zoom_anim_value = Property(
-        float,
-        get_zoom,
-        _set_zoom_anim_value
-    )
+    zoom_anim_value = Property(float, get_zoom, _set_zoom_anim_value)
 
     def contextMenuEvent(self, event):
         scene_pos = self.mapToScene(event.pos())
@@ -194,7 +191,9 @@ class GraphView(QGraphicsView):
             for port in node_item.port_items.values():
                 if port.is_input == target_is_input:
                     target_port = port
-                    valid = GraphValidator.is_valid_connection(self.graph, source_port, target_port)
+                    valid = GraphValidator.is_valid_connection(
+                        self.graph, source_port, target_port
+                    )
                     if valid:
                         valid_port = target_port
                         break
@@ -249,14 +248,20 @@ class GraphView(QGraphicsView):
 
     def viewportEvent(self, event):
         if isinstance(event, QMouseEvent):
-            if event.button() == Qt.MiddleButton and event.modifiers() == Qt.ControlModifier: # Ctrl + MB
+            if (
+                event.button() == Qt.MiddleButton
+                and event.modifiers() == Qt.ControlModifier
+            ):  # Ctrl + MB
                 current_scale = self.transform().m11()
                 applied_factor = 1 / current_scale
                 self.scale(applied_factor, applied_factor)
                 self._sync_zoom_from_transform()
                 return True
 
-            elif event.type() == QEvent.MouseButtonPress and event.button() == Qt.MiddleButton: # MB begin
+            elif (
+                event.type() == QEvent.MouseButtonPress
+                and event.button() == Qt.MiddleButton
+            ):  # MB begin
                 self._previous_drag_mode = self.dragMode()
                 self.setDragMode(QGraphicsView.ScrollHandDrag)
                 self.setInteractive(False)
@@ -266,19 +271,22 @@ class GraphView(QGraphicsView):
                     event.position(),
                     Qt.LeftButton,
                     Qt.LeftButton,
-                    event.modifiers()
+                    event.modifiers(),
                 )
                 super().mousePressEvent(fake)
                 return True
 
-            elif event.type() == QEvent.MouseButtonRelease and event.button() == Qt.MiddleButton: # MB end
+            elif (
+                event.type() == QEvent.MouseButtonRelease
+                and event.button() == Qt.MiddleButton
+            ):  # MB end
                 self.setInteractive(True)
                 fake = QMouseEvent(
                     QEvent.MouseButtonRelease,
                     event.position(),
                     Qt.LeftButton,
                     Qt.NoButton,
-                    event.modifiers()
+                    event.modifiers(),
                 )
                 super().mouseReleaseEvent(fake)
 
@@ -292,38 +300,44 @@ class GraphView(QGraphicsView):
         if isinstance(focus_item, QGraphicsTextItem):
             super().keyPressEvent(event)
             return
-        if event.matches(QKeySequence.Copy): # Ctrl+C
+        if event.matches(QKeySequence.Copy):  # Ctrl+C
             self.copy_selection()
             return
-        if event.key() == Qt.Key_Space and event.modifiers() & Qt.ControlModifier: # Ctrl+Space
+        if (
+            event.key() == Qt.Key_Space and event.modifiers() & Qt.ControlModifier
+        ):  # Ctrl+Space
             selected = self.get_selected_node_items()
             if len(selected) == 1:
                 self._open_palette_from_selected(selected[0])
                 event.accept()
                 return
-        if event.matches(QKeySequence.Paste): # Ctrl+V
+        if event.matches(QKeySequence.Paste):  # Ctrl+V
             if self.clipboard.has_data():
                 view_pos = self.mapFromGlobal(QCursor.pos())
                 scene_pos = self.mapToScene(view_pos)
-                self.undo_stack.push(PasteCommand(self, self.clipboard.get(), scene_pos))
+                self.undo_stack.push(
+                    PasteCommand(self, self.clipboard.get(), scene_pos)
+                )
             return
-        if event.key() == Qt.Key_C: # C
+        if event.key() == Qt.Key_C:  # C
             self.create_comment_box()
             event.accept()
             return
-        if event.matches(QKeySequence.Undo): # Ctrl+Z
+        if event.matches(QKeySequence.Undo):  # Ctrl+Z
             self.undo_stack.undo()
             self.clear_property_panel_request.emit()
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
             return
 
-        if event.matches(QKeySequence.Redo) or (event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier): # Ctrl+Shift+Z or Ctrl+Y
+        if event.matches(QKeySequence.Redo) or (
+            event.key() == Qt.Key_Y and event.modifiers() & Qt.ControlModifier
+        ):  # Ctrl+Shift+Z or Ctrl+Y
             self.undo_stack.redo()
             self.clear_property_panel_request.emit()
 
             return
-        if event.matches(QKeySequence.SelectAll): # Ctrl+A
+        if event.matches(QKeySequence.SelectAll):  # Ctrl+A
             self.scene().clearSelection()
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
@@ -331,7 +345,7 @@ class GraphView(QGraphicsView):
             if Config.SYNC_NODES_AND_GEN:
                 self.graph_scene.graph_changed.emit()
             return
-        if event.matches(QKeySequence.Cut): # Ctrl+X
+        if event.matches(QKeySequence.Cut):  # Ctrl+X
             self.copy_selection()
             selected_node_items = self.get_selected_node_items()
             if selected_node_items:
@@ -340,19 +354,21 @@ class GraphView(QGraphicsView):
                     self.undo_stack.push(RemoveNodeCommand(self, item.node.id))
                 self.undo_stack.endMacro()
             return
-        if event.key() == Qt.Key_D and event.modifiers() & Qt.ControlModifier: # Ctrl+D
+        if event.key() == Qt.Key_D and event.modifiers() & Qt.ControlModifier:  # Ctrl+D
             self.copy_selection()
             self.paste()
             return
-        if event.matches(QKeySequence.Delete): # Del
+        if event.matches(QKeySequence.Delete):  # Del
             self.clear_property_panel_request.emit()
             selected_items = self.scene().selectedItems()
 
             node_items = [it for it in selected_items if isinstance(it, NodeItem)]
-            comment_items = [it for it in selected_items if isinstance(it, CommentBoxItem)]
+            comment_items = [
+                it for it in selected_items if isinstance(it, CommentBoxItem)
+            ]
 
             if node_items or comment_items:
-                self.undo_stack.beginMacro("Delete") # both macro in the same key seq
+                self.undo_stack.beginMacro("Delete")  # both macro in the same key seq
 
                 for it in node_items:
                     self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
@@ -368,17 +384,17 @@ class GraphView(QGraphicsView):
                 event.accept()
                 return
 
-        if event.key() == Qt.Key_F: # F
+        if event.key() == Qt.Key_F:  # F
             self.auto_layout()
             return
-        if event.key() == Qt.Key_R: # R
+        if event.key() == Qt.Key_R:  # R
             self.rebuild_graph()
             return
-        if event.key() == Qt.Key_H: # H
+        if event.key() == Qt.Key_H:  # H
             self.frame_all()
             return
 
-        if event.key() == Qt.Key_Alt and Config.lang != "en": # Alt
+        if event.key() == Qt.Key_Alt and Config.lang != "en":  # Alt
             self.alt_lang = True
             for item in self.scene().items():
                 if isinstance(item, NodeItem):
@@ -387,12 +403,12 @@ class GraphView(QGraphicsView):
         if event.modifiers() == Qt.KeypadModifier:
             current_scale = self.transform().m11()
             divisor = 4
-            if event.key() == Qt.Key_Plus: # Num+
+            if event.key() == Qt.Key_Plus:  # Num+
                 zoom_factor = 1 / (1 - 1 / divisor)
                 proposed_scale = current_scale * zoom_factor
                 self.set_zoom(proposed_scale, animated=True)
                 return
-            elif event.key() == Qt.Key_Minus: # Num-
+            elif event.key() == Qt.Key_Minus:  # Num-
                 zoom_factor = 1 / (1 + 1 / (divisor - 1))
                 proposed_scale = current_scale * zoom_factor
                 self.set_zoom(proposed_scale, animated=True)
@@ -421,13 +437,13 @@ class GraphView(QGraphicsView):
             event.accept()
             return
         item = self.itemAt(event.pos())
-        if isinstance(item, NodeItem): # can't drag if click on node
+        if isinstance(item, NodeItem):  # can't drag if click on node
             self.setDragMode(QGraphicsView.NoDrag)
         else:
             self.setDragMode(QGraphicsView.RubberBandDrag)
         super().mousePressEvent(event)
 
-    def mouseReleaseEvent(self, event): # restore drag mode after dragging
+    def mouseReleaseEvent(self, event):  # restore drag mode after dragging
         if event.button() == Qt.LeftButton:
             self.graph_scene.block_input = False
 
@@ -470,8 +486,7 @@ class GraphView(QGraphicsView):
 
     def get_selected_node_items(self):
         return [
-            item for item in self.graph_scene.selectedItems()
-            if hasattr(item, "node")
+            item for item in self.graph_scene.selectedItems() if hasattr(item, "node")
         ]
 
     def get_selected_nodes(self):
@@ -528,7 +543,9 @@ class GraphView(QGraphicsView):
             source_i = edge_data["source_output_index"]
             target_i = edge_data["target_input_index"]
 
-            if source_i >= len(source_node.outputs) or target_i >= len(target_node.inputs):
+            if source_i >= len(source_node.outputs) or target_i >= len(
+                target_node.inputs
+            ):
                 continue
 
             source_port = source_node.outputs[source_i]
@@ -654,14 +671,16 @@ class GraphView(QGraphicsView):
         self.zoom_widget.show()
 
     def _sync_zoom_from_transform(self):
-        actual_scale = self.transform().m11() # assuming uniform scaling, m11() is enough: https://doc.qt.io/qtforpython-6.5/PySide6/QtGui/QTransform.html
+        actual_scale = self.transform().m11()  # assuming uniform scaling, m11() is enough: https://doc.qt.io/qtforpython-6.5/PySide6/QtGui/QTransform.html
 
         self.scale_factor = actual_scale
 
         percent = int(actual_scale * 100)
         self.zoom_label.setText(f"{percent}%")
 
-        slider_value = max(self.zoom_slider.minimum(), min(self.zoom_slider.maximum(), percent))
+        slider_value = max(
+            self.zoom_slider.minimum(), min(self.zoom_slider.maximum(), percent)
+        )
         self.zoom_slider.blockSignals(True)
         self.zoom_slider.setValue(slider_value)
         self.zoom_slider.blockSignals(False)
@@ -726,7 +745,9 @@ class GraphView(QGraphicsView):
             if isinstance(item, NodeItem):
                 item.setSelected(True)
         self.copy_selection(message=False)
-        node_items = [it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)]
+        node_items = [
+            it for it in self.graph_scene.selectedItems() if isinstance(it, NodeItem)
+        ]
         for it in node_items:
             self.undo_stack.push(RemoveNodeCommand(self, it.node.id))
         self.paste_offset = (0, 0)
@@ -787,11 +808,13 @@ def frame_button_style() -> str:
             }}
         """
 
+
 def zoom_label_style() -> str:
     return f"""
                 color: {Theme.get_color("GRAPH_VIEW-ZOOMLABEL_TEXT")};
                 background: transparent;
         """
+
 
 def zoom_widget_style() -> str:
     return f"""
@@ -802,6 +825,7 @@ def zoom_widget_style() -> str:
                 padding: 6px;
             }}
         """
+
 
 def zoom_button_style() -> str:
     return f"""
@@ -820,6 +844,7 @@ def zoom_button_style() -> str:
                 background: {Theme.get_color("GRAPH_VIEW-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """
+
 
 def zoom_slider_style() -> str:
     return f"""

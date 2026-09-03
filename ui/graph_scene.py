@@ -29,7 +29,7 @@ from ui.edge_item import EdgeItem
 from ui.port_item import PortItem
 
 
-class GraphScene(QGraphicsScene):                                          #TODO Add undo commands
+class GraphScene(QGraphicsScene):  # TODO Add undo commands
     node_selected = Signal(object)
     connection_created = Signal(object, object)
     graph_changed = Signal()
@@ -57,7 +57,7 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
         if first_port.edges:
             match modifier:
-                case Qt.ControlModifier:    # Ctrl + LB
+                case Qt.ControlModifier:  # Ctrl + LB
                     self.is_ctrl = True
                     for edge in first_port.edges:
                         self.drag_edges.append(edge)
@@ -70,16 +70,21 @@ class GraphScene(QGraphicsScene):                                          #TODO
                     if Config.DEBUG:
                         Logger.LogMessage("-SCENE.START_CONNECTION: grab edge")
 
-                case Qt.AltModifier:        # Alt + LB
+                case Qt.AltModifier:  # Alt + LB
                     for edge in first_port.edges:
                         self.drag_edges.append(edge)
                     if Config.DEBUG:
                         Logger.LogMessage("-SCENE.START_CONNECTION: delete edge")
-                        Logger.LogMessage(f"EDGES: {len(self.graph.edges) - len(self.drag_edges)} (-{len(self.drag_edges)})")
+                        Logger.LogMessage(
+                            f"EDGES: {len(self.graph.edges) - len(self.drag_edges)} (-{len(self.drag_edges)})"
+                        )
                     self.delete_edges()
 
-                case _:                     # LB
-                    if first_port.is_input or first_port.port.port_type == PortType.EXEC:
+                case _:  # LB
+                    if (
+                        first_port.is_input
+                        or first_port.port.port_type == PortType.EXEC
+                    ):
                         edge = first_port.edges[0]
                         if first_port.is_input:
                             self.pending_port = edge.source_port
@@ -112,9 +117,11 @@ class GraphScene(QGraphicsScene):                                          #TODO
         self.addItem(drag_edge)
         return drag_edge
 
-    def delete_edges(self): # Only edges in self.drag_edges become deleted!
+    def delete_edges(self):  # Only edges in self.drag_edges become deleted!
         if Config.DEBUG:
-            Logger.LogMessage(f"SCENE.DELETE_EDGES: delete edges (-{len(self.drag_edges)})")
+            Logger.LogMessage(
+                f"SCENE.DELETE_EDGES: delete edges (-{len(self.drag_edges)})"
+            )
 
         for edge in self.drag_edges:
             if edge.source_port:
@@ -144,27 +151,37 @@ class GraphScene(QGraphicsScene):                                          #TODO
         if self.drag_edges:
             if self.pending_port:
                 if Config.DEBUG:
-                    Logger.LogMessage(f"SCENE.RESTORE_PENDING_CONNECTION: restore drag_edges, {self.drag_edges}")
+                    Logger.LogMessage(
+                        f"SCENE.RESTORE_PENDING_CONNECTION: restore drag_edges, {self.drag_edges}"
+                    )
 
                 if self.drag_edges[0].source_port and self.drag_edges[0].target_port:
                     self._show_invalid_feedback()
 
             else:
                 if Config.DEBUG:
-                    Logger.LogMessage(f"SCENE.RESTORE_PENDING_CONNECTION: delete drag_edges, {self.drag_edges}")
+                    Logger.LogMessage(
+                        f"SCENE.RESTORE_PENDING_CONNECTION: delete drag_edges, {self.drag_edges}"
+                    )
                 self._show_invalid_feedback()
 
     def switch_connections(self, first_port, second_port, backswitch: bool):
         if first_port.is_input == second_port.is_input:
             valid = GraphValidator.is_valid_port_type(first_port.edges, second_port)
             if valid:
-                valid = GraphValidator.is_valid_port_type(self.pending_port.edges, first_port)
+                valid = GraphValidator.is_valid_port_type(
+                    self.pending_port.edges, first_port
+                )
             if valid:
                 if Config.DEBUG:
                     if backswitch:
-                        Logger.LogMessage(f"SCENE.SWITCH_CONNECTIONS: {first_port} <-> {second_port}")
+                        Logger.LogMessage(
+                            f"SCENE.SWITCH_CONNECTIONS: {first_port} <-> {second_port}"
+                        )
                     else:
-                        Logger.LogMessage(f"SCENE.SWITCH_CONNECTIONS: {first_port} -> {second_port}")
+                        Logger.LogMessage(
+                            f"SCENE.SWITCH_CONNECTIONS: {first_port} -> {second_port}"
+                        )
 
                 for edge in first_port.edges:
                     self.pending_edges.append(edge)
@@ -177,7 +194,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
                         else:
                             edge.source_port = first_port
                         edge.update_positions()
-                        self.graph.update_edge(edge.edge.id, edge.source_port.port, edge.target_port.port)
+                        self.graph.update_edge(
+                            edge.edge.id, edge.source_port.port, edge.target_port.port
+                        )
 
                     second_port.edges.clear()
                 for edge in self.pending_edges:
@@ -187,7 +206,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
                     else:
                         edge.source_port = second_port
                     edge.update_positions()
-                    self.graph.update_edge(edge.edge.id, edge.source_port.port, edge.target_port.port)
+                    self.graph.update_edge(
+                        edge.edge.id, edge.source_port.port, edge.target_port.port
+                    )
 
                 self.colorize_port(first_port, False)
                 self.colorize_port(second_port, False)
@@ -202,7 +223,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
         if not self.drag_edges:
             return
 
-        mouse_pos = self.views()[0].mapToScene(self.views()[0].mapFromGlobal(QCursor.pos()))
+        mouse_pos = self.views()[0].mapToScene(
+            self.views()[0].mapFromGlobal(QCursor.pos())
+        )
         second_port = None
         for item in self.items(mouse_pos):
             if isinstance(item, PortItem):
@@ -215,7 +238,9 @@ class GraphScene(QGraphicsScene):                                          #TODO
         if first_port == second_port:
             if second_port.edges:
                 if Config.DEBUG:
-                    GraphValidator.is_valid_connection(self.graph, first_port, second_port)
+                    GraphValidator.is_valid_connection(
+                        self.graph, first_port, second_port
+                    )
                 self._show_invalid_feedback()
                 self.restore_pending_connection()
                 return
@@ -225,9 +250,11 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
         modifier = QApplication.keyboardModifiers()
         if second_port.edges:
-            if modifier == Qt.AltModifier:          # Deleting previous edges (Alt)
+            if modifier == Qt.AltModifier:  # Deleting previous edges (Alt)
                 if Config.DEBUG:
-                    Logger.LogMessage("SCENE.END_CONNECTION: delete previous drag_edges")
+                    Logger.LogMessage(
+                        "SCENE.END_CONNECTION: delete previous drag_edges"
+                    )
                 if first_port.port.port_type == second_port.port.port_type:
                     self.pending_edges.clear()
                     for edge in self.drag_edges:
@@ -244,22 +271,28 @@ class GraphScene(QGraphicsScene):                                          #TODO
                 else:
                     self.restore_pending_connection()
 
-        if self.pending_port:                       # Check for self-connection on multi-dragging
+        if self.pending_port:  # Check for self-connection on multi-dragging
             for drag_edge in self.drag_edges:
                 if drag_edge.source_port.port.node.id == second_port.port.node.id:
                     self.restore_pending_connection()
                     return
 
-        if modifier == Qt.ControlModifier:          # Ctrl + LB:
+        if modifier == Qt.ControlModifier:  # Ctrl + LB:
             if Config.DEBUG:
                 Logger.LogMessage("SCENE.END_CONNECTION: switch connections")
             self.switch_connections(first_port, second_port, True)
 
-        elif self.is_ctrl:                          # LB after Ctrl + LB start_connection
-            match (second_port.is_input, second_port.edges, second_port.port.port_type == PortType.EXEC):
+        elif self.is_ctrl:  # LB after Ctrl + LB start_connection
+            match (
+                second_port.is_input,
+                second_port.edges,
+                second_port.port.port_type == PortType.EXEC,
+            ):
                 case (True, [], _) | (False, _, False) | (_, [], True):
                     if Config.DEBUG:
-                        Logger.LogMessage("SCENE.END_CONNECTION: switch connections with empty port")
+                        Logger.LogMessage(
+                            "SCENE.END_CONNECTION: switch connections with empty port"
+                        )
                     self.switch_connections(first_port, second_port, False)
                 case _:
                     self.restore_pending_connection()
@@ -267,29 +300,36 @@ class GraphScene(QGraphicsScene):                                          #TODO
 
         for drag_edge in self.drag_edges:
             if second_port.edges:
-                if self.is_ctrl:                    # Ctrl + LB
+                if self.is_ctrl:  # Ctrl + LB
                     continue
 
-                elif first_port.is_input and first_port.port.port_type == PortType.EXEC:           # LB
+                elif (
+                    first_port.is_input and first_port.port.port_type == PortType.EXEC
+                ):  # LB
                     self.restore_pending_connection()
-                else:                               # LB
+                else:  # LB
                     if first_port.is_input == second_port.is_input:
                         if first_port.port.port_type == PortType.EXEC:
                             self.restore_pending_connection()
                         else:
                             self.set_edge(second_port, drag_edge.source_port, drag_edge)
                     else:
-                        if first_port.port.port_type == PortType.EXEC or second_port.is_input:
+                        if (
+                            first_port.port.port_type == PortType.EXEC
+                            or second_port.is_input
+                        ):
                             self.restore_pending_connection()
                         else:
                             self.set_edge(second_port, drag_edge.source_port, drag_edge)
 
-            else:                                   # LB, ignoring modifier
+            else:  # LB, ignoring modifier
                 if self.is_ctrl:
                     self.is_ctrl = False
                     if Config.DEBUG:
                         self.edge_logger_counter = None
-                if first_port.is_input == (first_port.is_input == second_port.is_input): # XNOR operator
+                if first_port.is_input == (
+                    first_port.is_input == second_port.is_input
+                ):  # XNOR operator
                     self.set_edge(drag_edge.source_port, second_port, drag_edge)
                 else:
                     self.set_edge(second_port, drag_edge.source_port, drag_edge)
@@ -335,10 +375,14 @@ class GraphScene(QGraphicsScene):                                          #TODO
             self.colorize_port(second_port, False)
 
         if Config.DEBUG:
-            Logger.LogMessage(f"SCENE.SET_EDGE: {first_port.port.port_type} -> {second_port.port.port_type}")
+            Logger.LogMessage(
+                f"SCENE.SET_EDGE: {first_port.port.port_type} -> {second_port.port.port_type}"
+            )
             Logger.LogMessage(f"SCENE.SET_EDGE: {edge}")
             if self.edge_logger_counter:
-                Logger.LogMessage(f"EDGES: {len(self.graph.edges)} ({self.edge_logger_counter})")
+                Logger.LogMessage(
+                    f"EDGES: {len(self.graph.edges)} ({self.edge_logger_counter})"
+                )
 
         if Config.SYNC_NODES_AND_GEN:
             self.graph_changed.emit()

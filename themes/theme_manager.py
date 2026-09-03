@@ -64,12 +64,16 @@ class Theme:
 
             if Theme.language != Config.lang:
                 Theme.language = Config.lang
-                Theme.comment_labels = Theme.colors.get("comment_labels").get(Theme.language.upper())
+                Theme.comment_labels = Theme.colors.get("comment_labels").get(
+                    Theme.language.upper()
+                )
                 if Theme.comment_labels == None:
                     Theme.comment_labels = Theme.colors.get("comment_labels").get("EN")
 
             if Theme.colors.get("description") != None:
-                Theme.description = Theme.colors.get("description").get(Theme.language.upper())
+                Theme.description = Theme.colors.get("description").get(
+                    Theme.language.upper()
+                )
                 if Theme.description == None:
                     Theme.description = Theme.colors.get("description").get("EN")
                     if Theme.description == None:
@@ -140,9 +144,13 @@ class Theme:
                 if name == None:
                     name = theme_properties.get("name").get("EN")
                 Theme.theme_names.append(name)
-                Theme.comment_labels = theme_properties.get("comment_labels").get(Theme.language.upper())
+                Theme.comment_labels = theme_properties.get("comment_labels").get(
+                    Theme.language.upper()
+                )
                 if Theme.comment_labels == None:
-                    Theme.comment_labels = theme_properties.get("comment_labels").get("EN")
+                    Theme.comment_labels = theme_properties.get("comment_labels").get(
+                        "EN"
+                    )
         return Theme.theme_names
 
     @staticmethod
@@ -158,14 +166,18 @@ class Theme:
         path = Path(Info.resource_path("themes/dark.yml"))
         if path.exists():
             if Config.DEBUG:
-                Debug.Warn("THEME_MANAGER: Custom theme not found! Loading standard theme.")
+                Debug.Warn(
+                    "THEME_MANAGER: Custom theme not found! Loading standard theme."
+                )
             return path
-        themes_names = (Info.get_files_from_directory("resource_path", "themes/", ".yml"))
+        themes_names = Info.get_files_from_directory("resource_path", "themes/", ".yml")
         for theme in themes_names:
             if "_" not in theme:
                 path = Path(Info.resource_path(f"themes/{theme}"))
                 if Config.DEBUG:
-                    Debug.Warn("THEME_MANAGER: Custom theme not found! Standard Theme not found! Loading next available fallback theme.")
+                    Debug.Warn(
+                        "THEME_MANAGER: Custom theme not found! Standard Theme not found! Loading next available fallback theme."
+                    )
                 return path
         print("\033[31m[ERROR] THEME_MANAGER: No theme found! -> Crash!")
         return None
@@ -181,12 +193,14 @@ class Theme:
         if path.exists():
             return path
 
-        themes_names = (Info.get_files_from_directory("resource_path", "themes/", ".yml"))
+        themes_names = Info.get_files_from_directory("resource_path", "themes/", ".yml")
         for theme in themes_names:
             if "_" not in theme:
                 path = Path(Info.resource_path(f"themes/{theme}"))
                 if Config.DEBUG:
-                    Debug.Warn("THEME_MANAGER: Missing fallback theme! Loading next available fallback theme.")
+                    Debug.Warn(
+                        "THEME_MANAGER: Missing fallback theme! Loading next available fallback theme."
+                    )
                 return path
 
         print("\033[31m[ERROR] THEME_MANAGER: No fallback theme found! -> Crash!")
@@ -210,9 +224,13 @@ class Theme:
             indent = len(raw_line) - len(raw_line.lstrip(" "))
             colon_idx = stripped.index(":")
             key = stripped[:colon_idx].strip()
-            value_raw = stripped[colon_idx + 1:].strip()
+            value_raw = stripped[colon_idx + 1 :].strip()
 
-            if value_raw and value_raw[0] in ('"', "'") and value_raw[-1] == value_raw[0]:
+            if (
+                value_raw
+                and value_raw[0] in ('"', "'")
+                and value_raw[-1] == value_raw[0]
+            ):
                 value: object = value_raw[1:-1]
             elif not value_raw:
                 value = None

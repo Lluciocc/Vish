@@ -31,7 +31,6 @@ COLOR_MAP = {
     35: "#aa00aa",
     36: "#00aaaa",
     37: "#aaaaaa",
-
     90: "#555555",
     91: "#ff5555",
     92: "#55ff55",
@@ -71,7 +70,7 @@ def ansi_to_html(text: str) -> str:
     last = 0
 
     for match in ANSI_REGEX.finditer(text):
-        output.append(escape(text[last:match.start()]))
+        output.append(escape(text[last : match.start()]))
 
         codes = match.group(1)
         for code in map(int, filter(None, codes.split(";") or ["0"])):
@@ -94,9 +93,6 @@ def ansi_to_html(text: str) -> str:
 
     return "<pre>" + "".join(output) + "</pre>"
 
+
 def escape(s: str) -> str:
-    return (
-        s.replace("&", "&amp;")
-         .replace("<", "&lt;")
-         .replace(">", "&gt;")
-    )
+    return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

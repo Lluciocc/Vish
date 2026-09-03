@@ -46,7 +46,8 @@ class BaseNode(Node):
 
     def get_next_exec_node(self):
         exec_outputs = [
-            o for o in self.outputs
+            o
+            for o in self.outputs
             if o.port_type == PortType.EXEC and o.connected_edges
         ]
         if not exec_outputs:

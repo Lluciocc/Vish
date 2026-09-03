@@ -106,12 +106,15 @@ class AboutGroup(QWidget):
         count = self.layout().count()
 
         if count == 0:
-            row.setStyleSheet(row.styleSheet() + f"""
+            row.setStyleSheet(
+                row.styleSheet()
+                + f"""
                 QWidget {{
                     border-top-left-radius: {self.RADIUS}px;
                     border-top-right-radius: {self.RADIUS}px;
                 }}
-            """)
+            """
+            )
 
         self.layout().addWidget(row)
 
@@ -120,12 +123,15 @@ class AboutGroup(QWidget):
             return
 
         last = self.layout().itemAt(self.layout().count() - 1).widget()
-        last.setStyleSheet(last.styleSheet() + f"""
+        last.setStyleSheet(
+            last.styleSheet()
+            + f"""
             QWidget {{
                 border-bottom-left-radius: {self.RADIUS}px;
                 border-bottom-right-radius: {self.RADIUS}px;
             }}
-        """)
+        """
+        )
 
 
 def section_title(key, fallback):
@@ -134,6 +140,7 @@ def section_title(key, fallback):
     label.setStyleSheet("font-size: 22px; font-weight: 600;")
     label.setWordWrap(True)
     return label
+
 
 def subtitle(key, fallback):
     label = QLabel(Traduction.get_trad(key, fallback))
@@ -172,64 +179,108 @@ class AboutMainPage(QWidget):
         header = QHBoxLayout()
         header.addWidget(icon)
         header_text.addWidget(section_title(title_key, title_fallback))
-        header_text.addWidget(subtitle(subtitle_key,subtitle_fallback))
+        header_text.addWidget(subtitle(subtitle_key, subtitle_fallback))
         header_text.addLayout(vrow)
         header.addLayout(header_text)
         header.addStretch(1)
         root.addLayout(header)
 
         g1 = AboutGroup()
-        g1.add_row(AboutRow(
-            Traduction.get_trad("about_whats_new", "What's New"),
-            "›",
-            lambda: go_to("whats_new")
-        ))
-        g1.add_row(AboutRow(
-            Traduction.get_trad("about_website", "Website"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_website", "Website"), "https://lluciocc.fr")
-        ))
+        g1.add_row(
+            AboutRow(
+                Traduction.get_trad("about_whats_new", "What's New"),
+                "›",
+                lambda: go_to("whats_new"),
+            )
+        )
+        g1.add_row(
+            AboutRow(
+                Traduction.get_trad("about_website", "Website"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad("about_website", "Website"),
+                    "https://lluciocc.fr",
+                ),
+            )
+        )
         g1.finalize()
 
         g2 = AboutGroup()
-        g2.add_row(AboutRow(
-            Traduction.get_trad("about_theme_repo", "Themes Collection Repository"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_theme_repo", "Themes Collection Repository"), "https://github.com/Lluciocc/vish-theme-collection")
-        ))
-        g2.add_row(AboutRow(
-            Traduction.get_trad("about_questions", "Frequently Asked Questions"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_questions", "Frequently Asked Questions"), "https://github.com/Lluciocc/Vish/wiki#faqs")
-        ))
-        g2.add_row(AboutRow(
-            Traduction.get_trad("about_report", "Report an Issue"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_report", "Report an Issue"), "https://github.com/Lluciocc/Vish/issues")
-        ))
-        g2.add_row(AboutRow(
-            Traduction.get_trad("about_support", "Support the project"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_support", "Support the project"), "https://github.com/Lluciocc/Vish?sponsor=1")
-        ))
+        g2.add_row(
+            AboutRow(
+                Traduction.get_trad("about_theme_repo", "Themes Collection Repository"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad(
+                        "about_theme_repo", "Themes Collection Repository"
+                    ),
+                    "https://github.com/Lluciocc/vish-theme-collection",
+                ),
+            )
+        )
+        g2.add_row(
+            AboutRow(
+                Traduction.get_trad("about_questions", "Frequently Asked Questions"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad(
+                        "about_questions", "Frequently Asked Questions"
+                    ),
+                    "https://github.com/Lluciocc/Vish/wiki#faqs",
+                ),
+            )
+        )
+        g2.add_row(
+            AboutRow(
+                Traduction.get_trad("about_report", "Report an Issue"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad("about_report", "Report an Issue"),
+                    "https://github.com/Lluciocc/Vish/issues",
+                ),
+            )
+        )
+        g2.add_row(
+            AboutRow(
+                Traduction.get_trad("about_support", "Support the project"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad("about_support", "Support the project"),
+                    "https://github.com/Lluciocc/Vish?sponsor=1",
+                ),
+            )
+        )
         g2.finalize()
 
         g3 = AboutGroup()
-        g3.add_row(AboutRow(
-            Traduction.get_trad("about_credits", "Credits"),
-            "›",
-            lambda: go_to("credits")
-        ))
-        g3.add_row(AboutRow(
-            Traduction.get_trad("about_legal", "Legal"),
-            "›",
-            lambda: go_to("legal")
-        ))
-        g3.add_row(AboutRow(
-            Traduction.get_trad("about_matrix", "Join our Matrix room"),
-            "↗",
-            lambda: open_link_box(self, Traduction.get_trad("about_matrix", "Join our Matrix room"), "https://matrix.to/#/%23vish-support%3Amatrix.org")
-        ))
+        g3.add_row(
+            AboutRow(
+                Traduction.get_trad("about_credits", "Credits"),
+                "›",
+                lambda: go_to("credits"),
+            )
+        )
+        g3.add_row(
+            AboutRow(
+                Traduction.get_trad("about_legal", "Legal"), "›", lambda: go_to("legal")
+            )
+        )
+        g3.add_row(
+            AboutRow(
+                Traduction.get_trad("about_matrix", "Join our Matrix room"),
+                "↗",
+                lambda: open_link_box(
+                    self,
+                    Traduction.get_trad("about_matrix", "Join our Matrix room"),
+                    "https://matrix.to/#/%23vish-support%3Amatrix.org",
+                ),
+            )
+        )
         g3.finalize()
 
         root.addSpacing(8)
@@ -280,6 +331,7 @@ def pushbutton_style() -> str:
             }}
         """
 
+
 def content_browser_style() -> str:
     return f"""
             QTextBrowser {{
@@ -318,12 +370,14 @@ def content_browser_style() -> str:
             }}
         """
 
+
 def arrow_label_style() -> str:
     return f"""
                 font-size: 16px;
                 opacity: 0.7;
                 color: {Theme.get_color("ABOUT_PAGES-ARROWLABEL_TEXT")};
         """
+
 
 def version_label_style() -> str:
     return f"""
@@ -332,7 +386,7 @@ def version_label_style() -> str:
                 min-height: 28px;
                 border-radius: 9px;
                 background-color: {Theme.get_color("ABOUT_PAGES-VERSIONLABEL_BACKGROUND")};;
-                color: {Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT") if Theme.icons == 'dark' else Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT_INVERT")}; /*ensure good contrast*/
+                color: {Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT") if Theme.icons == "dark" else Theme.get_color("ABOUT_PAGES-VERSIONLABEL_TEXT_INVERT")}; /*ensure good contrast*/
                 font-size: 13px;
                 font-weight: 600;
             }}

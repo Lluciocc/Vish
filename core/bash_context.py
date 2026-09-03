@@ -18,7 +18,6 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
-
 class BashContext:
     def __init__(self):
         self.variables: dict[str, str] = {}

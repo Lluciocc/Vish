@@ -22,11 +22,11 @@ from pathlib import Path
 
 
 class Colors:
-    RESET  = "\033[0m"
-    RED    = "\033[31m"
+    RESET = "\033[0m"
+    RED = "\033[31m"
     YELLOW = "\033[33m"
-    GREEN  = "\033[32m"
-    CYAN   = "\033[36m"
+    GREEN = "\033[32m"
+    CYAN = "\033[36m"
 
 
 class Logger:
@@ -41,6 +41,7 @@ class Logger:
         Logger.logged_messages.append(msg_log)
 
         from core.config import Config
+
         if Config.DEBUG:
             msg = f"{color}{msg_log} {Colors.RESET}"
             print(msg)

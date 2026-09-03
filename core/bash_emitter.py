@@ -35,7 +35,7 @@ class BashEmitter:
             "",
             "# Generated with Visual Bash Editor",
             "",
-            ""
+            "",
         ]
         if Config.CUSTOM_SHEBANG:
             header[0] = Config.CUSTOM_SHEBANG

@@ -68,9 +68,15 @@ class AboutDialog(QDialog):
 
         self.pages = {}
         self.pages["main"] = AboutMainPage(self.go_to)
-        self.pages["credits"] = AboutTextPage("about_credits", "Credits", MarkdownLoader.load_markdown("CREDITS.md"))
-        self.pages["legal"] = AboutTextPage("about_legal", "Legal", MarkdownLoader.load_markdown("LICENSE.md"))
-        self.pages["whats_new"] = AboutTextPage("about_whats_new", "What's New", MarkdownLoader.load_markdown("WHATSNEW.md"))
+        self.pages["credits"] = AboutTextPage(
+            "about_credits", "Credits", MarkdownLoader.load_markdown("CREDITS.md")
+        )
+        self.pages["legal"] = AboutTextPage(
+            "about_legal", "Legal", MarkdownLoader.load_markdown("LICENSE.md")
+        )
+        self.pages["whats_new"] = AboutTextPage(
+            "about_whats_new", "What's New", MarkdownLoader.load_markdown("WHATSNEW.md")
+        )
 
         for page in self.pages.values():
             self.stack.addWidget(page)
@@ -163,6 +169,7 @@ def main_style() -> str:
             color: {Theme.get_color("ABOUT-TEXT")};
         """
 
+
 def pushbutton_style() -> str:
     return f"""
             QPushButton {{
@@ -183,6 +190,7 @@ def pushbutton_style() -> str:
                 background: {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")};
             }}
         """
+
 
 def scroll_style() -> str:
     return f"""

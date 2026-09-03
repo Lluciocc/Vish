@@ -44,9 +44,7 @@ class ProjectManager:
         return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
     def _write_project_json(self, directory: Path):
-        (directory / "project.json").write_text(
-            json.dumps(self.project_data, indent=4)
-        )
+        (directory / "project.json").write_text(json.dumps(self.project_data, indent=4))
 
     def create_project(self, directory: Path, name: str):
         directory = directory.resolve()
@@ -59,28 +57,31 @@ class ProjectManager:
         }
         self._write_project_json(directory)
         (directory / "graph.json").write_text(
-            json.dumps({
-                "nodes": [
-                    {
-                        "id": "58f0bf92-a7a0-4d1d-8f07-916fa9a6f21e",
-                        "type": "start",
-                        "title": "Start",
-                        "x": -74.0,
-                        "y": -174.0,
-                        "properties": {},
-                        "inputs": [],
-                        "outputs": [
-                            {
-                                "id": "0d391cac-0455-43d3-84b3-c3ac042326d9",
-                                "name": "Exec",
-                                "type": "exec",
-                            }
-                        ],
-                    }
-                ],
-                "edges": [],
-                "comments": [],
-            }, indent=4)
+            json.dumps(
+                {
+                    "nodes": [
+                        {
+                            "id": "58f0bf92-a7a0-4d1d-8f07-916fa9a6f21e",
+                            "type": "start",
+                            "title": "Start",
+                            "x": -74.0,
+                            "y": -174.0,
+                            "properties": {},
+                            "inputs": [],
+                            "outputs": [
+                                {
+                                    "id": "0d391cac-0455-43d3-84b3-c3ac042326d9",
+                                    "name": "Exec",
+                                    "type": "exec",
+                                }
+                            ],
+                        }
+                    ],
+                    "edges": [],
+                    "comments": [],
+                },
+                indent=4,
+            )
         )
         Project.NAME = name
         Project.PATH = str(directory)
@@ -141,7 +142,7 @@ class ProjectManager:
             recents.remove(path)
 
         recents.insert(0, path)
-        recents = recents[:self.MAX_RECENTS]
+        recents = recents[: self.MAX_RECENTS]
 
         self.recents_file.write_text(json.dumps(recents, indent=4))
 
@@ -158,16 +159,19 @@ class ProjectManager:
         if any(c in new_name for c in r'<>:"/\|?*'):
             raise ValueError("Invalid project name")
 
-        if self.current_project_path and self.current_project_path.resolve() == old_path:
+        if (
+            self.current_project_path
+            and self.current_project_path.resolve() == old_path
+        ):
             raise RuntimeError("Cannot rename currently opened project")
 
         renamed = False
 
         try:
-            old_path.rename(new_path) # Rename the folder
+            old_path.rename(new_path)  # Rename the folder
             renamed = True
 
-            # Update in project.json 
+            # Update in project.json
             project_file = new_path / "project.json"
             if project_file.exists():
                 data = json.loads(project_file.read_text())
@@ -184,12 +188,14 @@ class ProjectManager:
 
             return new_path
 
-        except Exception as e: # were trying to rename but something went wrong, attempt to rollback if we already renamed
+        except Exception as e:  # were trying to rename but something went wrong, attempt to rollback if we already renamed
             if renamed:
                 try:
                     new_path.rename(old_path)
                 except Exception:
-                    Logger.LogError(f"Failed to rollback project rename from {new_path} to {old_path} after an error occurred: {e}")
+                    Logger.LogError(
+                        f"Failed to rollback project rename from {new_path} to {old_path} after an error occurred: {e}"
+                    )
                     raise RuntimeError(
                         f"Rename failed and rollback also failed.\nOriginal error: {e}"
                     )

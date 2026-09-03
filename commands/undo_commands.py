@@ -185,7 +185,9 @@ class PasteCommand(QUndoCommand):
             target_i = ed.get("target_input_index")
             if source_i is None or target_i is None:
                 continue
-            if source_i >= len(source_node.outputs) or target_i >= len(target_node.inputs):
+            if source_i >= len(source_node.outputs) or target_i >= len(
+                target_node.inputs
+            ):
                 continue
 
             source_port = source_node.outputs[source_i]

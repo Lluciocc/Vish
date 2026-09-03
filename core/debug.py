@@ -42,8 +42,11 @@ class Debug:
     def _show(message: str, level: str):
         if not Debug._parent:
             from core.config import Config
+
             if Config.DEBUG:
-                Logger.LogError("Debug not initialized with parent widget, using console for output.")
+                Logger.LogError(
+                    "Debug not initialized with parent widget, using console for output."
+                )
                 Debug.init_error = True
             return
 
@@ -67,8 +70,15 @@ class Debug:
 
 
 class Info:
-    CONFIG_FILE = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish", "config.json")
-    CONFIG_PATH = os.path.join(QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish")
+    CONFIG_FILE = os.path.join(
+        QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation),
+        "vish",
+        "config.json",
+    )
+    CONFIG_PATH = os.path.join(
+        QStandardPaths.writableLocation(QStandardPaths.AppConfigLocation), "vish"
+    )
+
     @staticmethod
     def get_os():
         return platform.system()
@@ -115,7 +125,7 @@ class Info:
 
     @staticmethod
     def get_user():
-         return getpass.getuser()
+        return getpass.getuser()
 
     @staticmethod
     def get_device_type():
@@ -124,7 +134,7 @@ class Info:
 
         physical_width = screen.size().width() / dpi
         physical_height = screen.size().height() / dpi
-        physical_diagonal = (physical_width ** 2 + physical_height ** 2) ** 0.5
+        physical_diagonal = (physical_width**2 + physical_height**2) ** 0.5
 
         if physical_diagonal <= 7.5:
             device_type = "phone"

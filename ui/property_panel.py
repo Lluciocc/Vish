@@ -41,14 +41,11 @@ class PropertyPanel(QWidget):
         self.layout.addWidget(self.title)
 
         for key, value in node.properties.items():
-
             if key.startswith("DYNAMIC_"):
                 self.label = key.replace("DYNAMIC_", "").replace("_", " ").title()
 
                 self.button = QPushButton(label)
-                self.button.clicked.connect(
-                    lambda _, k=key: self._run_dynamic(k)
-                )
+                self.button.clicked.connect(lambda _, k=key: self._run_dynamic(k))
 
                 self.layout.addWidget(self.button)
                 continue
@@ -56,9 +53,7 @@ class PropertyPanel(QWidget):
             self.label = QLabel(key)
             self.field = QLineEdit(str(value))
 
-            self.field.textChanged.connect(
-                lambda v, k=key: self._update_property(k, v)
-            )
+            self.field.textChanged.connect(lambda v, k=key: self._update_property(k, v))
 
             self.layout.addWidget(self.label)
             self.layout.addWidget(self.field)
@@ -95,10 +90,14 @@ class PropertyPanel(QWidget):
 
     def _apply_theme(self):
         if self.findChild(QLabel):
-            self.title.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-TITLELABEL_TEXT")}")
+            self.title.setStyleSheet(
+                f"color: {Theme.get_color('PROPERTY_PANEL-TITLELABEL_TEXT')}"
+            )
         for widget in self.layout.parent().children():
             if isinstance(widget, QLabel):
-                widget.setStyleSheet(f"color: {Theme.get_color("PROPERTY_PANEL-LABEL_TEXT")}")
+                widget.setStyleSheet(
+                    f"color: {Theme.get_color('PROPERTY_PANEL-LABEL_TEXT')}"
+                )
             elif isinstance(widget, QPushButton):
                 widget.setStyleSheet(pushbutton_style())
             elif isinstance(widget, QLineEdit):
@@ -120,6 +119,7 @@ def lineedit_style() -> str:
                 border: 1px solid {Theme.get_color("PROPERTY_PANEL-LINEEDIT_BORDER_HOVER")};
             }}
         """
+
 
 def pushbutton_style() -> str:
     return f"""

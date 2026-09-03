@@ -46,7 +46,9 @@ class NodeItem(QGraphicsItem):
         self.setFlag(QGraphicsItem.ItemIsSelectable, True)
         self.setFlag(QGraphicsItem.ItemSendsGeometryChanges, True)
 
-        self.title_item = QGraphicsTextItem(Traduction.get_trad(node.node_type, node.title), self)
+        self.title_item = QGraphicsTextItem(
+            Traduction.get_trad(node.node_type, node.title), self
+        )
         self.title_item.setDefaultTextColor(QColor(Theme.get_color("NODE_ITEM-TITLE")))
         self.title_item.setPos(10, 8)
         self.setZValue(1)
@@ -54,14 +56,20 @@ class NodeItem(QGraphicsItem):
         self.setup_icon()
         self.setup_ports()
 
-        self.height = self.HEADER_HEIGHT + max(
-            len(node.inputs) * self.PORT_SPACING,
-            len(node.outputs) * self.PORT_SPACING
-        ) + 20
+        self.height = (
+            self.HEADER_HEIGHT
+            + max(
+                len(node.inputs) * self.PORT_SPACING,
+                len(node.outputs) * self.PORT_SPACING,
+            )
+            + 20
+        )
 
     def update_traduction(item: Node, language):
         Traduction.set_translate_model(language)
-        item.title_item.setPlainText(Traduction.get_trad(item.node.node_type, item.node.title))
+        item.title_item.setPlainText(
+            Traduction.get_trad(item.node.node_type, item.node.title)
+        )
 
     def setup_ports(self):
         for i, port in enumerate(self.node.inputs):
@@ -153,10 +161,14 @@ class NodeItem(QGraphicsItem):
 
         self.setup_ports()
 
-        self.height = self.HEADER_HEIGHT + max(
-            len(self.node.inputs) * self.PORT_SPACING,
-            len(self.node.outputs) * self.PORT_SPACING
-        ) + 20
+        self.height = (
+            self.HEADER_HEIGHT
+            + max(
+                len(self.node.inputs) * self.PORT_SPACING,
+                len(self.node.outputs) * self.PORT_SPACING,
+            )
+            + 20
+        )
 
         if scene:
             for edge_item in list(scene.edges):
@@ -193,7 +205,9 @@ class NodeItem(QGraphicsItem):
     def get_icon_node(self, item: Node, icon_size, padding):
         node = NODE_REGISTRY.get(item.node_type)
         if node is not None:
-            icon = Icon.load_item(self, f"nodes/{node["category"]}", item.title, icon_size, padding)
+            icon = Icon.load_item(
+                self, f"nodes/{node['category']}", item.title, icon_size, padding
+            )
 
     def setup_icon(self):
         icon_size = 24

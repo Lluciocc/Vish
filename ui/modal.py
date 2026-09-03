@@ -27,7 +27,7 @@ from themes.theme_manager import Theme
 
 # Supported dict entries:
 #   ENTRY           DATA-TYPE               HINTS
-#---------------------------------------------------------------
+# ---------------------------------------------------------------
 #   type            core.traduction         required
 #   title           core.tratuction         recommented
 #   message         core.traduction         recommented, not used with custom_message
@@ -46,7 +46,10 @@ MODALS = {
     "remove_project": {
         "type": "question",
         "title": ("modal_title_remove_recent", "Remove from recents"),
-        "message": ("modal_remove_recent_question", "Do you want to remove this project from the recent list?"),
+        "message": (
+            "modal_remove_recent_question",
+            "Do you want to remove this project from the recent list?",
+        ),
         "icon": QMessageBox.Warning,
         "buttons": [QMessageBox.Yes, QMessageBox.No],
         "default_button": QMessageBox.No,
@@ -62,8 +65,11 @@ MODALS = {
         "icon": QMessageBox.Question,
         "buttons": [QMessageBox.Ok, QMessageBox.Yes, QMessageBox.Cancel],
         "default_button": QMessageBox.Cancel,
-        "button_texts": [("modal_rename_file", "Rename File"), ("modal_overwrite_file", "Overwrite File")],
-        "button_icons": [],                         #TODO 2 entries
+        "button_texts": [
+            ("modal_rename_file", "Rename File"),
+            ("modal_overwrite_file", "Overwrite File"),
+        ],
+        "button_icons": [],  # TODO 2 entries
     },
     "delete_theme": {
         "type": "question",
@@ -72,7 +78,7 @@ MODALS = {
         "buttons": [QMessageBox.Yes, QMessageBox.No],
         "default_button": QMessageBox.No,
         "button_texts": [("modal_delete_file", "Delete File")],
-        "button_icons": [],                         #TODO 1 entry
+        "button_icons": [],  # TODO 1 entry
     },
     "delete_theme_not_exist": {
         "type": "info",
@@ -82,7 +88,10 @@ MODALS = {
     "shebang_change": {
         "type": "question",
         "title": ("modal_title_shebang", "Changing Shebang"),
-        "message": ("modal_shebang_question", "Changing the shebang may break script execution on some systems.\n\nAre you sure you know what you are doing?"),
+        "message": (
+            "modal_shebang_question",
+            "Changing the shebang may break script execution on some systems.\n\nAre you sure you know what you are doing?",
+        ),
         "icon": QMessageBox.Warning,
         "buttons": [QMessageBox.Yes, QMessageBox.No],
         "default_button": QMessageBox.No,
@@ -98,29 +107,33 @@ MODALS = {
         "icon": QMessageBox.Question,
         "buttons": [QMessageBox.Ok, QMessageBox.Yes, QMessageBox.Cancel],
         "default_button": QMessageBox.Cancel,
-        "button_texts": [("modal_copy_link", "Copy Link"), ("modal_open_link", "Open Link")],
-        "button_icons": [],                         #TODO 2 entries
-    }
+        "button_texts": [
+            ("modal_copy_link", "Copy Link"),
+            ("modal_open_link", "Open Link"),
+        ],
+        "button_icons": [],  # TODO 2 entries
+    },
 }
 
 BUTTONDEFAULT = {
     QMessageBox.Ok: {
         "text": ("modal_button_ok", "Okay"),
-        "icon": ("None", ""),                       #TODO
+        "icon": ("None", ""),  # TODO
     },
     QMessageBox.Yes: {
         "text": ("modal_button_yes", "Yes"),
-        "icon": ("None", ""),                       #TODO
+        "icon": ("None", ""),  # TODO
     },
     QMessageBox.No: {
         "text": ("modal_button_no", "No"),
-        "icon": ("None", ""),                       #TODO
+        "icon": ("None", ""),  # TODO
     },
     QMessageBox.Cancel: {
         "text": ("modal_button_cancel", "Cancel"),
-        "icon": ("None", ""),                       #TODO
-    }
+        "icon": ("None", ""),  # TODO
+    },
 }
+
 
 def show_message(data, parent, custom_message):
     exit_code = CustomMessageBox(data, parent, custom_message).exec_()
@@ -135,6 +148,7 @@ def show_message(data, parent, custom_message):
             return "no"
         case 4194304:
             return "cancel"
+
 
 def get_input(data, parent):
     input_box = CustomInputBox(data, parent)
@@ -197,10 +211,14 @@ class CustomMessageBox(QMessageBox):
                 case 2:
                     self.setStandardButtons(data["buttons"][0] | data["buttons"][1])
                 case 3:
-                    self.setStandardButtons(data["buttons"][0] | data["buttons"][1] | data["buttons"][2])
+                    self.setStandardButtons(
+                        data["buttons"][0] | data["buttons"][1] | data["buttons"][2]
+                    )
                 case _:
                     if Config.DEBUG:
-                        Logger.LogError("MODAL: Zero or more than four buttons not supported.")
+                        Logger.LogError(
+                            "MODAL: Zero or more than four buttons not supported."
+                        )
                     return
         else:
             self.setStandardButtons(QMessageBox.Cancel)
@@ -210,14 +228,20 @@ class CustomMessageBox(QMessageBox):
 
         for index in range(len(data["buttons"])):
             button = self.button(data["buttons"][index])
-            button.setText(Traduction.get_trad(*BUTTONDEFAULT[data["buttons"][index]]["text"]))
-            button.setIcon(Icon.load_icon(*BUTTONDEFAULT[data["buttons"][index]]["icon"]))
+            button.setText(
+                Traduction.get_trad(*BUTTONDEFAULT[data["buttons"][index]]["text"])
+            )
+            button.setIcon(
+                Icon.load_icon(*BUTTONDEFAULT[data["buttons"][index]]["icon"])
+            )
             button.setStyleSheet(pushbutton_style())
 
             if "button_texts" in data:
                 if len(data["button_texts"]) > index:
                     if data["button_texts"][index]:
-                        button.setText(Traduction.get_trad(*data["button_texts"][index]))
+                        button.setText(
+                            Traduction.get_trad(*data["button_texts"][index])
+                        )
             if "button_icons" in data:
                 if len(data["button_icons"]) > index:
                     if data["button_icons"][index]:
@@ -241,25 +265,39 @@ class CustomInputBox(QInputDialog):
         else:
             self.setLabelText("")
 
-        self.setCancelButtonText(Traduction.get_trad(*BUTTONDEFAULT[QMessageBox.Cancel]["text"]))
-        self.setOkButtonText(Traduction.get_trad(*BUTTONDEFAULT[QMessageBox.Ok]["text"]))
+        self.setCancelButtonText(
+            Traduction.get_trad(*BUTTONDEFAULT[QMessageBox.Cancel]["text"])
+        )
+        self.setOkButtonText(
+            Traduction.get_trad(*BUTTONDEFAULT[QMessageBox.Ok]["text"])
+        )
         if "button_texts" in data:
             if len(data["button_texts"]) > 0:
                 if data["button_texts"][0]:
-                    self.setCancelButtonText(Traduction.get_trad(*data["button_texts"][0]))
+                    self.setCancelButtonText(
+                        Traduction.get_trad(*data["button_texts"][0])
+                    )
             if len(data["button_texts"]) > 1:
                 if data["button_texts"][1]:
                     self.setOkButtonText(Traduction.get_trad(data["button_texts"][1]))
 
-        self.findChildren(QPushButton)[0].setIcon(Icon.load_icon(*BUTTONDEFAULT[QMessageBox.Ok]["icon"]))
-        self.findChildren(QPushButton)[1].setIcon(Icon.load_icon(*BUTTONDEFAULT[QMessageBox.Cancel]["icon"]))
+        self.findChildren(QPushButton)[0].setIcon(
+            Icon.load_icon(*BUTTONDEFAULT[QMessageBox.Ok]["icon"])
+        )
+        self.findChildren(QPushButton)[1].setIcon(
+            Icon.load_icon(*BUTTONDEFAULT[QMessageBox.Cancel]["icon"])
+        )
         if "button_icons" in data:
             if len(data["button_icons"]) > 0:
                 if data["button_icons"][0]:
-                    self.findChildren(QPushButton)[0].setIcon(Icon.load_icon(*data["button_icons"][0]))
+                    self.findChildren(QPushButton)[0].setIcon(
+                        Icon.load_icon(*data["button_icons"][0])
+                    )
             if len(data["button_icons"]) > 1:
                 if data["button_icons"][1]:
-                    self.findChildren(QPushButton)[1].setIcon(Icon.load_icon(*data["button_icons"][1]))
+                    self.findChildren(QPushButton)[1].setIcon(
+                        Icon.load_icon(*data["button_icons"][1])
+                    )
 
         self.setStyleSheet(box_style())
         for button in self.findChildren(QPushButton):
@@ -285,11 +323,13 @@ def lineedit_style() -> str:
             }}
         """
 
+
 def box_style() -> str:
     return f"""
                 background: {Theme.get_color("MODAL-BACKGROUND")};
                 color: {Theme.get_color("MODAL-TEXT")};
         """
+
 
 def pushbutton_style() -> str:
     return f"""

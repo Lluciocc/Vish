@@ -125,7 +125,7 @@ class VisualBashEditor(QMainWindow):
 
         self.splitter.addWidget(self.output_splitter)
 
-        self.output_text.setStyleSheet(f"color: {Theme.get_color("MAIN-BASH_TEXT")}")
+        self.output_text.setStyleSheet(f"color: {Theme.get_color('MAIN-BASH_TEXT')}")
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
         self.splitter.setSizes([900, 300, 400])
@@ -163,7 +163,11 @@ class VisualBashEditor(QMainWindow):
 
     def generate_bash(self):
         if not self.graph.nodes:
-            Debug.Warn(Traduction.get_trad("warn_generating_empty_graph", "Generating an empty graph."))
+            Debug.Warn(
+                Traduction.get_trad(
+                    "warn_generating_empty_graph", "Generating an empty graph."
+                )
+            )
         emitter = BashEmitter(self.graph)
         bash_script = emitter.emit()
         self.output_text.setPlainText(bash_script)
@@ -179,14 +183,22 @@ class VisualBashEditor(QMainWindow):
     def toggle_full_screen(self):
         if self.windowState() & Qt.WindowState.WindowFullScreen:
             self.setWindowState(Qt.WindowState.WindowNoState)
-            self.toolbar.fullscreen_action.setIcon(Icon.load_icon("menu_app", "fullscreen"))
+            self.toolbar.fullscreen_action.setIcon(
+                Icon.load_icon("menu_app", "fullscreen")
+            )
             if "fullscreen_button" in self.toolbar.toolbar:
-                self.toolbar.fullscreen_button.setIcon(Icon.load_icon("menu_app", "fullscreen"))
+                self.toolbar.fullscreen_button.setIcon(
+                    Icon.load_icon("menu_app", "fullscreen")
+                )
         else:
             self.setWindowState(Qt.WindowState.WindowFullScreen)
-            self.toolbar.fullscreen_action.setIcon(Icon.load_icon("menu_app", "windowmode"))
+            self.toolbar.fullscreen_action.setIcon(
+                Icon.load_icon("menu_app", "windowmode")
+            )
             if "fullscreen_button" in self.toolbar.toolbar:
-                self.toolbar.fullscreen_button.setIcon(Icon.load_icon("menu_app", "windowmode"))
+                self.toolbar.fullscreen_button.setIcon(
+                    Icon.load_icon("menu_app", "windowmode")
+                )
 
     def open_keyboard_shortcuts(self):
         KeyboardShortcutsDialog(self).exec()
@@ -199,17 +211,21 @@ class VisualBashEditor(QMainWindow):
             Debug.Log(
                 Traduction.get_trad(
                     "no_project_loaded",
-                    "No project loaded. You can create or open a project from the welcome screen."
+                    "No project loaded. You can create or open a project from the welcome screen.",
                 )
             )
 
     def save_graph(self, msg=True):
         if not self.graph.nodes:
-            Debug.Error(Traduction.get_trad("error_cannot_save_empty_graph", "Cannot save an empty graph."))
+            Debug.Error(
+                Traduction.get_trad(
+                    "error_cannot_save_empty_graph", "Cannot save an empty graph."
+                )
+            )
             return
 
         if not self.project_manager.get_project_path():
-            if msg: # Notice that without this, this func is called every frame when having an AUTO_SAVE=True, might need to fix this in the future
+            if msg:  # Notice that without this, this func is called every frame when having an AUTO_SAVE=True, might need to fix this in the future
                 Debug.Error("No project loaded.")
             return
 
@@ -217,23 +233,27 @@ class VisualBashEditor(QMainWindow):
 
         json_data = Serializer.serialize(self.graph, self.graph_view)
 
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             f.write(json_data)
 
         if msg:
             Debug.Log("Project saved.")
 
     def load_graph(self):
-        projects_path = os.path.dirname(os.path.dirname(self.project_manager.get_graph_path()))
+        projects_path = os.path.dirname(
+            os.path.dirname(self.project_manager.get_graph_path())
+        )
         file_path, _ = QFileDialog.getOpenFileName(
             self,
             Traduction.get_trad("file_dialog_open", "Load Graph"),
             f"{projects_path}/graph.json",
-            "JSON Files (*.json)"
+            "JSON Files (*.json)",
         )
 
         if not file_path:
-            Debug.Error(Traduction.get_trad("error_no_file_selected", "No file selected."))
+            Debug.Error(
+                Traduction.get_trad("error_no_file_selected", "No file selected.")
+            )
             return
 
         with open(file_path, "r") as f:
@@ -247,7 +267,7 @@ class VisualBashEditor(QMainWindow):
                 f"Graph loaded successfully from {file_path} with {len(self.graph.nodes)} nodes and {len(self.graph.edges)} edges.",
                 file_path=file_path,
                 node_count=len(self.graph.nodes),
-                edge_count=len(self.graph.edges)
+                edge_count=len(self.graph.edges),
             )
         )
 
@@ -275,7 +295,9 @@ class VisualBashEditor(QMainWindow):
 
     def _load_graph_data(self, json_data):
         try:
-            self.graph, comments, viewport = Serializer.deserialize(json_data, self.node_factory)
+            self.graph, comments, viewport = Serializer.deserialize(
+                json_data, self.node_factory
+            )
         except ValueError as e:
             text = f"Project contains unknown node type: '{e.args[0][1]}'\nPlease check if a newer version of this tool is available."
             Modal.create("unknown_nodes", self, text)
@@ -307,7 +329,8 @@ class VisualBashEditor(QMainWindow):
             self.load_comment(comment)
 
         comment_items = [
-            item for item in self.graph_view.scene().items()
+            item
+            for item in self.graph_view.scene().items()
             if isinstance(item, CommentBoxItem)
         ]
         if comment_items:
@@ -320,7 +343,9 @@ class VisualBashEditor(QMainWindow):
         # Restore viewport after loading graph to ensure it's centered on the correct position
         if viewport:
             if Config.DEBUG:
-                Logger.LogMessage(f"Restoring viewport position: x={viewport.get('x', 0)}, y={viewport.get('y', 0)}, zoom={viewport.get('zoom', 1.0)}")
+                Logger.LogMessage(
+                    f"Restoring viewport position: x={viewport.get('x', 0)}, y={viewport.get('y', 0)}, zoom={viewport.get('zoom', 1.0)}"
+                )
             QTimer.singleShot(0, lambda: self._restore_viewport(viewport))
 
         self._connect_signals()
@@ -334,19 +359,19 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.setFocus()
 
     def load_comment(self, comment):
-            box = CommentBoxItem(
-                rect=QRectF(0, 0, comment["w"], comment["h"]),
-                title=comment["title"],
-                body_text=comment.get("body", "")
-            )
-            box.setPos(comment["x"], comment["y"])
-            box.setZValue(comment.get("z", box.zValue()))
-            box.set_locked(comment.get("locked", False))
-            box._accent_index = comment.get("color_index", 0)
-            box.set_title_size_index(comment.get("size_index", 2))
-            box.move_children = comment.get("move_children", True)
-            box.setRect(QRectF(0, 0, comment["w"], comment["h"]))
-            self.graph_view.scene().addItem(box)
+        box = CommentBoxItem(
+            rect=QRectF(0, 0, comment["w"], comment["h"]),
+            title=comment["title"],
+            body_text=comment.get("body", ""),
+        )
+        box.setPos(comment["x"], comment["y"])
+        box.setZValue(comment.get("z", box.zValue()))
+        box.set_locked(comment.get("locked", False))
+        box._accent_index = comment.get("color_index", 0)
+        box.set_title_size_index(comment.get("size_index", 2))
+        box.move_children = comment.get("move_children", True)
+        box.setRect(QRectF(0, 0, comment["w"], comment["h"]))
+        self.graph_view.scene().addItem(box)
 
     def clear_property_panel(self):
         self.property_panel.clear()
@@ -392,7 +417,9 @@ class VisualBashEditor(QMainWindow):
         output = output.decode(errors="replace")
 
         filtered = []
-        for line in output.splitlines(): # NOTE: i have to filter some lines because bash -i outputs them
+        for line in (
+            output.splitlines()
+        ):  # NOTE: i have to filter some lines because bash -i outputs them
             if (
                 "cannot set terminal process group" in line
                 or "no job control in this shell" in line
@@ -408,7 +435,7 @@ class VisualBashEditor(QMainWindow):
 
         possible_paths = [
             r"C:\Program Files\Git\bin\bash.exe",
-            r"C:\Program Files (x86)\Git\bin\bash.exe"
+            r"C:\Program Files (x86)\Git\bin\bash.exe",
         ]
 
         for path in possible_paths:
@@ -416,12 +443,12 @@ class VisualBashEditor(QMainWindow):
                 return path
 
         import shutil
+
         bash_in_path = shutil.which("bash")
         if bash_in_path:
             return bash_in_path
 
         return None
-
 
     def run_no_pty(self, script_path: str) -> str:
         bash_cmd = self.find_bash()
@@ -432,27 +459,32 @@ class VisualBashEditor(QMainWindow):
                 "No Bash executable found.\nInstall Git Bash or enable WSL."
             )
 
-        result = subprocess.run(
-            [bash_cmd, script_path],
-            capture_output=True,
-            text=True
-        )
+        result = subprocess.run([bash_cmd, script_path], capture_output=True, text=True)
 
         if result.stderr:
             return f"\x1b[1;31mError:\x1b[0m\n{result.stderr}"
 
         return result.stdout
 
-
     def run_bash(self):
         if Info.get_os() == "Windows":
-            Debug.Warn(Traduction.get_trad("running_windows", "It is not possible to run scripts on Windows."))
+            Debug.Warn(
+                Traduction.get_trad(
+                    "running_windows", "It is not possible to run scripts on Windows."
+                )
+            )
             return
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
         self.run_output_text.clear()
-        if not bash_script.strip() or len(bash_script) == 49: # 49 is length of the header
-            Debug.Warn(Traduction.get_trad("no_bash_script", "No bash script found to run the graph."))
+        if (
+            not bash_script.strip() or len(bash_script) == 49
+        ):  # 49 is length of the header
+            Debug.Warn(
+                Traduction.get_trad(
+                    "no_bash_script", "No bash script found to run the graph."
+                )
+            )
             return
 
         temp_script_path = f"temp_script_{int(time.time())}.sh"
@@ -461,7 +493,11 @@ class VisualBashEditor(QMainWindow):
 
         os.chmod(temp_script_path, 0o755)
 
-        Debug.Log(Traduction.get_trad("running_generated_bash_script", "Running generated bash script..."))
+        Debug.Log(
+            Traduction.get_trad(
+                "running_generated_bash_script", "Running generated bash script..."
+            )
+        )
 
         try:
             if Config.USING_TTY:
@@ -497,37 +533,48 @@ class VisualBashEditor(QMainWindow):
         self.graph_view.setStyleSheet(Style.apply_viewport_style())
         self.output_splitter.setStyleSheet(Style.apply_bash_textedit_style())
         self.central_widget.setStyleSheet(Style.toolpanels_style())
-        self.output_text.setStyleSheet(f"color: {Theme.get_color("MAIN-BASH_TEXT")}")
+        self.output_text.setStyleSheet(f"color: {Theme.get_color('MAIN-BASH_TEXT')}")
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
     def keyPressEvent(self, event):
-        if event.matches(QKeySequence.Save): # Ctrl+S
+        if event.matches(QKeySequence.Save):  # Ctrl+S
             self.save_graph()
-        elif event.matches(QKeySequence.Open): # Ctrl+O
+        elif event.matches(QKeySequence.Open):  # Ctrl+O
             self.load_graph()
-        elif event.key() == Qt.Key_G and event.modifiers() & Qt.ControlModifier: # Ctrl+G
+        elif (
+            event.key() == Qt.Key_G and event.modifiers() & Qt.ControlModifier
+        ):  # Ctrl+G
             self.generate_bash()
-        elif event.key() == Qt.Key_R and event.modifiers() & Qt.ControlModifier: # Ctrl+R
+        elif (
+            event.key() == Qt.Key_R and event.modifiers() & Qt.ControlModifier
+        ):  # Ctrl+R
             self.run_bash()
-        elif event.key() == Qt.Key_W and event.modifiers() & Qt.ControlModifier: # Ctrl+W
+        elif (
+            event.key() == Qt.Key_W and event.modifiers() & Qt.ControlModifier
+        ):  # Ctrl+W
             self.open_welcome_screen()
-        elif event.key() == Qt.Key_F11: # F11
+        elif event.key() == Qt.Key_F11:  # F11
             self.toggle_full_screen()
-        elif event.key() == Qt.Key_F1: # F1
+        elif event.key() == Qt.Key_F1:  # F1
             self.open_keyboard_shortcuts()
-        elif event.key() == Qt.Key_F9: # F9
+        elif event.key() == Qt.Key_F9:  # F9
             self.open_settings()
-        elif event.key() == Qt.Key_Escape: # Esc
+        elif event.key() == Qt.Key_Escape:  # Esc
             if self.windowState() & Qt.WindowState.WindowFullScreen:
                 self.setWindowState(Qt.WindowState.WindowNoState)
-        elif event.key() == Qt.Key_L and event.modifiers() & Qt.ControlModifier and event.modifiers() & Qt.AltModifier: # Ctrl+Shift+L
+        elif (
+            event.key() == Qt.Key_L
+            and event.modifiers() & Qt.ControlModifier
+            and event.modifiers() & Qt.AltModifier
+        ):  # Ctrl+Shift+L
             Debug.Warn("Log file saved with current logs.")
             Logger.save_logged_messages()
 
         super().keyPressEvent(event)
 
+
 def main():
-    ConfigManager.load_config() # Load config before setting theme and language
+    ConfigManager.load_config()  # Load config before setting theme and language
     Traduction.set_translate_model(Config.lang)
 
     app = QApplication(sys.argv)
@@ -545,6 +592,7 @@ def main():
     editor.open_welcome_screen()
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     try:

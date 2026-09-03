@@ -43,13 +43,13 @@ class MessageWidget(QWidget):
                 border: 1px solid #1f618d;
                 border-radius: 10px;
             }
-        """
+        """,
     }
 
     TITLE_COLORS = {
         "error": "#ffc7c7",
-        "warn":  "#ffe5bb",
-        "info":  "#c8e0ff",
+        "warn": "#ffe5bb",
+        "info": "#c8e0ff",
     }
 
     def __init__(self, parent, message: str, level="info"):

@@ -30,7 +30,15 @@ class Config:
     lang = "en"
     theme = "dark.yml"
     CUSTOM_SHEBANG = "#!/usr/bin/env bash"
-    TOOLBAR = ["generate_button", "save_button",  "load_button", "stretch", "run_bash_button", "clipboard_button", "hamburger_menu_button"]
+    TOOLBAR = [
+        "generate_button",
+        "save_button",
+        "load_button",
+        "stretch",
+        "run_bash_button",
+        "clipboard_button",
+        "hamburger_menu_button",
+    ]
 
 
 class ConfigManager:
@@ -56,6 +64,7 @@ class ConfigManager:
             Debug.Warn("Config file not found. Using default configuration.")
         except Exception as e:
             Debug.Error(f"Failed to load config: {e}")
+
     @staticmethod
     def save_config():
         config_dict = dict(ConfigManager.serialize_config(Config))

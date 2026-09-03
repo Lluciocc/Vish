@@ -23,7 +23,12 @@ from nodes.base_node import BaseNode
 from nodes.registry import register_node
 
 
-@register_node("run_command", category="Commands", label="Run a command", description="Executes a shell command")
+@register_node(
+    "run_command",
+    category="Commands",
+    label="Run a command",
+    description="Executes a shell command",
+)
 class RunCommandNode(BaseNode):
     def __init__(self):
         super().__init__("run_command", "Run Command")
@@ -44,7 +49,12 @@ class RunCommandNode(BaseNode):
         return command
 
 
-@register_node("pipe", category="Commands", label="Pipe", description="Pipes output from Command 1 into Command 2")
+@register_node(
+    "pipe",
+    category="Commands",
+    label="Pipe",
+    description="Pipes output from Command 1 into Command 2",
+)
 class PipeNode(BaseNode):
     def __init__(self):
         super().__init__("pipe", "Pipe")
@@ -73,7 +83,12 @@ class PipeNode(BaseNode):
         return f"{cmd1} | {cmd2}"
 
 
-@register_node("echo", category="Commands", label="Print a text", description="Prints a text to the console")
+@register_node(
+    "echo",
+    category="Commands",
+    label="Print a text",
+    description="Prints a text to the console",
+)
 class EchoNode(BaseNode):
     def __init__(self):
         super().__init__("echo", "Echo")
@@ -95,13 +110,24 @@ class EchoNode(BaseNode):
                 text = value
 
         # if the text looks like a variable reference, command substitution, or is already quoted, don't add extra quotes
-        if text.isdigit() or text.startswith("$") or text.startswith('"') or text.startswith("'") or text.startswith('`'):
-            return f'echo {text}'
+        if (
+            text.isdigit()
+            or text.startswith("$")
+            or text.startswith('"')
+            or text.startswith("'")
+            or text.startswith("`")
+        ):
+            return f"echo {text}"
 
         return f'echo "{text}"'
 
 
-@register_node("exit", category="Commands", label="Exit script", description="Exits the script with a status code")
+@register_node(
+    "exit",
+    category="Commands",
+    label="Exit script",
+    description="Exits the script with a status code",
+)
 class ExitNode(BaseNode):
     def __init__(self):
         super().__init__("exit", "Exit")

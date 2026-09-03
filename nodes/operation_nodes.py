@@ -30,7 +30,12 @@ class MathNode(BaseNode):
         return default
 
 
-@register_node("number_constant", category="Constants", label="Number Constant", description="Represents a number constant value")
+@register_node(
+    "number_constant",
+    category="Constants",
+    label="Number Constant",
+    description="Represents a number constant value",
+)
 class NumberConstant(MathNode):
     def __init__(self):
         super().__init__("number_constant", "Number Constant")
@@ -97,7 +102,12 @@ class Division(MathNode):
         return f"$(({a} / {b}))"
 
 
-@register_node("modulo", category="Math", label="Modulo", description="Calculates the remainder of the division")
+@register_node(
+    "modulo",
+    category="Math",
+    label="Modulo",
+    description="Calculates the remainder of the division",
+)
 class Modulo(MathNode):
     def __init__(self):
         super().__init__("modulo", "Modulo")
@@ -111,7 +121,9 @@ class Modulo(MathNode):
         return f"$(({a} % {b}))"
 
 
-@register_node("less_than", category="Logic", label="Less Than", description="Is A less than B?")
+@register_node(
+    "less_than", category="Logic", label="Less Than", description="Is A less than B?"
+)
 class LessThan(MathNode):
     def __init__(self):
         super().__init__("less_than", "Less Than")
@@ -125,7 +137,12 @@ class LessThan(MathNode):
         return f"(( {a} < {b} ))"
 
 
-@register_node("greater_than", category="Logic", label="Greater Than", description="Is A greater than B?")
+@register_node(
+    "greater_than",
+    category="Logic",
+    label="Greater Than",
+    description="Is A greater than B?",
+)
 class GreaterThan(MathNode):
     def __init__(self):
         super().__init__("greater_than", "Greater Than")
@@ -178,7 +195,7 @@ class EqualsVariable(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"[ \"{a}\" = {b} ]"
+        return f'[ "{a}" = {b} ]'
 
 
 @register_node("logical_and", category="Logic", label="AND")
@@ -231,7 +248,12 @@ class LogicalNot(MathNode):
         return f"! {a}"
 
 
-@register_node("command_condition", category="Logic", label="Command Condition", description="Uses a custom command as a condition")
+@register_node(
+    "command_condition",
+    category="Logic",
+    label="Command Condition",
+    description="Uses a custom command as a condition",
+)
 class CommandConditionNode(BaseNode):
     def __init__(self):
         super().__init__("command_condition", "Command Condition")

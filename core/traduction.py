@@ -38,7 +38,7 @@ class Traduction:
                 if lang_name is None:
                     lang_name = "Unknown language"
                 langs.append((lang_name, file_name))
-        langs.sort(key=lambda pair : pair[1])
+        langs.sort(key=lambda pair: pair[1])
         langs.insert(0, ("English", "en"))
         return langs
 

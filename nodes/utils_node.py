@@ -56,10 +56,15 @@ class ToInt(BaseNode):
         else:
             expr = input_port.value or "0"
 
-        return f'$(( {expr} ))'
+        return f"$(( {expr} ))"
 
 
-@register_node("sleep", category="Utilities", label="Sleep", description="Pauses execution for a specified duration")
+@register_node(
+    "sleep",
+    category="Utilities",
+    label="Sleep",
+    description="Pauses execution for a specified duration",
+)
 class SleepNode(BaseNode):
     def __init__(self):
         super().__init__("sleep", "Sleep")
@@ -76,10 +81,15 @@ class SleepNode(BaseNode):
             source_node = duration_port.connected_edges[0].source.node
             duration = source_node.properties.get("value", duration)
 
-        return f'sleep {duration}'
+        return f"sleep {duration}"
 
 
-@register_node("download_file", category="Utilities", label="Download File", description="Downloads a file from a specified URL")
+@register_node(
+    "download_file",
+    category="Utilities",
+    label="Download File",
+    description="Downloads a file from a specified URL",
+)
 class DownloadFileNode(BaseNode):
     def __init__(self):
         super().__init__("download_file", "Download File")
@@ -95,11 +105,16 @@ class DownloadFileNode(BaseNode):
         return f'curl -o "{output_path}" "{url}"'
 
 
-@register_node("git_clone", category="Utilities", label="Git Clone", description="Clones a Git repository to a specified destination")
+@register_node(
+    "git_clone",
+    category="Utilities",
+    label="Git Clone",
+    description="Clones a Git repository to a specified destination",
+)
 class GitCloneNode(BaseNode):
     def __init__(self):
         super().__init__("git_clone", "Git Clone")
-        self.add_input("Exec", PortType.EXEC, "Control flow input")        
+        self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
         self.properties["repo_url"] = ""
         self.properties["destination_path"] = ""
@@ -111,7 +126,12 @@ class GitCloneNode(BaseNode):
         return f'git clone "{repo_url}" "{destination_path}"'
 
 
-@register_node("open_website", category="Utilities", label="Open Website", description="Opens a specified URL in the default web browser")  
+@register_node(
+    "open_website",
+    category="Utilities",
+    label="Open Website",
+    description="Opens a specified URL in the default web browser",
+)
 class OpenWebsiteNode(BaseNode):
     def __init__(self):
         super().__init__("open_website", "Open Website")

@@ -30,6 +30,7 @@ class Serializer:
         VERSION = open(version_path).read().strip()
     except:
         from core.config import Config
+
         if Config.DEBUG:
             Logger.LogWarning("Could not load VERSION file")
         VERSION = "???"
@@ -42,7 +43,17 @@ class Serializer:
         # Viewport
         center = graph_view.mapToScene(graph_view.viewport().rect().center())
 
-        data = {"version": Serializer.VERSION, "nodes": [], "edges": [], "comments": [], "viewport_pos": {"x": center.x(), "y": center.y(), "zoom": graph_view.scale_factor}}
+        data = {
+            "version": Serializer.VERSION,
+            "nodes": [],
+            "edges": [],
+            "comments": [],
+            "viewport_pos": {
+                "x": center.x(),
+                "y": center.y(),
+                "zoom": graph_view.scale_factor,
+            },
+        }
 
         for node in graph.nodes.values():
             node_data = {
@@ -87,7 +98,7 @@ class Serializer:
                         "color_index": item._accent_index,
                         "size_index": item._size_index,
                         "locked": item.locked,
-                        "move_children": item.move_children
+                        "move_children": item.move_children,
                     }
                 )
 
@@ -110,7 +121,7 @@ class Serializer:
             node.title = node_data["title"]
             node.x = node_data["x"]
             node.y = node_data["y"]
-            node.z = node_data.get("z", 0) # using get for backward compatibility
+            node.z = node_data.get("z", 0)  # using get for backward compatibility
             node.properties = node_data.get("properties", {})
             graph.add_node(node)
 
@@ -127,7 +138,11 @@ class Serializer:
             target = port_map.get(edge_data["target"])
             if source and target:
                 graph.add_edge(source, target)
-        return graph, data.get("comments", []), data.get("viewport_pos", {"x": 0, "y": 0, "zoom": 1.0})
+        return (
+            graph,
+            data.get("comments", []),
+            data.get("viewport_pos", {"x": 0, "y": 0, "zoom": 1.0}),
+        )
 
     def serialize_node(self, node):
         return {

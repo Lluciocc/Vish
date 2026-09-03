@@ -39,11 +39,17 @@ class Path:
 
         icon_path = Info.resource_path(f"assets/icons/{category}/{icon_name}.svg")
         if not os.path.exists(icon_path):
-            icon_path = Info.resource_path(f"assets/icons/{category}/{contrast}/{icon_name}.svg")
+            icon_path = Info.resource_path(
+                f"assets/icons/{category}/{contrast}/{icon_name}.svg"
+            )
             if not os.path.exists(icon_path):
-                icon_path = Info.resource_path(f"assets/icons/{category}/{icon_name}_placeholder.svg")
+                icon_path = Info.resource_path(
+                    f"assets/icons/{category}/{icon_name}_placeholder.svg"
+                )
                 if not os.path.exists(icon_path):
-                    icon_path = Info.resource_path(f"assets/icons/{category}/{contrast}/{icon_name}_placeholder.svg")
+                    icon_path = Info.resource_path(
+                        f"assets/icons/{category}/{contrast}/{icon_name}_placeholder.svg"
+                    )
                     if not os.path.exists(icon_path):
                         icon_path = Info.resource_path("assets/icons/placeholder.svg")
         return icon_path
@@ -73,7 +79,7 @@ class Icon:
         icon = QSvgWidget(icon_path, self)
         icon.setFixedSize(width, height)
 
-    @staticmethod   # For use in stylesheets only! Use the above 3 methods elsewhere.
+    @staticmethod  # For use in stylesheets only! Use the above 3 methods elsewhere.
     def get_icon_path(category, name):
         icon_path = Path.get_path(category, name)
         return icon_path

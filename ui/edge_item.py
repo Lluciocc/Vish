@@ -84,17 +84,19 @@ class EdgeItem(QGraphicsPathItem):
 
         dx = self.target_pos.x() - self.source_pos.x()
         dy = self.target_pos.y() - self.source_pos.y()
-        d_str = (dx ** 2 + dy ** 2) ** 0.5 * 1.35
+        d_str = (dx**2 + dy**2) ** 0.5 * 1.35
 
-        ctrl1_x = self.source_pos.x() + min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        ctrl1_x = (
+            self.source_pos.x() + min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        )
         ctrl1_y = self.source_pos.y()
-        ctrl2_x = self.target_pos.x() - min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        ctrl2_x = (
+            self.target_pos.x() - min(d_str, max(dx, pow(abs(dx), 0.8) + 250)) * 0.5
+        )
         ctrl2_y = self.target_pos.y()
 
         path.cubicTo(
-            QPointF(ctrl1_x, ctrl1_y),
-            QPointF(ctrl2_x, ctrl2_y),
-            self.target_pos
+            QPointF(ctrl1_x, ctrl1_y), QPointF(ctrl2_x, ctrl2_y), self.target_pos
         )
 
         self.setPath(path)
@@ -112,6 +114,6 @@ class EdgeItem(QGraphicsPathItem):
             self.setPen(QPen(QColor(Theme.get_color("EDGE_ITEM-EDGE_INVALID")), width))
         elif QColor.isValidColor(str(color)):
             self.setPen(QPen(QColor(color), width))
-        else:                                           #reset
+        else:  # reset
             color = QColor(style.color)
             self.setPen(QPen(QColor(color), width))

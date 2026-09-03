@@ -53,11 +53,13 @@ def set_config_bool(attr_name: str, value: bool) -> None:
     setattr(Config, attr_name, bool(value))
     ConfigManager.save_config()
 
+
 def add_separator(layout: QVBoxLayout) -> None:
     sep = QFrame()
     sep.setFrameShape(QFrame.HLine)
     sep.setFrameShadow(QFrame.Sunken)
     layout.addWidget(sep)
+
 
 def create_switch_row(label_key: str, fallback: str, config_attr: str):
     row = QHBoxLayout()
@@ -72,6 +74,7 @@ def create_switch_row(label_key: str, fallback: str, config_attr: str):
 
 class SettingsDialog(QDialog):
     traduction_changed = Signal()
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setModal(True)
@@ -139,8 +142,12 @@ class SettingsDialog(QDialog):
         self.theme_description.setObjectName("ThemeDescription")
         self.theme_description.setWordWrap(True)
 
-        self.import_theme_button = QPushButton(Traduction.get_trad("import_theme", "Import"))
-        self.delete_theme_button = QPushButton(Traduction.get_trad("delete_theme", "Delete"))
+        self.import_theme_button = QPushButton(
+            Traduction.get_trad("import_theme", "Import")
+        )
+        self.delete_theme_button = QPushButton(
+            Traduction.get_trad("delete_theme", "Delete")
+        )
         self.import_theme_button.clicked.connect(self.on_import_theme)
         self.delete_theme_button.clicked.connect(self.on_delete_theme)
         self._refresh_delete_button_state()
@@ -202,7 +209,9 @@ class SettingsDialog(QDialog):
         self.advanced_title = self.make_section_title("advanced", "Advanced")
         self.layout.addWidget(self.advanced_title)
 
-        self.shebang_label = QLabel(Traduction.get_trad("custom_shebang", "Custom Shebang"))
+        self.shebang_label = QLabel(
+            Traduction.get_trad("custom_shebang", "Custom Shebang")
+        )
         self.shebang_input = QLineEdit(Config.CUSTOM_SHEBANG)
         self.shebang_input.editingFinished.connect(self.on_shebang_changed)
 
@@ -219,9 +228,11 @@ class SettingsDialog(QDialog):
             ("auto_save", "Auto Save", "AUTO_SAVE"),
         ]:
             row, label = create_switch_row(key, fallback, attr)
-            switch = row.itemAt(row.count() - 1).widget()  #  get the switch we just created
+            switch = row.itemAt(
+                row.count() - 1
+            ).widget()  #  get the switch we just created
             self._switches.append(switch)
-            setattr(self, f"{attr.lower()}_row",   row)
+            setattr(self, f"{attr.lower()}_row", row)
             setattr(self, f"{attr.lower()}_label", label)
             row.setContentsMargins(0, 0, 2, 0)
             self.layout.addLayout(row)
@@ -249,7 +260,7 @@ class SettingsDialog(QDialog):
     def get_themes_names(self, imported):
         temp_list = []
         separator_index = -1
-        themes = (Info.get_files_from_directory("resource_path", "themes/", ".yml"))
+        themes = Info.get_files_from_directory("resource_path", "themes/", ".yml")
 
         for theme in themes:
             if "_" in theme:
@@ -282,12 +293,14 @@ class SettingsDialog(QDialog):
         Logger.LogMessage(f"SETTINGS: Theme changed to: {theme}")
 
     def on_import_theme(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Import Theme", "", "YAML Theme Files (*.yml)")
+        path, _ = QFileDialog.getOpenFileName(
+            self, "Import Theme", "", "YAML Theme Files (*.yml)"
+        )
         if not path:
             return
 
         file_name = path.rsplit("/", 1)[1]
-        config_theme_path = Info.get_config_path()+"/themes/"
+        config_theme_path = Info.get_config_path() + "/themes/"
         Info.ensure_dir_exists(config_theme_path)
         temp_list = Info.get_files_from_directory("config_path", "themes/", ".yml")
 
@@ -299,12 +312,15 @@ class SettingsDialog(QDialog):
                     index = 0
                     terms = temp_file.rsplit("_")
                     while index < len(temp_list):
-                        if terms[0]+f"({index})_"+terms[1] in temp_list:
+                        if terms[0] + f"({index})_" + terms[1] in temp_list:
                             index += 1
                         else:
                             break
                     try:
-                        shutil.copy(path, config_theme_path+terms[0]+f"({index})_"+terms[1])
+                        shutil.copy(
+                            path,
+                            config_theme_path + terms[0] + f"({index})_" + terms[1],
+                        )
                     except Exception as exception:
                         if Config.DEBUG:
                             Debug.Error(f"Failed to copy theme file: {exception}")
@@ -314,27 +330,27 @@ class SettingsDialog(QDialog):
 
                 elif question == "yes":
                     try:
-                        shutil.copy(path, config_theme_path+file_name)
+                        shutil.copy(path, config_theme_path + file_name)
                     except Exception as exception:
                         if Config.DEBUG:
                             Debug.Error(f"Failed to copy theme file: {exception}")
                 return
 
         try:
-            shutil.copy(path, config_theme_path+file_name)
+            shutil.copy(path, config_theme_path + file_name)
         except Exception as exception:
             if Config.DEBUG:
                 Debug.Error(f"Failed to copy theme file: {exception}")
 
     def on_delete_theme(self):
-        themes = (Info.get_files_from_directory("config_path", "themes/", ".yml"))
+        themes = Info.get_files_from_directory("config_path", "themes/", ".yml")
         name = self.theme_combo.currentData()
 
         for theme in themes:
             if name == theme:
                 text = f"Theme {name} will be deleted.\n\n Are you sure?\n"
                 if Modal.create("delete_theme", self, text) == "yes":
-                    os.remove(Info.get_config_path()+"/themes/"+theme)
+                    os.remove(Info.get_config_path() + "/themes/" + theme)
                     self._populate_theme_combo(True)
                     self.theme_combo.setCurrentIndex(0)
                 return
@@ -381,7 +397,9 @@ class SettingsDialog(QDialog):
         self.advanced_title.setText(Traduction.get_trad("advanced", "Advanced"))
         self.theme_title.setText(Traduction.get_trad("theme", "Theme"))
         self.language_label.setText(Traduction.get_trad("language", "Language"))
-        self.shebang_label.setText(Traduction.get_trad("custom_shebang", "Custom Shebang"))
+        self.shebang_label.setText(
+            Traduction.get_trad("custom_shebang", "Custom Shebang")
+        )
         self.close_button.setText(Traduction.get_trad("close", "Close"))
         self.import_theme_button.setText(Traduction.get_trad("import_theme", "Import…"))
         self.delete_theme_button.setText(Traduction.get_trad("delete_theme", "Delete"))
@@ -426,8 +444,10 @@ class SettingsDialog(QDialog):
             if isinstance(widget, QFrame) and not isinstance(widget, QScrollArea):
                 widget.setStyleSheet(separator_style())
 
-        self.setStyleSheet(f"background: {Theme.get_color("SETTINGS-BACKGROUND")}")
-        self.content_widget.setStyleSheet("QWidget#SettingsContent { background: transparent; }")
+        self.setStyleSheet(f"background: {Theme.get_color('SETTINGS-BACKGROUND')}")
+        self.content_widget.setStyleSheet(
+            "QWidget#SettingsContent { background: transparent; }"
+        )
 
         if self.parent():
             self.parent().graph_view._apply_theme()
@@ -467,7 +487,11 @@ class Switch(QWidget):
     def paintEvent(self, event):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
-        painter.setBrush(QColor(Theme.get_color("SETTINGS-SETTING_ENABLED")) if self._checked else QColor(Theme.get_color("SETTINGS-SETTING_DISABLED")))
+        painter.setBrush(
+            QColor(Theme.get_color("SETTINGS-SETTING_ENABLED"))
+            if self._checked
+            else QColor(Theme.get_color("SETTINGS-SETTING_DISABLED"))
+        )
         painter.setPen(Qt.NoPen)
         painter.drawRoundedRect(0, 0, 42, 22, 11, 11)
         painter.setBrush(Qt.white)
@@ -502,6 +526,7 @@ def label_style() -> str:
             }}
         """
 
+
 def scroll_style() -> str:
     return f"""
             QScrollArea#SettingsScrollArea {{
@@ -534,6 +559,7 @@ def scroll_style() -> str:
             }}
         """
 
+
 def combobox_style() -> str:
     return f"""
             QComboBox {{
@@ -563,6 +589,7 @@ def combobox_style() -> str:
             }}
         """
 
+
 def pushbutton_style() -> str:
     return f"""
             QPushButton {{
@@ -583,6 +610,7 @@ def pushbutton_style() -> str:
             }}
         """
 
+
 def lineedit_style() -> str:
     return f"""
             QLineEdit {{
@@ -598,6 +626,7 @@ def lineedit_style() -> str:
                 border-color: {Theme.get_color("SETTINGS-LINEEDIT_BORDER_HOVER")};
             }}
         """
+
 
 def separator_style() -> str:
     return f"""

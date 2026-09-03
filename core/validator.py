@@ -45,7 +45,9 @@ class GraphValidator:
 
         if not a.port.can_connect_to(b.port):
             if Config.DEBUG:
-                Logger.LogMessage(f"VALIDATOR: invalid, {a.port.port_type} -> {b.port.port_type}")
+                Logger.LogMessage(
+                    f"VALIDATOR: invalid, {a.port.port_type} -> {b.port.port_type}"
+                )
             return False
 
         if a.port.direction == PortDirection.OUTPUT:
@@ -92,6 +94,8 @@ class GraphValidator:
         for edge in drag_edges:
             if not edge.source_port.port.can_connect_to(target_port.port):
                 if Config.DEBUG:
-                    Logger.LogMessage(f"VALIDATOR: invalid, {edge.source_port.port.port_type} -> {target_port.port.port_type}")
+                    Logger.LogMessage(
+                        f"VALIDATOR: invalid, {edge.source_port.port.port_type} -> {target_port.port.port_type}"
+                    )
                 return False
         return True

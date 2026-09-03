@@ -54,7 +54,15 @@ class ClickableLabel(QLabel):
 
 
 class ProjectListItem(QWidget):
-    def __init__(self, name: str, path_str: str, last_modified: str | None, on_delete, on_rename, parent=None):
+    def __init__(
+        self,
+        name: str,
+        path_str: str,
+        last_modified: str | None,
+        on_delete,
+        on_rename,
+        parent=None,
+    ):
         super().__init__(parent)
         self.path_str = path_str
         self._name = name
@@ -94,7 +102,9 @@ class ProjectListItem(QWidget):
 
         self.delete_button = QPushButton("✕")
         self.delete_button.setFixedSize(26, 26)
-        self.delete_button.setToolTip(Traduction.get_trad("remove_recent", "Remove from recents"))
+        self.delete_button.setToolTip(
+            Traduction.get_trad("remove_recent", "Remove from recents")
+        )
         self.delete_button.setCursor(Qt.PointingHandCursor)
         self.delete_button.clicked.connect(lambda: on_delete(path_str))
         layout.addWidget(self.delete_button)
@@ -143,6 +153,7 @@ class ProjectListItem(QWidget):
 
     def eventFilter(self, obj, event):
         from PySide6.QtCore import QEvent
+
         if obj is self.name_editor and event.type() == QEvent.KeyPress:
             if event.key() == Qt.Key_Escape:
                 self.cancel_rename()
@@ -155,7 +166,9 @@ class ProjectListItem(QWidget):
         self.name_label.setStyleSheet(label_name_style())
         self.date_label.setStyleSheet(label_time_style())
 
-        self.setStyleSheet(f"background: {Theme.get_color("WELCOME-TOOLTIP_BACKGROUND")}")
+        self.setStyleSheet(
+            f"background: {Theme.get_color('WELCOME-TOOLTIP_BACKGROUND')}"
+        )
 
 
 class WelcomeScreen(QDialog):
@@ -177,7 +190,10 @@ class WelcomeScreen(QDialog):
         main_layout.setSpacing(16)
         main_layout.setContentsMargins(40, 24, 40, 32)
 
-        self.title = QLabel(Traduction.get_trad("welcome_title", "Welcome") + f", {Info.get_user().capitalize()}")
+        self.title = QLabel(
+            Traduction.get_trad("welcome_title", "Welcome")
+            + f", {Info.get_user().capitalize()}"
+        )
         title_font = QFont()
         title_font.setPointSize(20)
         title_font.setBold(True)
@@ -189,7 +205,9 @@ class WelcomeScreen(QDialog):
         self.separator.setFixedHeight(1)
         main_layout.addWidget(self.separator)
 
-        self.recent_label = QLabel(Traduction.get_trad("welcome_recent_projects", "Recent Projects"))
+        self.recent_label = QLabel(
+            Traduction.get_trad("welcome_recent_projects", "Recent Projects")
+        )
         main_layout.addWidget(self.recent_label)
 
         self.recent_list = QListWidget()
@@ -207,11 +225,15 @@ class WelcomeScreen(QDialog):
         button_layout.setSpacing(16)
         button_layout.setContentsMargins(0, 4, 0, 0)
 
-        self.new_button = QPushButton(Traduction.get_trad("welcome_new_project", "New Project"))
+        self.new_button = QPushButton(
+            Traduction.get_trad("welcome_new_project", "New Project")
+        )
         self.new_button.clicked.connect(self.create_project)
         self.new_button.setMinimumHeight(38)
 
-        self.open_button = QPushButton(Traduction.get_trad("welcome_open_project", "Open Project"))
+        self.open_button = QPushButton(
+            Traduction.get_trad("welcome_open_project", "Open Project")
+        )
         self.open_button.clicked.connect(self.open_project)
         self.open_button.setMinimumHeight(38)
 
@@ -333,12 +355,13 @@ class WelcomeScreen(QDialog):
         recents = self.project_manager.get_recent_projects()
         if path_str in recents:
             recents.remove(path_str)
-            self.project_manager.recents_file.write_text(
-                json.dumps(recents, indent=4)
-            )
+            self.project_manager.recents_file.write_text(json.dumps(recents, indent=4))
         self.populate_recent_projects()
 
-        if self.recent_list.count() > 0 and self.recent_list.item(0).flags() != Qt.NoItemFlags:
+        if (
+            self.recent_list.count() > 0
+            and self.recent_list.item(0).flags() != Qt.NoItemFlags
+        ):
             self.recent_list.setCurrentRow(0)
             self.recent_list.setFocus()
         else:
@@ -362,8 +385,7 @@ class WelcomeScreen(QDialog):
 
     def open_project(self):
         directory = QFileDialog.getExistingDirectory(
-            self,
-            Traduction.get_trad("select_project_folder", "Select Project Folder")
+            self, Traduction.get_trad("select_project_folder", "Select Project Folder")
         )
 
         if not directory:
@@ -398,8 +420,10 @@ class WelcomeScreen(QDialog):
         self.open_button.setStyleSheet(pushbutton_style())
         self.new_button.setStyleSheet(pushbutton_style())
 
-        self.separator.setStyleSheet(f"background: {Theme.get_color("WELCOME-SEPARATOR")}")
-        self.setStyleSheet(f"background-color: {Theme.get_color("WELCOME-BACKGROUND")}")
+        self.separator.setStyleSheet(
+            f"background: {Theme.get_color('WELCOME-SEPARATOR')}"
+        )
+        self.setStyleSheet(f"background-color: {Theme.get_color('WELCOME-BACKGROUND')}")
 
 
 def _format_last_modified(iso: str | None) -> str:
@@ -410,6 +434,7 @@ def _format_last_modified(iso: str | None) -> str:
         return dt.astimezone().strftime("%d %b %Y  %H:%M")
     except Exception:
         return ""
+
 
 def lineedit_style() -> str:
     return f"""
@@ -428,6 +453,7 @@ def lineedit_style() -> str:
                 border-color: {Theme.get_color("WELCOME-LINEEDIT_BORDER_HOVER")};
             }}
         """
+
 
 def pushbutton_delete_style() -> str:
     return f"""
@@ -453,6 +479,7 @@ def pushbutton_delete_style() -> str:
             }}
         """
 
+
 def label_name_style() -> str:
     return f"""
             color: {Theme.get_color("WELCOME-NAMELABEL_TEXT")};
@@ -461,6 +488,7 @@ def label_name_style() -> str:
             background: {Theme.get_color("WELCOME-NAMELABEL_BACKGROUND")};
         """
 
+
 def label_time_style() -> str:
     return f"""
             color: {Theme.get_color("WELCOME-DATELABEL_TEXT")};
@@ -468,6 +496,7 @@ def label_time_style() -> str:
             font-style: italic;
             background: {Theme.get_color("WELCOME-DATELABEL_BACKGROUND")};
         """
+
 
 def label_recent_style() -> str:
     return f"""
@@ -478,12 +507,14 @@ def label_recent_style() -> str:
             letter-spacing: 1px;
         """
 
+
 def label_title_style() -> str:
     return f"""
             color: {Theme.get_color("WELCOME-TITLELABEL_TEXT")};
             background: {Theme.get_color("WELCOME-TITLELABEL_BACKGROUND")};
             font-size: 18pt;
         """
+
 
 def listwidget_style() -> str:
     return f"""
@@ -506,6 +537,7 @@ def listwidget_style() -> str:
                 background: {Theme.get_color("WELCOME-LISTWIDGET_BUTTON_HOVER")};
             }}
         """
+
 
 def pushbutton_style() -> str:
     return f"""

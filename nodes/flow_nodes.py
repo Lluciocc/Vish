@@ -24,7 +24,12 @@ from nodes.base_node import BaseNode
 from nodes.registry import register_node
 
 
-@register_node("start", category="Flow", label="Start", description="The starting point of the flow")
+@register_node(
+    "start",
+    category="Flow",
+    label="Start",
+    description="The starting point of the flow",
+)
 class StartNode(BaseNode):
     def __init__(self):
         super().__init__("start", "Start")
@@ -34,7 +39,12 @@ class StartNode(BaseNode):
         return ""
 
 
-@register_node("sequencer",category="Flow",label="Sequencer",description="Executes connected nodes sequentially from top to bottom")
+@register_node(
+    "sequencer",
+    category="Flow",
+    label="Sequencer",
+    description="Executes connected nodes sequentially from top to bottom",
+)
 class SequencerNode(BaseNode):
     def __init__(self):
         super().__init__("sequencer", "Sequencer")
@@ -49,11 +59,11 @@ class SequencerNode(BaseNode):
         self.properties["DYNAMIC_remove_output_dynamic"] = ""
 
     def add_output_dynamic(self):
-        self.add_output(f"Step {len(self.outputs)+1}", PortType.EXEC, "")
+        self.add_output(f"Step {len(self.outputs) + 1}", PortType.EXEC, "")
 
     def remove_output_dynamic(self):
         if len(self.outputs) <= 3:
-            Debug.Error('Cannot have less than 3 outputs')
+            Debug.Error("Cannot have less than 3 outputs")
         else:
             self.outputs.pop(-1)
 
@@ -65,7 +75,12 @@ class SequencerNode(BaseNode):
         return ""
 
 
-@register_node("if", category="Flow", label="If Condition", description="Evaluates a condition and branches the flow")
+@register_node(
+    "if",
+    category="Flow",
+    label="If Condition",
+    description="Evaluates a condition and branches the flow",
+)
 class IfNode(BaseNode):
     def __init__(self):
         super().__init__("if", "If")
@@ -94,23 +109,19 @@ class IfNode(BaseNode):
         context.add_line("fi")
         next_port = self.outputs[2]
         if next_port.connected_edges:
-            BaseNode.emit_exec_chain(
-                next_port.connected_edges[0].target.node,
-                context
-            )
+            BaseNode.emit_exec_chain(next_port.connected_edges[0].target.node, context)
         return ""
 
     def _emit_branch(self, context: BashContext, output_index: int):
         port = self.outputs[output_index]
         if not port.connected_edges:
             return
-        BaseNode.emit_exec_chain(
-            port.connected_edges[0].target.node,
-            context
-        )
+        BaseNode.emit_exec_chain(port.connected_edges[0].target.node, context)
 
 
-@register_node("for", category="Flow", label="For Loop", description="Iterates over a list")
+@register_node(
+    "for", category="Flow", label="For Loop", description="Iterates over a list"
+)
 class ForNode(BaseNode):
     def __init__(self):
         super().__init__("for", "For Loop")
@@ -151,7 +162,12 @@ class ForNode(BaseNode):
         return ""
 
 
-@register_node("while", category="Flow", label="While Loop", description="Repeats execution while a condition is true")
+@register_node(
+    "while",
+    category="Flow",
+    label="While Loop",
+    description="Repeats execution while a condition is true",
+)
 class WhileNode(BaseNode):
     def __init__(self):
         super().__init__("while", "While")
@@ -172,9 +188,7 @@ class WhileNode(BaseNode):
         body_port = self.outputs[0]
         if body_port.connected_edges:
             BaseNode.emit_exec_chain(
-                body_port.connected_edges[0].target.node,
-                context,
-                stop_at=self
+                body_port.connected_edges[0].target.node, context, stop_at=self
             )
 
         context.dedent()
@@ -182,17 +196,16 @@ class WhileNode(BaseNode):
 
         next_port = self.outputs[1]
         if next_port.connected_edges:
-            BaseNode.emit_exec_chain(
-                next_port.connected_edges[0].target.node,
-                context
-            )
+            BaseNode.emit_exec_chain(next_port.connected_edges[0].target.node, context)
         return ""
 
     def get_next_exec_node(self):
         return None
 
 
-@register_node("function", category="Flow", label="Function", description="Defines a bash function")
+@register_node(
+    "function", category="Flow", label="Function", description="Defines a bash function"
+)
 class FunctionNode(BaseNode):
     def __init__(self):
         super().__init__("function", "Function")
@@ -202,7 +215,7 @@ class FunctionNode(BaseNode):
 
     def emit_bash(self, context: BashContext) -> str:
         name = self.properties.get("name", "my_function")
-        context.add_function_line(f"{name}() {{") # double { to escape in f-string
+        context.add_function_line(f"{name}() {{")  # double { to escape in f-string
 
         prev_buffer = context._current_buffer
         prev_indent = context.indent_level
@@ -222,7 +235,9 @@ class FunctionNode(BaseNode):
         return ""
 
 
-@register_node("call",category="Flow",label="Call Function",description="Calls a bash function")
+@register_node(
+    "call", category="Flow", label="Call Function", description="Calls a bash function"
+)
 class CallNode(BaseNode):
     def __init__(self):
         super().__init__("call", "Call")
@@ -236,7 +251,12 @@ class CallNode(BaseNode):
         return self.properties.get("function", "")
 
 
-@register_node("return", category="Flow", label="Return", description="Return the result of a fonction")
+@register_node(
+    "return",
+    category="Flow",
+    label="Return",
+    description="Return the result of a fonction",
+)
 class ReturnNode(BaseNode):
     def __init__(self):
         super().__init__("return", "Return")

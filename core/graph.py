@@ -29,7 +29,14 @@ if TYPE_CHECKING:
 
 
 class Port:
-    def __init__(self, name: str, port_type: PortType, direction: PortDirection, node: 'Node', tooltip=""):
+    def __init__(
+        self,
+        name: str,
+        port_type: PortType,
+        direction: PortDirection,
+        node: "Node",
+        tooltip="",
+    ):
         self.id = str(uuid4())
         self.name = name
         self.port_type = port_type
@@ -39,7 +46,7 @@ class Port:
         self.connected_edges: list[Edge] = []
         self.tooltip = tooltip
 
-    def can_connect_to(self, other: 'Port') -> bool:
+    def can_connect_to(self, other: "Port") -> bool:
         if self.direction == other.direction:
             return False
 
@@ -94,7 +101,7 @@ class Node:
                 return port
         return None
 
-    def emit_bash(self, context: 'BashContext') -> str:
+    def emit_bash(self, context: "BashContext") -> str:
         return ""
 
 

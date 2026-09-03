@@ -54,73 +54,157 @@ class BashHighlighter(QSyntaxHighlighter):
         number = QTextCharFormat()
         number.setForeground(QColor(Theme.get_color("HIGHLIGHTS-NUMBER")))
         keywords = [
-            "if", "then", "else", "elif", "fi",
-            "for", "while", "do", "done",
-            "case", "esac", "in",
-            "select", "until", "break",
-            "continue", "return", "exit"
+            "if",
+            "then",
+            "else",
+            "elif",
+            "fi",
+            "for",
+            "while",
+            "do",
+            "done",
+            "case",
+            "esac",
+            "in",
+            "select",
+            "until",
+            "break",
+            "continue",
+            "return",
+            "exit",
         ]
         for kw in keywords:
-            self.rules.append((
-                QRegularExpression(rf"\b{kw}\b"),
-                keyword
-            ))
+            self.rules.append((QRegularExpression(rf"\b{kw}\b"), keyword))
 
         commands = [
-            "echo", "cd", "pwd", "read", "printf",
-            "mkdir", "rm", "cp", "mv", "touch",
-            "chmod", "chown", "grep", "sed", "awk",
-            "curl", "wget", "sudo", "apt", "dnf",
-            "pacman", "zypper", "systemctl", "ls",
-            "cat", "head", "tail", "diff", "find",
-            "xargs", "tar", "zip", "unzip",
-            "ssh", "scp", "git", "make", "gcc",
-            "gdb", "docker", "kubectl",
-            "npm", "yarn", "node", "python", "java",
-            "javac", "perl", "ruby", "php",
-            "mysql", "psql", "top", "htop",
-            "kill", "ping", "traceroute",
-            "ifconfig", "netstat", "ssh-keygen",
-            "alias", "unalias", "export", "source",
-            "history", "clear", "man", "help", "which",
-            "env", "printenv", "date", "time", "uptime", 
-            "df", "du", "mount", "umount", "service", "set",
-            "unset", "jobs", "fg", "bg", "wait", "trap", "test", 
-            "expr", "bc", "cut", "sort", "uniq", "wc", "tee", "diff",
-            "cmp", "stat", "file", "basename", "dirname", "readlink",
-            "ln", "sleep", "shift", "getopts", "printf", "let", "eval",
-            "exec", "disown", "shopt", "complete", "compgen", "mapfile", 
-
+            "echo",
+            "cd",
+            "pwd",
+            "read",
+            "printf",
+            "mkdir",
+            "rm",
+            "cp",
+            "mv",
+            "touch",
+            "chmod",
+            "chown",
+            "grep",
+            "sed",
+            "awk",
+            "curl",
+            "wget",
+            "sudo",
+            "apt",
+            "dnf",
+            "pacman",
+            "zypper",
+            "systemctl",
+            "ls",
+            "cat",
+            "head",
+            "tail",
+            "diff",
+            "find",
+            "xargs",
+            "tar",
+            "zip",
+            "unzip",
+            "ssh",
+            "scp",
+            "git",
+            "make",
+            "gcc",
+            "gdb",
+            "docker",
+            "kubectl",
+            "npm",
+            "yarn",
+            "node",
+            "python",
+            "java",
+            "javac",
+            "perl",
+            "ruby",
+            "php",
+            "mysql",
+            "psql",
+            "top",
+            "htop",
+            "kill",
+            "ping",
+            "traceroute",
+            "ifconfig",
+            "netstat",
+            "ssh-keygen",
+            "alias",
+            "unalias",
+            "export",
+            "source",
+            "history",
+            "clear",
+            "man",
+            "help",
+            "which",
+            "env",
+            "printenv",
+            "date",
+            "time",
+            "uptime",
+            "df",
+            "du",
+            "mount",
+            "umount",
+            "service",
+            "set",
+            "unset",
+            "jobs",
+            "fg",
+            "bg",
+            "wait",
+            "trap",
+            "test",
+            "expr",
+            "bc",
+            "cut",
+            "sort",
+            "uniq",
+            "wc",
+            "tee",
+            "diff",
+            "cmp",
+            "stat",
+            "file",
+            "basename",
+            "dirname",
+            "readlink",
+            "ln",
+            "sleep",
+            "shift",
+            "getopts",
+            "printf",
+            "let",
+            "eval",
+            "exec",
+            "disown",
+            "shopt",
+            "complete",
+            "compgen",
+            "mapfile",
         ]
         for cmd in commands:
-            self.rules.append((
-                QRegularExpression(rf"\b{cmd}\b"),
-                command
-            ))
+            self.rules.append((QRegularExpression(rf"\b{cmd}\b"), command))
 
-        self.rules.append((
-            QRegularExpression(r'"[^"\\]*(\\.[^"\\]*)*"'),
-            string
-        ))
-        self.rules.append((
-            QRegularExpression(r"'[^'\\]*(\\.[^'\\]*)*'"),
-            string
-        ))
+        self.rules.append((QRegularExpression(r'"[^"\\]*(\\.[^"\\]*)*"'), string))
+        self.rules.append((QRegularExpression(r"'[^'\\]*(\\.[^'\\]*)*'"), string))
 
-        self.rules.append((
-            QRegularExpression(r"\$\{?[A-Za-z_][A-Za-z0-9_]*\}?"),
-            variable
-        ))
+        self.rules.append(
+            (QRegularExpression(r"\$\{?[A-Za-z_][A-Za-z0-9_]*\}?"), variable)
+        )
 
-        self.rules.append((
-            QRegularExpression(r"\b\d+\b"),
-            number
-        ))
+        self.rules.append((QRegularExpression(r"\b\d+\b"), number))
 
-        self.rules.append((
-            QRegularExpression(r"#.*"),
-            comment
-        ))
+        self.rules.append((QRegularExpression(r"#.*"), comment))
 
         self.function_def_regex = QRegularExpression(
             r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(\)\s*\{"
@@ -137,18 +221,14 @@ class BashHighlighter(QSyntaxHighlighter):
             self.setFormat(
                 match.capturedStart(1),
                 match.capturedLength(1),
-                self.function_def_format
+                self.function_def_format,
             )
 
         for regex, fmt in self.rules:
             it = regex.globalMatch(text)
             while it.hasNext():
                 m = it.next()
-                self.setFormat(
-                    m.capturedStart(),
-                    m.capturedLength(),
-                    fmt
-                )
+                self.setFormat(m.capturedStart(), m.capturedLength(), fmt)
 
         for fn in self.known_functions:
             call_regex = QRegularExpression(rf"\b{fn}\b")
@@ -156,7 +236,5 @@ class BashHighlighter(QSyntaxHighlighter):
             while it.hasNext():
                 m = it.next()
                 self.setFormat(
-                    m.capturedStart(),
-                    m.capturedLength(),
-                    self.function_call_format
+                    m.capturedStart(), m.capturedLength(), self.function_call_format
                 )
