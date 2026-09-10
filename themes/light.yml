@@ -352,6 +352,16 @@ theme_detail:
     ABOUT_PAGES-VERSIONLABEL_BACKGROUND:        "CUSTOM_ACCENT"
     ABOUT_PAGES-VERSIONLABEL_TEXT:              "FONT"
     ABOUT_PAGES-VERSIONLABEL_TEXT_INVERT:       "FONT_INVERT"
+    ABOUT_PAGES-TEXT:                           "FONT"
+    ABOUT_PAGES-NUMERIC:                        "CUSTOM_ACCENT"
+    ABOUT_PAGES-LINK:                           "CUSTOM_ACCENT"
+    ABOUT_PAGES-NUMERIC:                        "CUSTOM_ACCENT"
+    ABOUT_PAGES-ALPHA_NUMERIC:                  "CUSTOM_ACCENT"
+    ABOUT_PAGES-TITLE_H:                        "CUSTOM_ACCENT"
+    ABOUT_PAGES-TITLE_HH:                       "FONT"
+    ABOUT_PAGES-TITLE_HHH:                      "FONT"
+    ABOUT_PAGES-CENTER:                         "CUSTOM_ACCENT"
+    ABOUT_PAGES-CENTER_TEXT:                    "#00395f"
 
     # MODALS
     MODAL-TEXT:                                 "FONT"

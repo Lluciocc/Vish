@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
     QSizePolicy,
     QStackedWidget,
     QVBoxLayout,
+    QWidget,
 )
 
 from core.config import MarkdownLoader
@@ -54,6 +55,14 @@ class AboutDialog(QDialog):
         main_layout.setContentsMargins(0, 0, 0, 0)
         main_layout.setSpacing(12)
 
+        self.title = QPushButton()
+        self.title.setText("")
+        self.title.setToolTip(Traduction.get_trad("about_move_top", "Scroll to top of the page."))
+        self.title.setStyleSheet(title_hidden_style())
+        self.bottom_fade = QWidget()
+        self.bottom_fade.setStyleSheet(title_visible_style())
+        self.bottom_fade.setFixedHeight(33)
+
         self.scroll_area = QScrollArea()
         self.scroll_area.setObjectName("AboutScrollArea")
         self.scroll_area.setWidgetResizable(True)
@@ -63,26 +72,21 @@ class AboutDialog(QDialog):
         self.scroll_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
 
         self.stack = QStackedWidget()
-        self.stack.setContentsMargins(10, 0, 10, 2)
+        self.stack.setContentsMargins(10, 0, 0, 2)
         self.scroll_area.setWidget(self.stack)
 
         self.pages = {}
         self.pages["main"] = AboutMainPage(self.go_to)
-        self.pages["credits"] = AboutTextPage(
-            "about_credits", "Credits", MarkdownLoader.load_markdown("CREDITS.md")
-        )
-        self.pages["legal"] = AboutTextPage(
-            "about_legal", "Legal", MarkdownLoader.load_markdown("LICENSE.md")
-        )
-        self.pages["whats_new"] = AboutTextPage(
-            "about_whats_new", "What's New", MarkdownLoader.load_markdown("WHATSNEW.md")
-        )
-
+        self.pages["credits"] = AboutTextPage("CREDITS")
+        self.pages["legal"] = AboutTextPage("LICENSE")
+        self.pages["whats_new"] = AboutTextPage("WHATSNEW")
         for page in self.pages.values():
             self.stack.addWidget(page)
 
         self.stack.setCurrentWidget(self.pages["main"])
         self.current_index = self.stack.currentIndex()
+        self.title.clicked.connect(lambda: self.stack.currentWidget().move_top())
+
 
         self.back_button = QPushButton(Traduction.get_trad("back", "Back"))
         self.back_button.setFixedHeight(40)
@@ -101,33 +105,42 @@ class AboutDialog(QDialog):
         footer.setContentsMargins(0, 0, 10, 10)
 
         main_layout.addSpacing(10)
+        main_layout.addWidget(self.title)
+        main_layout.addSpacing(-45)
         main_layout.addWidget(self.scroll_area)
+        main_layout.addSpacing(-13)
+        main_layout.addWidget(self.bottom_fade)
+        main_layout.addSpacing(-28)
+        self.title.raise_()
         main_layout.addLayout(footer)
         self._apply_theme()
 
     def show_back_button(self):
         self.back_button.show()
+        self.title.setStyleSheet(title_visible_style())
 
     def hide_back_button(self):
         self.back_button.hide()
+        self.title.setText("")
+        self.title.setStyleSheet(title_hidden_style())
 
     def animate_switch(self, target_index, direction):
         current = self.stack.currentWidget()
         target = self.stack.widget(target_index)
 
-        w = self.stack.width()
-        target.move(direction * w, 0)
+        width = self.stack.width()
+        target.move(direction * width, 0)
         target.show()
 
         anim_out = QPropertyAnimation(current, b"pos", self)
         anim_out.setDuration(220)
         anim_out.setStartValue(QPoint(0, 0))
-        anim_out.setEndValue(QPoint(-direction * w, 0))
+        anim_out.setEndValue(QPoint(-direction * width, 0))
         anim_out.setEasingCurve(QEasingCurve.OutCubic)
 
         anim_in = QPropertyAnimation(target, b"pos", self)
         anim_in.setDuration(220)
-        anim_in.setStartValue(QPoint(direction * w, 0))
+        anim_in.setStartValue(QPoint(direction * width, 0))
         anim_in.setEndValue(QPoint(0, 0))
         anim_in.setEasingCurve(QEasingCurve.InOutQuad)
 
@@ -136,6 +149,14 @@ class AboutDialog(QDialog):
             current.move(0, 0)
             target.move(0, 0)
             self.current_index = target_index
+
+            title_text = [
+                "",
+                Traduction.get_trad("about_credits", "Credits"),
+                Traduction.get_trad("about_legal", "Legal"),
+                Traduction.get_trad("about_whats_new", "What's new?"),
+            ]
+            self.title.setText(title_text[self.current_index])
             if self.current_index == 0:
                 self.hide_back_button()
             else:
@@ -167,6 +188,47 @@ def main_style() -> str:
     return f"""
             background: {Theme.get_color("ABOUT-BACKGROUND")};
             color: {Theme.get_color("ABOUT-TEXT")};
+        """
+
+
+def title_hidden_style() -> str:
+    return f"""
+            QPushButton {{
+                background: transparent;
+                font-size: 30px;
+                outline: none;
+                border: none;
+                height: 25px;
+                margin: 0px 12px;
+                padding-bottom: 18px;
+            }}
+        """
+
+
+def title_visible_style() -> str:
+    return f"""
+            QPushButton {{
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0.7 {Theme.get_color("ABOUT-BACKGROUND")},
+                    stop: 1 transparent);
+                font-size: 20px;
+                outline: none;
+                border: none;
+                border-radius: 5px;
+                height: 25px;
+                margin: 0px 12px;
+                padding-bottom: 18px;
+            }}
+            QPushButton:hover {{
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0.7 {Theme.get_color("ABOUT-BACKGROUND")},
+                    stop: 1 {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")});
+            }}
+            QPushButton:pressed {{
+                background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
+                    stop: 0.7 #64203f,
+                    stop: 1 {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")});
+            }}
         """
 
 

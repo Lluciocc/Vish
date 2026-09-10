@@ -85,4 +85,5 @@ theme_detail:
     TOOLBAR-TOOLBUTTON_BORDER:                  "transparent"
     SCROLL_HANDLE:                              "#494B4C"
     GRAPH_VIEW-ZOOMSLIDER_HANDLE_BORDER_PRESSED: "#672141"
+    ABOUT_PAGES-CENTER_TEXT:                    "#e38eb9"
 

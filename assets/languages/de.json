@@ -49,6 +49,7 @@
     "app_name": "Visual Bash Editor",
     "app_tagline": "Eine visuelle Methode zum Erstellen von Bash-Skripten",
 
+    "about_move_top": "Scroll ans obere Ende der Seite.",
     "about_website": "Website",
     "about_report": "Melde einen Fehler",
     "about_credits": "Credits",

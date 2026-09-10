@@ -49,6 +49,7 @@
     "app_name": "Visual Bash Editor",
     "app_tagline": "A visual way to build Bash scripts",
 
+    "about_move_top": "Scroll to top of the page",
     "about_website": "Website",
     "about_report": "Report an issue",
     "about_credits": "Credits",
