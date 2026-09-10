@@ -111,7 +111,7 @@ MODALS = {
             ("modal_copy_link", "Copy Link"),
             ("modal_open_link", "Open Link"),
         ],
-        "button_icons": [],  # TODO 2 entries
+        "button_icons": [("menu_app", "clipboard")],  # TODO 2 entries
     },
 }
 
