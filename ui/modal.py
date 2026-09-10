@@ -245,7 +245,7 @@ class CustomMessageBox(QMessageBox):
             if "button_icons" in data:
                 if len(data["button_icons"]) > index:
                     if data["button_icons"][index]:
-                        button.setIcon(Icon.load_icon(data["button_icons"][index]))
+                        button.setIcon(Icon.load_icon(*data["button_icons"][index]))
 
     def closeEvent(self, event):
         event.accept()
