@@ -32,6 +32,7 @@ theme_main:
     INVALID:                "#d4001c"
 
     # NODES DEFAULT COLORS
+    NODES_BACKGROUND:       "#34495E"
     NODES_BORDER:           "#2C3E50"
 
     NODES_GRAPH_PORTAL:     "#88e66836"
@@ -174,7 +175,7 @@ theme_detail:
 
     # NODE ITEM
     NODE_ITEM-TITLE:                            "#f9f9f9"   # Matches SVG colors.
-    NODE_ITEM-BACKGROUND:                       "#34495E"
+    NODE_ITEM-BACKGROUND:                       "NODES_BACKGROUND"
     NODE_ITEM-BORDER:                           "NODES_BORDER"
     NODE_ITEM-BORDER_HOVER:                     "CUSTOM_ACCENT"
 
