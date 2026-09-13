@@ -85,7 +85,11 @@ class Info:
 
     @staticmethod
     def get_config_file():
-        Info.ensure_dir_exists(Info.CONFIG_FILE)
+        Info.ensure_dir_exists(Info.CONFIG_PATH)
+
+        if os.path.isdir(Info.CONFIG_FILE):
+            os.rmdir(Info.CONFIG_FILE)
+
         return Info.CONFIG_FILE
 
     @staticmethod
