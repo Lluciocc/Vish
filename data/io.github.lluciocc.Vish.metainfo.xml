@@ -11,7 +11,7 @@
     <p>
         Vish is an editor for creating Bash scripts using a node interface. 
         It allows users to design their scripts by connecting nodes that represent different 
-        Bash commands and basic programmation.
+        Bash commands and basic programming concepts.
         Vish is made for educational purposes and to simplify the process of creating Bash scripts.
     </p>
   </description>
@@ -23,11 +23,11 @@
 
   <launchable type="desktop-id">io.github.lluciocc.Vish.desktop</launchable>
 
-  <url type="homepage">https://github.com/Lluciocc/Vish</url>
-  <url type="bugtracker">https://github.com/Lluciocc/Vish/issues</url>
-  <url type="vcs-browser">https://github.com/Lluciocc/Vish</url>
-  <url type="contribute">https://github.com/Lluciocc/Vish/wiki/Contributing</url>
-  <url type="translate">https://github.com/Lluciocc/Vish/wiki/Contributing#translating</url>
+  <url type="homepage">https://codeberg.org/Lluciocc/Vish</url>
+  <url type="bugtracker">https://codeberg.org/Lluciocc/Vish/issues</url>
+  <url type="vcs-browser">https://codeberg.org/Lluciocc/Vish</url>
+  <url type="contribute">https://codeberg.org/Lluciocc/Vish/wiki/Contributing</url>
+  <url type="translate">https://codeberg.org/Lluciocc/Vish/wiki/Contributing#translating</url>
   <url type="donation">https://github.com/Lluciocc/Vish?sponsor=1</url>
   
   <developer id="io.github.lluciocc">
@@ -52,6 +52,18 @@
   </screenshots>
 
   <releases>
+    <release version="1.1.4" date="2026-09-13">
+      <description>
+        <ul>
+          <li>Redesigned the interface with responsive layouts, unified dialogs, and a customizable toolbar</li>
+          <li>Added a new theme engine with built-in and user-defined themes</li>
+          <li>Improved edge reconnection, replacement, deletion, and visual feedback</li>
+          <li>Expanded comments with body text, title resizing, locking, and z-order management</li>
+          <li>Improved translations, keyboard shortcuts, project loading, and logging</li>
+          <li>Fixed node registration and configuration saving</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.3" date="2026-04-03">
       <description>
         <p>Fix bugs, improve performance, adding czech translation, improved logging system</p>
