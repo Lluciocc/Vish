@@ -98,13 +98,13 @@ class Theme:
         fallback_color = Theme.colors.get("theme_main").get(color)
         if QColor.isValidColor(str(fallback_color)):
             return fallback_color
-        if fallback_color.split("-")[0] == "ACCENT":
+        if str(fallback_color).split("-")[0] == "ACCENT":
             color = Theme.apply_accent_alpha(fallback_color)
             return color
         fallback_color = Theme.fallback_colors.get("theme_main").get(color)
         if QColor.isValidColor(str(fallback_color)):
             return fallback_color
-        if fallback_color.split("-")[0] == "ACCENT":
+        if str(fallback_color).split("-")[0] == "ACCENT":
             color = Theme.apply_accent_alpha(fallback_color)
             return color
         return None
