@@ -17,6 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QMenu, QPushButton, QToolButton
 
@@ -132,6 +133,12 @@ class Toolbar(QHBoxLayout):
         self.hamburger_button.setText("☰")
         self.hamburger_button.setPopupMode(QToolButton.InstantPopup)
         self.more_menu = QMenu(self.editor)
+        self.more_menu.setWindowFlags(
+            self.more_menu.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        self.more_menu.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.settings_action = self.more_menu.addAction("")
         self.keyboard_action = self.more_menu.addAction("")

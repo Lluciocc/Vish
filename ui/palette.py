@@ -76,7 +76,10 @@ class NodePalette(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle(Traduction.get_trad("add_node", "Add Node"))
-        self.setWindowFlags(Qt.Popup)
+        self.setWindowFlags(
+            Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
+        )
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.background = QWidget(self)
         self.background.setObjectName("Background")

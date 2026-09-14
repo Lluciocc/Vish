@@ -548,17 +548,35 @@ class CommentBoxItem(QGraphicsRectItem):
             return
 
         self.menu = QMenu()
+        self.menu.setWindowFlags(
+            self.menu.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        self.menu.setAttribute(Qt.WA_TranslucentBackground, True)
         self.menu.setStyleSheet(menu_style())
         lock_action = self.menu.addAction("Unlock" if self.locked else "Lock")
         self.menu.addSeparator()
 
         color_menu = self.menu.addMenu("Accent colour")
+        color_menu.setWindowFlags(
+            color_menu.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        color_menu.setAttribute(Qt.WA_TranslucentBackground, True)
         color_names = Theme.comment_labels.split(";")
         color_actions = [
             color_menu.addAction(f"{'●' if i == self._accent_index else '○'} {n}")
             for i, n in enumerate(color_names)
         ]
         size_menu = self.menu.addMenu("Size")
+        size_menu.setWindowFlags(
+            size_menu.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        size_menu.setAttribute(Qt.WA_TranslucentBackground, True)
         size_names = ["Small", "Medium", "Medium-Large", "Large", "Extra Large"]
         size_actions = [
             size_menu.addAction(f"{'●' if i == self._size_index else '○'} {n}")
