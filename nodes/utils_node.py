@@ -58,6 +58,20 @@ class ToInt(BaseNode):
 
         return f"$(( {expr} ))"
 
+@register_node(
+    "path_constant",
+    category="Constants",
+    label="Path Constant",
+    description="Represents a path constant value",
+)
+class PathConstant(BaseNode):
+    def __init__(self):
+        super().__init__("path_constant", "Path Constant")
+        self.add_output("Value", PortType.PATH, "Path value")
+        self.properties["value"] = "~"
+
+    def emit_bash_value(self, context: BashContext) -> str:
+        return str(self.properties.get("value", "~"))
 
 @register_node(
     "sleep",

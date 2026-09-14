@@ -141,6 +141,7 @@ theme_detail:
     BASE_NODE-SET_VARIABLE:                     "NODES_STRING"
     BASE_NODE-GET_VARIABLE:                     "NODES_STRING"
     BASE_NODE-STRING_CONSTANT:                  "NODES_STRING"
+    BASE_NODE-PATH_CONSTANT:                    "NODES_STRING"
 
     BASE_NODE-SEQUENCER:                        "NODES_FLOW"
     BASE_NODE-IF:                               "NODES_FLOW"
@@ -176,6 +177,7 @@ theme_detail:
     BASE_NODE-DIRECTORY_EXISTS:                 "NODES_LOGICAL"
     BASE_NODE-CREATE_DIRECTORY:                 "NODES_BASH_FUNCTION"
     BASE_NODE-COPY_FILE:                        "NODES_BASH_FUNCTION"
+    BASE_NODE-COPY_DIRECTORY:                   "NODES_BASH_FUNCTION"
     BASE_NODE-MOVE_FILE:                        "NODES_BASH_FUNCTION"
     BASE_NODE-DELETE_FILE:                      "NODES_BASH_FUNCTION"
     BASE_NODE-DELETE_DIRECTORY:                 "NODES_BASH_FUNCTION"

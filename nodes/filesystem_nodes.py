@@ -1,9 +1,21 @@
 # filesystem_nodes.py
 #
 # Copyright 2026 Lluciocc
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
 # SPDX-License-Identifier: GPL-3.0-or-later
-
-"""File-system and path nodes."""
 
 import shlex
 
@@ -13,8 +25,6 @@ from nodes.registry import register_node
 
 
 class ArgumentNode(BaseNode):
-    """Base class for nodes whose properties can be overridden by input ports."""
-
     def _argument(self, key, port_index, context, default=""):
         port = self.inputs[port_index] if port_index is not None else None
         if port is not None and port.connected_edges:
@@ -29,7 +39,6 @@ class ArgumentNode(BaseNode):
     def _add_exec_ports(self):
         self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
-
 
 @register_node(
     "directory_exists",
@@ -84,6 +93,27 @@ class CopyFileNode(ArgumentNode):
         source = self._argument("source", 1, context)
         destination = self._argument("destination", 2, context)
         return f"cp -- {source} {destination}"
+
+
+@register_node(
+    "copy_directory",
+    category="File System",
+    label="Copy Directory",
+    description="Copies a directory and all of its contents to another path",
+)
+class CopyDirectoryNode(CopyFileNode):
+    def __init__(self):
+        ArgumentNode.__init__(self, "copy_directory", "Copy Directory")
+        self._add_exec_ports()
+        self.add_input("Source", PortType.PATH, "Source directory path")
+        self.add_input("Destination", PortType.PATH, "Destination path")
+        self.properties["source"] = ""
+        self.properties["destination"] = ""
+
+    def emit_bash(self, context):
+        source = self._argument("source", 1, context)
+        destination = self._argument("destination", 2, context)
+        return f"cp -R -- {source} {destination}"
 
 
 @register_node(
