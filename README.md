@@ -28,7 +28,7 @@ Vish is made for educational purposes and to simplify the process of creating Ba
 It can help beginners understand the structure and flow of Bash scripts, making it easier to learn scripting concepts.
 
 ## Wiki
-For more detailed information about Vish, including contribution instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://github.com/lluciocc/vish/wiki).
+For more detailed information about Vish, including contribution instructions, usage guides, and troubleshooting tips, please visit the [Wiki](https://codeberg.org/lluciocc/vish/wiki).
 
 ## Installation
 ### From Flathub
