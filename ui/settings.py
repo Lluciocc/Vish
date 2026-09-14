@@ -125,6 +125,13 @@ class SettingsDialog(QDialog):
         self.layout.addWidget(self.appearance_title)
 
         self.theme_combo = QComboBox()
+        theme_popup = self.theme_combo.view().window()
+        theme_popup.setWindowFlags(
+            theme_popup.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        theme_popup.setAttribute(Qt.WA_TranslucentBackground, True)
         self.theme_combo.setMaxVisibleItems(16)
         self._populate_theme_combo(False)
         self.theme_combo.setCurrentIndex(self.theme_combo.findData(Theme.theme))
@@ -189,6 +196,13 @@ class SettingsDialog(QDialog):
         self.layout.addWidget(self.language_title)
 
         self.lang_combo = QComboBox()
+        language_popup = self.lang_combo.view().window()
+        language_popup.setWindowFlags(
+            language_popup.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        language_popup.setAttribute(Qt.WA_TranslucentBackground, True)
         for label, code in Traduction.get_languages():
             self.lang_combo.addItem(label, code)
 
