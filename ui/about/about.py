@@ -209,7 +209,7 @@ def title_visible_style() -> str:
     return f"""
             QPushButton {{
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0.7 {Theme.get_color("ABOUT-BACKGROUND")},
+                    stop: 0.7 {Theme.get_color("ABOUT-TITLEBUTTON_BACKGROUND")},
                     stop: 1 transparent);
                 font-size: 20px;
                 outline: none;
@@ -221,13 +221,13 @@ def title_visible_style() -> str:
             }}
             QPushButton:hover {{
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0.7 {Theme.get_color("ABOUT-BACKGROUND")},
-                    stop: 1 {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")});
+                    stop: 0.7 {Theme.get_color("ABOUT-TITLEBUTTON_BACKGROUND_HOVER")},
+                    stop: 1 {Theme.get_color("ABOUT-TITLEBUTTON_UNDERLINE_HOVER")});
             }}
             QPushButton:pressed {{
                 background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,
-                    stop: 0.7 #64203f,
-                    stop: 1 {Theme.get_color("ABOUT-PUSHBUTTON_BACKGROUND_PRESSED")});
+                    stop: 0.7 {Theme.get_color("ABOUT-TITLEBUTTON_BACKGROUND_PRESSED")},
+                    stop: 1 {Theme.get_color("ABOUT-TITLEBUTTON_UNDERLINE_PRESSED")});
             }}
         """
 

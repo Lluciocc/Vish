@@ -589,6 +589,7 @@ def combobox_style() -> str:
                 background: {Theme.get_color("SETTINGS-COMBOBOX_BACKGROUND_HOVER")};
             }}
             QComboBox QAbstractItemView {{
+                color: {Theme.get_color("SETTINGS-COMBOBOX_TEXT")};
                 border: 1px solid {Theme.get_color("SETTINGS-COMBOBOX_BORDER")};
                 border-radius: 5px;
                 background: {Theme.get_color("SETTINGS-COMBOBOX_MAIN_BACKGROUND")};
