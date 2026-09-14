@@ -122,6 +122,9 @@
     "Constants": "Constantes",
     "Conversion": "Conversion",
     "Utilities": "Utilitaires",
+    "File System": "Système de fichiers",
+    "Paths": "Chemins",
+    "Strings": "Chaînes de caractères",
     "Other": "Autres",
 
     "run_command": "Exécuter une commande",

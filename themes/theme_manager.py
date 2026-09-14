@@ -84,9 +84,9 @@ class Theme:
     def get_color(selector):
         Theme.get_data()
 
-        color = Theme.colors.get("theme_detail").get(selector)
+        color = Theme.colors.get("theme_detail", {}).get(selector)
         if color == None:
-            color = Theme.fallback_colors.get("theme_detail").get(selector)
+            color = Theme.fallback_colors.get("theme_detail", {}).get(selector)
             if color == None:
                 return None
 

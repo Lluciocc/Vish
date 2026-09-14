@@ -46,10 +46,11 @@ from core.logger import Logger
 from core.projects import ProjectManager
 from core.serializer import Serializer
 from core.traduction import Traduction
-
 from nodes import (  # noqa: F401
     command_nodes,
+    filesystem_nodes,
     operation_nodes,
+    string_nodes,
     utils_node,
     variable_nodes,
 )

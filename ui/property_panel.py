@@ -17,7 +17,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
 
 from themes.theme_manager import Theme
 
@@ -44,16 +51,27 @@ class PropertyPanel(QWidget):
             if key.startswith("DYNAMIC_"):
                 self.label = key.replace("DYNAMIC_", "").replace("_", " ").title()
 
-                self.button = QPushButton(label)
+                self.button = QPushButton(self.label)
                 self.button.clicked.connect(lambda _, k=key: self._run_dynamic(k))
 
                 self.layout.addWidget(self.button)
                 continue
 
-            self.label = QLabel(key)
-            self.field = QLineEdit(str(value))
-
-            self.field.textChanged.connect(lambda v, k=key: self._update_property(k, v))
+            self.label = QLabel(key.replace("_", " ").title())
+            if key in getattr(node, "multiline_properties", set()):
+                self.field = QTextEdit()
+                self.field.setPlainText(str(value))
+                self.field.setMinimumHeight(120)
+                self.field.textChanged.connect(
+                    lambda k=key, field=self.field: self._update_property(
+                        k, field.toPlainText()
+                    )
+                )
+            else:
+                self.field = QLineEdit(str(value))
+                self.field.textChanged.connect(
+                    lambda v, k=key: self._update_property(k, v)
+                )
 
             self.layout.addWidget(self.label)
             self.layout.addWidget(self.field)
@@ -100,7 +118,7 @@ class PropertyPanel(QWidget):
                 )
             elif isinstance(widget, QPushButton):
                 widget.setStyleSheet(pushbutton_style())
-            elif isinstance(widget, QLineEdit):
+            elif isinstance(widget, (QLineEdit, QTextEdit)):
                 widget.setStyleSheet(lineedit_style())
 
 
