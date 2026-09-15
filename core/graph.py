@@ -81,6 +81,7 @@ class Node:
         # Property names that should use a multi-line editor in the property panel.
         # This is UI metadata only; property values keep using the normal serializer.
         self.multiline_properties: set[str] = set()
+        self.collapsed = False
 
     def add_input(self, name: str, port_type: PortType, tooltip="") -> Port:
         port = Port(name, port_type, PortDirection.INPUT, self, tooltip)

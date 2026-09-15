@@ -63,15 +63,10 @@ class Icon:
         return icon
 
     @staticmethod
-    def load_item(self, category, name, size, padding):
+    def load_item(self, category, name):
         icon_path = Path.get_path(category, name)
         icon = QGraphicsSvgItem(icon_path, self)
-
-        bounds = icon.boundingRect()
-        scale = size / max(bounds.width(), bounds.height())
-        icon.setScale(scale)
-        icon_y = (self.HEADER_HEIGHT - bounds.height() * scale) / 2
-        icon.setPos(padding, icon_y)
+        return icon
 
     @staticmethod
     def load_widget(self, category, name, width, height):

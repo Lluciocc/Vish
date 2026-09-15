@@ -36,6 +36,8 @@
     "using_tty": "TTY الاستعمال",
     "sync_nodes_and_gen": "مزامنة العقد و التوليد",
     "auto_save": "الحفظ التلقائي",
+
+
     "custom_shebang": "Shebang مخصص",
     "full_screen": "ملء الشاشة",
     "close": "إغلاق",

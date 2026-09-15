@@ -17,99 +17,207 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen
-from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem
+from PySide6.QtCore import Qt, QPointF, QRectF
+from PySide6.QtGui import QBrush, QColor, QPainterPath, QPen, QPainter
+from PySide6.QtWidgets import QGraphicsItem, QGraphicsPathItem, QGraphicsTextItem
 
 from core.graph import Port
+from core.config import Config
 from core.port_types import PORT_STYLES, PortStyle, PortType
 from themes.theme_manager import Theme
 
 
-class PortItem(QGraphicsPathItem):
-    def __init__(self, port: Port, parent=None, is_input=False):
-        style = PORT_STYLES[port.port_type]
+TYPE = {
+    PortType.EXEC: "",
+    PortType.STRING: "STR",
+    PortType.INT: "INT",
+    PortType.BOOL: "BOOL",
+    PortType.CONDITION: "CON",
+    PortType.PATH: "PATH",
+    PortType.VARIABLE: "VAR",
+    PortType.ANY: "ANY",
+}
 
-        super().__init__(self.generate_path(port, style), parent)
+
+FILTER = [
+    "exec",
+    "string",
+    "int",
+    "bool",
+    "condition",
+    "path",
+    "variable",
+    "any",
+    "value",
+    "result",
+    "input",
+    "output",
+]
+
+
+SIZE = 12
+TWICE_SIZE = 2 * SIZE
+
+
+class PortItem(QGraphicsItem):
+    def __init__(self, port: Port, parent=None, is_input=False):
+        self.style = PORT_STYLES[port.port_type]
+
+        super().__init__(parent)
 
         self.port = port
         self.is_input = is_input
         self.edges = []
+        self.parent = parent
 
-        self.setBrush(QBrush(QColor(style.color)))
-        self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-BORDER")), 2))
-
-        self.setAcceptedMouseButtons(Qt.LeftButton)
-        self.setAcceptHoverEvents(True)
-        self.setFlag(QGraphicsItem.ItemIsSelectable, False)
-        self.setZValue(10)
-        # SET THE TOOLTIP
-        self.setToolTip(self.port.tooltip)
-
+        self.brush_color = self.style.color
+        self.pen_color = Theme.get_color("PORT_ITEM-BORDER")
         self.highlight = False
 
-    def get_color(self) -> QColor:
-        port_type = getattr(self.port, "type", None) or getattr(
-            self.port, "port_type", None
-        )
-        style = PORT_STYLES.get(port_type)
-        if style:
-            return QColor(style.color)
-        return QColor(Theme.get_color("PORT_ITEM-FILL_BROKEN"))
+        self.type_text = QGraphicsTextItem("", self)
+        self.name = QGraphicsTextItem("", self)
+        self.setup_port()
 
-    def overwrite_color(self, color):
-        if color == "invalid":
-            self.setBrush(QBrush(QColor(Theme.get_color("PORT_ITEM-FILL_INVALID"))))
-            if self.highlight:
-                self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-FILL_INVALID")), 3))
-        elif QColor.isValidColor(str(color)):
-            self.setBrush(QBrush(QColor(color)))
-        else:  # reset
-            self.setBrush(QBrush(QColor(self.get_color())))
-            if self.highlight:
-                self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-BORDER_RESET")), 3))
+    def setup_port(self):
+        self.overwrite_text_color(self.brush_color)
+        self.name.setAcceptHoverEvents(False)
+        self.name.setDefaultTextColor(Theme.get_color("PORT_ITEM-NAME"))
+
+        name_allowed = True
+        for filter in FILTER:
+            if self.port.name.lower() == filter:
+                name_allowed = False
+                break
+        if name_allowed:
+            self.name.setPlainText(self.port.name)
+
+        type_space = self.type_text.document().idealWidth() + 10
+        required_width = self.type_text.document().idealWidth() + self.name.document().idealWidth()
+        if self.is_input:
+            self.type_text.setPos(10, -13)
+            if self.type_text.toPlainText():
+                self.name.setPos(type_space, -13)
             else:
-                self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-BORDER")), 2))
+                self.name.setPos(10, -13)
+            if required_width > self.parent.width_input:
+                self.parent.width_input = required_width
+        else:
+            self.type_text.setPos(-10 - self.type_text.document().idealWidth(), -13)
+            if self.type_text.toPlainText():
+                self.name.setPos(-self.name.document().idealWidth() - type_space, -13)
+            else:
+                self.name.setPos(-self.name.document().idealWidth() - 10, -13)
+            if required_width > self.parent.width_output:
+                self.parent.width_output = required_width
 
-    def generate_path(self, port: Port, style: PortStyle) -> QPainterPath:
+    def boundingRect(self):
+        if self.port.port_type == PortType.EXEC or Config.PORT_HINT == False or self.parent.node.collapsed == True:
+            if self.is_input:
+                rect = QRectF(-SIZE, -SIZE, TWICE_SIZE, TWICE_SIZE)
+            else:
+                rect = QRectF(-SIZE, -SIZE, TWICE_SIZE, TWICE_SIZE)
+        else:
+            if self.is_input:
+                rect = QRectF(-SIZE, -SIZE, self.type_text.document().idealWidth() + TWICE_SIZE, TWICE_SIZE)
+            else:
+                rect = QRectF(-self.type_text.document().idealWidth() - SIZE, -SIZE, self.type_text.document().idealWidth() + TWICE_SIZE, TWICE_SIZE)
+        return rect
+
+    def paint(self, painter, option, widget):
+        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setBrush(QColor(self.brush_color))
+        painter.setPen(QPen(QColor(self.pen_color), 2))
+
         retval = QPainterPath()
-        match port.port_type:
+        match self.port.port_type:
             # Exec: triangular arrow
             case PortType.EXEC:
-                half = style.size / 2
-                retval.moveTo(-half, -half)
-                retval.lineTo(0, -half)
-                retval.lineTo(half, 0)
-                retval.lineTo(0, half)
-                retval.lineTo(-half, half)
+                half = SIZE * 0.6
+                shift = SIZE * 0.1
+                retval.moveTo(-half + shift, -half)
+                retval.lineTo(shift, -half)
+                retval.lineTo(half + shift, 0)
+                retval.lineTo(shift, half)
+                retval.lineTo(-half + shift, half)
                 retval.closeSubpath()
             # Default path
             case _:
-                half = style.size / 2
-                retval.addEllipse(-half, -half, style.size, style.size)
+                half = SIZE / 2
+                retval.addEllipse(-half, -half, SIZE, SIZE)
                 retval.closeSubpath()
 
-        return retval
+        painter.drawPath(retval)
+
+        self.setAcceptedMouseButtons(Qt.LeftButton)
+        self.setAcceptHoverEvents(True)
+        self.setFlag(QGraphicsItem.ItemIsSelectable, True)
+        self.setZValue(10)
+        self.setToolTip(self.port.tooltip)
+
+    def overwrite_color(self, color):
+        if color == "invalid":
+            self.brush_color = Theme.get_color("PORT_ITEM-FILL_INVALID")
+            if self.highlight:
+                self.pen_color = Theme.get_color("PORT_ITEM-FILL_INVALID")
+                self.overwrite_text_color("PORT_ITEM-FILL_INVALID", True)
+            else:
+                self.overwrite_text_color("PORT_ITEM-FILL_INVALID")
+        elif color == "hover_enter":
+            self.highlight = True
+            self.pen_color = Theme.get_color("PORT_ITEM-BORDER_HOVER")
+            self.overwrite_text_color(self.brush_color, True)
+        elif color == "hover_leave":
+            self.highlight = False
+            self.pen_color = Theme.get_color("PORT_ITEM-BORDER")
+            self.overwrite_text_color(self.brush_color)
+        elif QColor.isValidColor(str(color)):
+            self.brush_color = color
+            self.overwrite_text_color(self.brush_color)
+        else:  # reset
+            self.brush_color = self.style.color
+            self.overwrite_text_color(self.brush_color)
+            if self.highlight:
+                self.pen_color = Theme.get_color("PORT_ITEM-BORDER_RESET")
+            else:
+                self.pen_color = Theme.get_color("PORT_ITEM-BORDER")
+        self.update()
+
+    def overwrite_text_color(self, color, underscore = False):
+        if  Config.PORT_HINT == True and self.parent.node.collapsed == False:
+            if underscore:
+                self.type_text.setHtml(f'<u><strong><div style="color: {color}">{TYPE[self.port.port_type]}</div></strong></u>')
+            else:
+                self.type_text.setHtml(f'<strong><div style="color: {color}">{TYPE[self.port.port_type]}</div></strong>')
+        else:
+            self.type_text.setHtml("")
+        if not self.is_input:
+            self.type_text.setPos(-10 - self.type_text.document().idealWidth(), -13)
+        self.update()
 
     def center_scene_pos(self):
-        return self.mapToScene(self.boundingRect().center())
-
-    def mousePressEvent(self, event):
-        # print("PORT CLICK")
-        pass
+        if self.port.port_type == PortType.EXEC or Config.PORT_HINT == False or self.parent.node.collapsed == True:
+            if self.is_input:
+                return self.mapToScene(self.boundingRect().center() - QPointF(5, 0))
+            else:
+                return self.mapToScene(self.boundingRect().center() + QPointF(5, 0))
+        else:
+            text_size_adjustment = QPointF((self.type_text.document().idealWidth()) / 2 + 5, 0)
+            if self.is_input:
+                return self.mapToScene(self.boundingRect().center() - text_size_adjustment)
+            else:
+                return self.mapToScene(self.boundingRect().center() + text_size_adjustment)
 
     def hoverEnterEvent(self, event):
-        self.highlight = True
-        self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-BORDER_HOVER")), 3))
+        self.overwrite_color("hover_enter")
         super().hoverEnterEvent(event)
 
     def hoverLeaveEvent(self, event):
-        self.highlight = False
-        self.setPen(QPen(QColor(Theme.get_color("PORT_ITEM-BORDER")), 2))
+        self.overwrite_color("hover_leave")
         super().hoverLeaveEvent(event)
 
     def mousePressEvent(self, event):
         self.scene().start_connection(self)
+        event.accept()
 
     def mouseReleaseEvent(self, event):
         scene = self.scene()

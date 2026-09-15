@@ -72,6 +72,7 @@ class Serializer:
                     {"id": p.id, "name": p.name, "type": p.port_type.value}
                     for p in node.outputs
                 ],
+                "collapsed": node.collapsed,
             }
             data["nodes"].append(node_data)
 
@@ -123,6 +124,7 @@ class Serializer:
             node.y = node_data["y"]
             node.z = node_data.get("z", 0)  # using get for backward compatibility
             node.properties = node_data.get("properties", {})
+            node.collapsed = node_data.get("collapsed", False)
             graph.add_node(node)
 
             for saved, port in zip(node_data.get("inputs", []), node.inputs):
@@ -153,6 +155,7 @@ class Serializer:
             "properties": dict(node.properties),
             "inputs": [p.id for p in node.inputs],
             "outputs": [p.id for p in node.outputs],
+            "collapsed": node.collapsed,
         }
 
     def serialize_edge(self, edge):

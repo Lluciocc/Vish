@@ -69,7 +69,7 @@ def create_switch_row(label_key: str, fallback: str, config_attr: str):
     row.addWidget(label)
     row.addStretch()
     row.addWidget(switch)
-    return row, label
+    return row, label, switch
 
 
 class SettingsDialog(QDialog):
@@ -82,7 +82,7 @@ class SettingsDialog(QDialog):
         if Info.get_device_type() == "phone":
             self.showMaximized()
         else:
-            self.resize(380, 520)
+            self.resize(380, 590)
 
         self.root_layout = QVBoxLayout(self)
         self.root_layout.setContentsMargins(0, 0, 0, 0)
@@ -240,8 +240,10 @@ class SettingsDialog(QDialog):
             ("using_tty", "Use TTY", "USING_TTY"),
             ("sync_nodes_and_gen", "Sync Nodes and Generation", "SYNC_NODES_AND_GEN"),
             ("auto_save", "Auto Save", "AUTO_SAVE"),
+            ("port_hint", "Show Data Types", "PORT_HINT"),
+            ("collapse_nodes", "Allow Nodes to Collapse", "COLLAPSE_NODES"),
         ]:
-            row, label = create_switch_row(key, fallback, attr)
+            row, label, switch = create_switch_row(key, fallback, attr)
             switch = row.itemAt(
                 row.count() - 1
             ).widget()  #  get the switch we just created
@@ -250,6 +252,11 @@ class SettingsDialog(QDialog):
             setattr(self, f"{attr.lower()}_label", label)
             row.setContentsMargins(0, 0, 2, 0)
             self.layout.addLayout(row)
+            if key == "port_hint":
+                switch.toggled.connect(lambda value: self.switch_action(value))
+
+    def switch_action(self, value):
+        self.parent().graph_view._apply_port_hints()
 
     def _build_footer(self):
         self.layout.addStretch(1)
@@ -427,6 +434,8 @@ class SettingsDialog(QDialog):
             ("using_tty", "using_tty", "Use TTY"),
             ("sync_nodes_and_gen", "sync_nodes_and_gen", "Sync Nodes and Generation"),
             ("auto_save", "auto_save", "Auto Save"),
+            ("port_hint", "port_hint", "Show Data Types"),
+            ("collapse_nodes", "collapse_nodes", "Allow Nodes to Collapse on Creation"),
         ]:
             label = getattr(self, f"{attr}_label", None)
             if label:

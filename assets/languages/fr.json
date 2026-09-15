@@ -36,6 +36,8 @@
     "using_tty": "Utiliser le TTY",
     "sync_nodes_and_gen": "Synchroniser les nœuds et la génération",
     "auto_save": "Sauvegarde automatique",
+
+
     "custom_shebang": "Shebang personnalisé",
     "full_screen": "Plein écran",
     "close": "Fermer",

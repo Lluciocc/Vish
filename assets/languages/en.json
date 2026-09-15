@@ -36,6 +36,8 @@
     "using_tty": "Use TTY",
     "sync_nodes_and_gen": "Sync Nodes and Generation",
     "auto_save": "Auto Save",
+    "port_hint": "Show Data Types",
+    "collapse_nodes": "Allow Nodes to Collapse on Creation",
     "custom_shebang": "Custom Shebang",
     "full_screen": "Full Screen",
     "close": "Close",

@@ -39,6 +39,8 @@ class Config:
         "clipboard_button",
         "hamburger_menu_button",
     ]
+    PORT_HINT = True
+    COLLAPSE_NODES = True
 
 
 class ConfigManager:

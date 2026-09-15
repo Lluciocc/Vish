@@ -36,6 +36,8 @@
     "using_tty": "Benutze TTY",
     "sync_nodes_and_gen": "Synchronisiere Knoten und Generierung",
     "auto_save": "Automatisch Speichern",
+    "port_hint": "Zeige Datentypen an",
+    "collapse_nodes": "Erlaube Knoten bei Erstellung zu kollabieren",
     "custom_shebang": "Eigener Shebang",
     "full_screen": "Vollbild",
     "close": "Schließen",

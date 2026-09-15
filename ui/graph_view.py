@@ -179,6 +179,9 @@ class GraphView(QGraphicsView):
 
         self.undo_stack.push(AddNodeCommand(self, node))
         node_item = self.node_items.get(node.id)
+        if node_item.collapsable and Config.COLLAPSE_NODES:
+            node.collapsed = node_item.collapsable
+            node_item.switch_collapse()
 
         scene = self.scene()
         if scene.drag_edges:
@@ -779,6 +782,13 @@ class GraphView(QGraphicsView):
     def get_icon(self, name):
         icon = Icon.load_icon("main", name)
         return icon
+
+    def _apply_port_hints(self):
+        for node_id in self.node_items:
+            node_item = self.node_items[node_id]
+            for port_id in node_item.port_items:
+                port_item = node_item.port_items[port_id]
+                port_item.setup_port()
 
     def _apply_theme(self):
         self.setBackgroundBrush(QColor("transparent"))

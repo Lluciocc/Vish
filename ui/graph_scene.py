@@ -46,6 +46,7 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
         self.block_input = False
         self.is_ctrl = False
         self.edge_logger_counter = "+1"
+        self.old_hover_port = None
 
     def start_connection(self, first_port):
         if self.block_input:
@@ -395,8 +396,6 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
         if self.pending_port:
             edges = []
             for edge in self.drag_edges:
-                if edge0.source_port == edge0.target_port:
-                    edge.source_port.overwrite_color("invalid")
                 edge.overwrite_color("invalid")
                 edges.append(edge)
             port = self.pending_port
@@ -481,6 +480,26 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
     def mouseMoveEvent(self, event):
         for drag_edge in self.drag_edges:
             drag_edge.set_target_pos(event.scenePos(), drag_edge.source_port.is_input)
+
+        # triggers hover_actions
+        if event.buttons() == Qt.LeftButton and self.drag_edges:
+            mouse_pos = self.views()[0].mapToScene(
+                self.views()[0].mapFromGlobal(QCursor.pos())
+            )
+            hover_port = None
+            for item in self.items(mouse_pos):
+                if isinstance(item, PortItem):
+                    hover_port = item
+                    break
+            if hover_port:
+                if hover_port != self.old_hover_port:
+                    hover_port.overwrite_color("hover_enter")
+                    if self.old_hover_port:
+                        self.old_hover_port.overwrite_color("hover_leave")
+                    self.old_hover_port = hover_port
+            elif self.old_hover_port:
+                self.old_hover_port.overwrite_color("hover_leave")
+                self.old_hover_port = None
 
         super().mouseMoveEvent(event)
 

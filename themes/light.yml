@@ -215,6 +215,7 @@ theme_detail:
     NODE_ITEM-BORDER_HOVER:                     "CUSTOM_ACCENT"
 
     # PORT ITEM
+    PORT_ITEM-NAME:                             "#f9f9f9"   # Matches SVG colors.
     PORT_ITEM-BORDER:                           "NODES_BORDER"
     PORT_ITEM-FILL_BROKEN:                      "ff5500"
     PORT_ITEM-FILL_INVALID:                     "INVALID"

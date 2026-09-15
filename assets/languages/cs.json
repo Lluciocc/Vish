@@ -36,6 +36,8 @@
     "using_tty": "Použít TTY",
     "sync_nodes_and_gen": "Synchronizovat uzly a generování",
     "auto_save": "Automatické ukládání",
+
+
     "custom_shebang": "Vlastní shebang",
     "full_screen": "Celá obrazovka",
     "close": "Zavřít",

@@ -36,6 +36,8 @@
     "using_tty": "Usar TTY",
     "sync_nodes_and_gen": "Sincronizar Nodos e Geração",
     "auto_save": "Salvamento Automático",
+
+
     "custom_shebang": "Shebang Personalizado",
     "full_screen": "Tela Cheia",
     "close": "Fechar",
