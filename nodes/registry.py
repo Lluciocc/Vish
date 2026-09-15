@@ -20,13 +20,14 @@
 NODE_REGISTRY = {}
 
 
-def register_node(node_type: str, *, label=None, category="Other", description=""):
+def register_node(node_type: str, *, label=None, category="Other", description="", collapsable=False):
     def decorator(cls):
         NODE_REGISTRY[node_type] = {
             "class": cls,
             "label": label or cls.__name__,
             "category": category,
             "description": description,
+            "collapsable": collapsable,
         }
         return cls
 
