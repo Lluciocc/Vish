@@ -60,7 +60,6 @@ class NodeItem(QGraphicsItem):
         self.width = self.DEFAULT_WIDTH
         self.setup_icon()
         self.setup_ports()
-        print(self.title_item.document().idealWidth())
 
         min_header_width = self.title_item.document().idealWidth() + self.ICON_SIZE + self.MIN_WIDTH
         min_body_width = self.width_input + self.width_output + self.MIN_WIDTH
