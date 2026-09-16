@@ -45,6 +45,7 @@ class ArgumentNode(BaseNode):
     category="File System",
     label="Directory Exists",
     description="Checks whether a directory exists",
+    collapsable=True,
 )
 class DirectoryExistsNode(ArgumentNode):
     def __init__(self):
@@ -176,6 +177,7 @@ class DeleteDirectoryNode(DeleteFileNode):
     category="File System",
     label="Read File",
     description="Reads the contents of a file",
+    collapsable=True,
 )
 class ReadFileNode(ArgumentNode):
     def __init__(self):
@@ -235,6 +237,7 @@ class AppendToFileNode(FileContentWriterNode):
     category="File System",
     label="List Directory",
     description="Lists a directory's entries",
+    collapsable=True,
 )
 class ListDirectoryNode(ArgumentNode):
     def __init__(self):
@@ -252,6 +255,7 @@ class ListDirectoryNode(ArgumentNode):
     category="File System",
     label="File Size",
     description="Returns a file's size in bytes",
+    collapsable=True,
 )
 class FileSizeNode(ArgumentNode):
     def __init__(self):
@@ -269,6 +273,7 @@ class FileSizeNode(ArgumentNode):
     category="Paths",
     label="File Extension",
     description="Returns a filename extension without the dot",
+    collapsable=True,
 )
 class FileExtensionNode(ArgumentNode):
     def __init__(self):
@@ -291,6 +296,7 @@ class FileExtensionNode(ArgumentNode):
     category="Paths",
     label="Filename",
     description="Returns the final component of a path",
+    collapsable=True,
 )
 class FilenameNode(ArgumentNode):
     def __init__(self):
@@ -308,6 +314,7 @@ class FilenameNode(ArgumentNode):
     category="Paths",
     label="Parent Directory",
     description="Returns the parent directory of a path",
+    collapsable=True,
 )
 class ParentDirectoryNode(ArgumentNode):
     def __init__(self):
@@ -368,6 +375,7 @@ class TemporaryPathNode(ArgumentNode):
     category="File System",
     label="Create Temporary File",
     description="Creates a temporary file and returns its path",
+    collapsable=True,
 )
 class CreateTemporaryFileNode(TemporaryPathNode):
     def __init__(self):
@@ -380,6 +388,7 @@ class CreateTemporaryFileNode(TemporaryPathNode):
     category="File System",
     label="Create Temporary Directory",
     description="Creates a temporary directory and returns its path",
+    collapsable=True,
 )
 class CreateTemporaryDirectoryNode(TemporaryPathNode):
     option = "-d"

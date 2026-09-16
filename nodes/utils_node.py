@@ -23,7 +23,12 @@ from nodes.base_node import BaseNode
 from nodes.registry import register_node
 
 
-@register_node("to_string", category="Conversion", label="To String")
+@register_node(
+    "to_string",
+    category="Conversion",
+    label="To String",
+    collapsable=True,
+)
 class ToString(BaseNode):
     def __init__(self):
         super().__init__("to_string", "To String")
@@ -41,7 +46,12 @@ class ToString(BaseNode):
         return f'"{expr}"'
 
 
-@register_node("to_int", category="Conversion", label="To Int")
+@register_node(
+    "to_int",
+    category="Conversion",
+    label="To Int",
+    collapsable=True,
+)
 class ToInt(BaseNode):
     def __init__(self):
         super().__init__("to_int", "To Int")
@@ -63,6 +73,7 @@ class ToInt(BaseNode):
     category="Constants",
     label="Path Constant",
     description="Represents a path constant value",
+    collapsable=True,
 )
 class PathConstant(BaseNode):
     def __init__(self):

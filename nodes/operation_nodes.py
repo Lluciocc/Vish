@@ -35,6 +35,7 @@ class MathNode(BaseNode):
     category="Constants",
     label="Number Constant",
     description="Represents a number constant value",
+    collapsable=True,
 )
 class NumberConstant(MathNode):
     def __init__(self):
@@ -234,7 +235,12 @@ class LogicalOr(MathNode):
         return f"{a} || {b}"
 
 
-@register_node("logical_not", category="Logic", label="NOT")
+@register_node(
+    "logical_not",
+    category="Logic",
+    label="NOT",
+    collapsable=True,
+)
 class LogicalNot(MathNode):
     def __init__(self):
         super().__init__("logical_not", "NOT")
@@ -253,6 +259,7 @@ class LogicalNot(MathNode):
     category="Logic",
     label="Command Condition",
     description="Uses a custom command as a condition",
+    collapsable=True,
 )
 class CommandConditionNode(BaseNode):
     def __init__(self):

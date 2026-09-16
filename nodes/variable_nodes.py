@@ -71,6 +71,7 @@ class SetVariableNode(BaseNode):
     category="Variables",
     label="Get Variable",
     description="Gets the value of a variable",
+    collapsable=True,
 )
 class GetVariableNode(BaseNode):
     def __init__(self):
@@ -91,6 +92,7 @@ class GetVariableNode(BaseNode):
     category="Variables",
     label="File Exists",
     description="Checks if a file exists",
+    collapsable=True,
 )
 class FileExistsNode(BaseNode):
     def __init__(self):
@@ -115,6 +117,7 @@ class FileExistsNode(BaseNode):
     category="Constants",
     label="String Constant",
     description="Represents a string constant value",
+    collapsable=True,
 )
 class StringConstantNode(BaseNode):
     def __init__(self):

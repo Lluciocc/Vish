@@ -53,6 +53,7 @@ class ConcatenateStringsNode(BinaryStringNode):
     category="Strings",
     label="String Length",
     description="Returns the number of characters in text",
+    collapsable=True,
 )
 class StringLengthNode(ArgumentNode):
     def __init__(self):
@@ -195,6 +196,7 @@ class UnaryStringNode(ArgumentNode):
     category="Strings",
     label="Trim",
     description="Removes leading and trailing whitespace",
+    collapsable=True,
 )
 class TrimNode(UnaryStringNode):
     def __init__(self):
@@ -214,6 +216,7 @@ class TrimNode(UnaryStringNode):
     category="Strings",
     label="Uppercase",
     description="Converts text to uppercase",
+    collapsable=True,
 )
 class UppercaseNode(UnaryStringNode):
     def __init__(self):
@@ -230,6 +233,7 @@ class UppercaseNode(UnaryStringNode):
     category="Strings",
     label="Lowercase",
     description="Converts text to lowercase",
+    collapsable=True,
 )
 class LowercaseNode(UnaryStringNode):
     def __init__(self):
@@ -338,6 +342,7 @@ class CaptureRegexNode(ArgumentNode):
     category="Constants",
     label="Multiline Text",
     description="Stores a multiline text constant",
+    collapsable=True,
 )
 class MultilineTextNode(ArgumentNode):
     def __init__(self):
