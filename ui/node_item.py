@@ -35,7 +35,7 @@ class NodeItem(QGraphicsItem):
     MIN_WIDTH = 36
     HEADER_HEIGHT = 34
     PORT_SPACING = 24
-    NODE_HEIGHT_SPACING = 15
+    NODE_HEIGHT_SPACING = 12
     ICON_SIZE = 24
 
     def __init__(self, node: Node):
@@ -102,7 +102,7 @@ class NodeItem(QGraphicsItem):
         if self.node.collapsed == True:
             return self.PORT_SPACING * 2 - self.HEADER_HEIGHT / 2
         else:
-            return 0
+            return -self.NODE_HEIGHT_SPACING / 3
 
     def setup_ports(self):
         for i, port in enumerate(self.node.inputs):
