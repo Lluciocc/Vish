@@ -789,6 +789,7 @@ class GraphView(QGraphicsView):
             for port_id in node_item.port_items:
                 port_item = node_item.port_items[port_id]
                 port_item.setup_port()
+            node_item.update_node_width()
 
     def _apply_theme(self):
         self.setBackgroundBrush(QColor("transparent"))

@@ -91,6 +91,7 @@ class PortItem(QGraphicsItem):
         if name_allowed:
             self.name.setPlainText(self.port.name)
 
+    def calculate_required_space(self):
         type_space = self.type_text.document().idealWidth() + 10
         required_width = self.type_text.document().idealWidth() + self.name.document().idealWidth()
         if self.is_input:

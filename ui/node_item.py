@@ -58,8 +58,25 @@ class NodeItem(QGraphicsItem):
         self.width_input = 0
         self.width_output = 0
         self.width = self.DEFAULT_WIDTH
+        self.old_width = self.width
         self.setup_icon()
         self.setup_ports()
+        self.update_node_width()
+
+        if self.node.collapsed == False:
+            body_height = self.calc_height(True)
+        else:
+            body_height = 0
+        self.height = self.HEADER_HEIGHT + body_height
+
+    def update_node_width(self):
+        self.width_input = 0
+        self.width_output = 0
+        self.width = self.DEFAULT_WIDTH
+
+        for port_id in self.port_items:
+            port_item = self.port_items[port_id]
+            port_item.calculate_required_space()
 
         min_header_width = self.title_item.document().idealWidth() + self.ICON_SIZE + self.MIN_WIDTH
         min_body_width = self.width_input + self.width_output + self.MIN_WIDTH
@@ -67,18 +84,13 @@ class NodeItem(QGraphicsItem):
             self.width = min_header_width
         if self.width < min_body_width:
             self.width = min_body_width
-        if self.width != self.DEFAULT_WIDTH:
+        if self.width != self.old_width:
             for port_id in self.port_items:
                 port_item = self.port_items[port_id]
                 if not port_item.is_input:
                     y_pos = port_item.y()
                     port_item.setPos(self.width, y_pos)
-
-        if self.node.collapsed == False:
-            body_height = self.calc_height(True)
-        else:
-            body_height = 0
-        self.height = self.HEADER_HEIGHT + body_height
+        self.old_width = self.width
 
     def update_traduction(item: Node, language):
         Traduction.set_translate_model(language)
@@ -188,6 +200,7 @@ class NodeItem(QGraphicsItem):
         scene.update_edges_for_node(self)
         scene.update()
         self.setup_icon()
+        self.update_node_width()
 
     def calc_height(self, body=False):
         body_height = (
