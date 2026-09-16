@@ -36,6 +36,7 @@ class NodeItem(QGraphicsItem):
     HEADER_HEIGHT = 34
     PORT_SPACING = 24
     NODE_HEIGHT_SPACING = 15
+    ICON_SIZE = 24
 
     def __init__(self, node: Node):
         super().__init__()
@@ -59,9 +60,15 @@ class NodeItem(QGraphicsItem):
         self.width = self.DEFAULT_WIDTH
         self.setup_icon()
         self.setup_ports()
+        print(self.title_item.document().idealWidth())
 
-        if self.width_input + self.width_output + self.MIN_WIDTH > self.width:
-            self.width = self.width_input + self.width_output + self.MIN_WIDTH
+        min_header_width = self.title_item.document().idealWidth() + self.ICON_SIZE + self.MIN_WIDTH
+        min_body_width = self.width_input + self.width_output + self.MIN_WIDTH
+        if self.DEFAULT_WIDTH < min_header_width:
+            self.width = min_header_width
+        if self.width < min_body_width:
+            self.width = min_body_width
+        if self.width != self.DEFAULT_WIDTH:
             for port_id in self.port_items:
                 port_item = self.port_items[port_id]
                 if not port_item.is_input:
@@ -195,7 +202,7 @@ class NodeItem(QGraphicsItem):
             return body_height
         self.height = self.HEADER_HEIGHT + body_height
 
-    def get_icon_node(self, item: Node, icon_size, padding):
+    def get_icon_node(self, item: Node, padding):
         node = NODE_REGISTRY.get(item.node_type)
         if node is not None:
             if not self.icon_item:
@@ -203,7 +210,7 @@ class NodeItem(QGraphicsItem):
                     self, f"nodes/{node['category']}", item.title
                 )
             bounds = self.icon_item.boundingRect()
-            scale = icon_size / max(bounds.width(), bounds.height())
+            scale = self.ICON_SIZE / max(bounds.width(), bounds.height())
             self.icon_item.setScale(scale)
             icon_y = (self.HEADER_HEIGHT - bounds.height() * scale) / 2 + self.get_pos_y()
             self.icon_item.setPos(padding, icon_y)
@@ -214,9 +221,9 @@ class NodeItem(QGraphicsItem):
             padding = 6
         else:
             padding = 10
-        self.get_icon_node(self.node, icon_size, padding)
+        self.get_icon_node(self.node, padding)
 
-        text_x = icon_size + padding
+        text_x = self.ICON_SIZE + padding
         text_rect = self.title_item.boundingRect()
         text_y = (self.HEADER_HEIGHT - text_rect.height()) / 2 + self.get_pos_y()
         self.title_item.setPos(text_x, text_y)
