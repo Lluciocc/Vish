@@ -189,6 +189,7 @@ class NodeItem(QGraphicsItem):
         scene = self.scene()
         for port_id in self.port_items:
             port_item = self.port_items[port_id]
+            port_item.setup_port_name()
             port_item.overwrite_text_color(port_item.brush_color)
 
             if self.node.collapsed:

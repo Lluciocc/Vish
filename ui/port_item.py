@@ -82,14 +82,19 @@ class PortItem(QGraphicsItem):
         self.overwrite_text_color(self.brush_color)
         self.name.setAcceptHoverEvents(False)
         self.name.setDefaultTextColor(Theme.get_color("PORT_ITEM-NAME"))
+        self.setup_port_name()
 
+    def setup_port_name(self):
         name_allowed = True
         for filter in FILTER:
             if self.port.name.lower() == filter:
                 name_allowed = False
                 break
         if name_allowed:
-            self.name.setPlainText(self.port.name)
+            if self.parent.node.collapsed == False:
+                self.name.setPlainText(self.port.name)
+            else:
+                self.name.setPlainText("")
 
     def calculate_required_space(self):
         type_space = self.type_text.document().idealWidth() + 10
