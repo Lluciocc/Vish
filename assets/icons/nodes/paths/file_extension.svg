@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
+  <g fill="none" stroke="#f9f9f9" stroke-linecap="round" stroke-linejoin="round">
+    <path stroke-width="17" d="M 70,28 H 145 L 188,71 V 220 Q 188,228 180,228 H 70 Q 62,228 62,220 V 36 Q 62,28 70,28 Z M 146,30 V 70 H 186"/>
+    <g stroke-width="11"/>
+  </g>
+  <text style="fill: rgb(255, 255, 255); font-family: Amiko; font-size: 40px; white-space: pre; transform-box: fill-box; transform-origin: 34.9961% 34.9421%;" x="81.651" y="194.634">.EXT</text>
+  <defs>
+    <style bx:fonts="Amiko">@import url(https://fonts.googleapis.com/css2?family=Amiko%3Aital%2Cwght%400%2C400%3B0%2C600%3B0%2C700&amp;display=swap);</style>
+  </defs>
+</svg>
