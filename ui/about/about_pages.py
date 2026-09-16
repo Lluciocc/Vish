@@ -326,6 +326,7 @@ class AboutTextPage(QTextEdit):
 
         with open(Info.resource_path(f"assets/markdown/{md_file}.md"), "r") as file:
             for line in file:
+                line = line.replace("->", "→")
                 if line == "\n":
                     if remove_empty:
                         remove_empty = False
