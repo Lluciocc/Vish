@@ -53,6 +53,7 @@ from nodes import (  # noqa: F401
     string_nodes,
     utils_node,
     variable_nodes,
+    flow_nodes,
 )
 from nodes.flow_nodes import StartNode
 from nodes.registry import NODE_REGISTRY
