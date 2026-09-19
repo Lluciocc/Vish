@@ -56,6 +56,13 @@ class Port:
         if self.port_type == PortType.ANY or other.port_type == PortType.ANY:
             return True
 
+        # variable can carry a string, path, or numeric value
+        if self.port_type == PortType.VARIABLE or other.port_type == PortType.VARIABLE:
+            return (
+                self.port_type != PortType.CONDITION
+                and other.port_type != PortType.CONDITION
+            )
+
         return self.port_type == other.port_type
 
     def is_connected(self) -> bool:
@@ -78,8 +85,6 @@ class Node:
         self.y = 0.0
         self.z = 0.0
         self.properties: dict[str, Any] = {}
-        # Property names that should use a multi-line editor in the property panel.
-        # This is UI metadata only; property values keep using the normal serializer.
         self.multiline_properties: set[str] = set()
         self.collapsed = False
 

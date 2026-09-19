@@ -18,6 +18,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    condition,
+    identifier,
+    literal,
+    shell_assignment,
+    shell_word,
+    user_interpolation,
+    variable,
+)
 from core.port_types import PortType
 from nodes.base_node import BaseNode
 from nodes.registry import register_node
@@ -33,26 +42,15 @@ class SetVariableNode(BaseNode):
     def __init__(self):
         super().__init__("set_variable", "Set Variable")
         self.add_input("Exec", PortType.EXEC, "Control flow input")
-        self.add_input("Value", PortType.VARIABLE, "Value")
+        self.add_input("Value", PortType.ANY, "Value")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
 
         self.properties["variable"] = "VAR"
         self.properties["value"] = ""
 
     def emit_bash(self, context: BashContext) -> str:
-        var_name = self.properties.get("variable", "VAR")
-
-        raw_value = self.properties.get("value", "")
-        if (
-            raw_value.isdigit()
-            or raw_value.startswith("$")
-            or raw_value.startswith('"')
-            or raw_value.startswith("'")
-            or raw_value.startswith("`")
-        ):
-            value_expr = raw_value
-        else:
-            value_expr = f'"{raw_value}"'
+        var_name = identifier(self.properties.get("variable", "VAR"), "VAR")
+        value = user_interpolation(self.properties.get("value", ""))
 
         value_port = self.inputs[1]
         if value_port.connected_edges:
@@ -60,8 +58,9 @@ class SetVariableNode(BaseNode):
 
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
-                value_expr = emitted
+                value = emitted
 
+        value_expr = shell_assignment(value)
         context.variables[var_name] = value_expr
         return f"{var_name}={value_expr}"
 
@@ -80,11 +79,12 @@ class GetVariableNode(BaseNode):
         self.properties["variable"] = "VAR"
 
     def emit_bash(self, context: BashContext) -> str:
-        var_name = self.properties.get("variable", "VAR")
-        return f"${var_name}"
+        var_name = identifier(self.properties.get("variable", "VAR"), "VAR")
+        return str(variable(var_name))
 
     def emit_bash_value(self, context):
-        return f"${self.properties['variable']}"
+        var_name = identifier(self.properties.get("variable", "VAR"), "VAR")
+        return variable(var_name)
 
 
 @register_node(
@@ -102,14 +102,19 @@ class FileExistsNode(BaseNode):
         self.properties["path"] = ""
 
     def emit_bash(self, context: BashContext) -> str:
-        path = self.properties.get("path", "")
+        return self.emit_condition(context)
+
+    def emit_condition(self, context: BashContext) -> str:
+        path = user_interpolation(self.properties.get("path", ""), expand_tilde=True)
 
         path_port = self.inputs[0]
         if path_port.connected_edges:
             source_node = path_port.connected_edges[0].source.node
-            path = source_node.properties.get("value", path)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                path = emitted
 
-        return f'[ -f "{path}" ]'
+        return condition(f"[[ -f {shell_word(path)} ]]")
 
 
 @register_node(
@@ -126,4 +131,4 @@ class StringConstantNode(BaseNode):
         self.properties["value"] = ""
 
     def emit_bash_value(self, context: BashContext) -> str:
-        return f'"{self.properties.get("value", "")}"'
+        return literal(self.properties.get("value", ""))

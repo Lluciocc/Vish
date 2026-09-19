@@ -18,6 +18,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    BashValue,
+    arithmetic,
+    arithmetic_operand,
+    condition,
+    literal,
+    number,
+    shell_word,
+)
 from core.port_types import PortType
 from nodes.base_node import BaseNode
 from nodes.registry import register_node
@@ -26,8 +35,12 @@ from nodes.registry import register_node
 class MathNode(BaseNode):
     def _resolve(self, port, context: BashContext, default="0"):
         if port.connected_edges:
-            return port.connected_edges[0].source.node.emit_bash_value(context)
-        return default
+            value = port.connected_edges[0].source.node.emit_bash_value(context)
+            if value is not None:
+                return value
+        if isinstance(default, BashValue):
+            return default
+        return number(default)
 
 
 @register_node(
@@ -44,7 +57,7 @@ class NumberConstant(MathNode):
         self.properties["value"] = 0
 
     def emit_bash_value(self, context: BashContext) -> str:
-        return str(self.properties.get("value", 0))
+        return number(self.properties.get("value", 0))
 
 
 @register_node("addition", category="Math", label="Addition")
@@ -58,7 +71,7 @@ class Addition(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} + {b}))"
+        return arithmetic(f"{arithmetic_operand(a)} + {arithmetic_operand(b)}")
 
 
 @register_node("subtraction", category="Math", label="Subtraction")
@@ -72,7 +85,7 @@ class Subtraction(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} - {b}))"
+        return arithmetic(f"{arithmetic_operand(a)} - {arithmetic_operand(b)}")
 
 
 @register_node("multiplication", category="Math", label="Multiplication")
@@ -86,7 +99,7 @@ class Multiplication(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} * {b}))"
+        return arithmetic(f"{arithmetic_operand(a)} * {arithmetic_operand(b)}")
 
 
 @register_node("division", category="Math", label="Division")
@@ -100,7 +113,7 @@ class Division(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} / {b}))"
+        return arithmetic(f"{arithmetic_operand(a)} / {arithmetic_operand(b)}")
 
 
 @register_node(
@@ -119,7 +132,7 @@ class Modulo(MathNode):
     def emit_bash_value(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"$(({a} % {b}))"
+        return arithmetic(f"{arithmetic_operand(a)} % {arithmetic_operand(b)}")
 
 
 @register_node(
@@ -135,7 +148,7 @@ class LessThan(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"(( {a} < {b} ))"
+        return condition(f"(( {arithmetic_operand(a)} < {arithmetic_operand(b)} ))")
 
 
 @register_node(
@@ -154,7 +167,7 @@ class GreaterThan(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"(( {a} > {b} ))"
+        return condition(f"(( {arithmetic_operand(a)} > {arithmetic_operand(b)} ))")
 
 
 @register_node("equals", category="Logic", label="Equals (numeric)")
@@ -168,7 +181,7 @@ class EqualsNumeric(MathNode):
     def emit_condition(self, context: BashContext) -> str:
         a = self._resolve(self.inputs[0], context)
         b = self._resolve(self.inputs[1], context)
-        return f"(( {a} == {b} ))"
+        return condition(f"(( {arithmetic_operand(a)} == {arithmetic_operand(b)} ))")
 
 
 @register_node("equals_string", category="Logic", label="Equals (string)")
@@ -180,9 +193,9 @@ class EqualsString(MathNode):
         self.add_output("Result", PortType.CONDITION, "Result")
 
     def emit_condition(self, context: BashContext) -> str:
-        a = self._resolve(self.inputs[0], context)
-        b = self._resolve(self.inputs[1], context)
-        return f"[ {a} = {b} ]"
+        a = self._resolve(self.inputs[0], context, literal(""))
+        b = self._resolve(self.inputs[1], context, literal(""))
+        return condition(f"[[ {shell_word(a)} == {shell_word(b)} ]]")
 
 
 @register_node("equals_variable", category="Logic", label="Equals (variable)")
@@ -194,9 +207,9 @@ class EqualsVariable(MathNode):
         self.add_output("Result", PortType.CONDITION, "Result")
 
     def emit_condition(self, context: BashContext) -> str:
-        a = self._resolve(self.inputs[0], context)
-        b = self._resolve(self.inputs[1], context)
-        return f'[ "{a}" = {b} ]'
+        a = self._resolve(self.inputs[0], context, literal(""))
+        b = self._resolve(self.inputs[1], context, literal(""))
+        return condition(f"[[ {shell_word(a)} == {shell_word(b)} ]]")
 
 
 @register_node("logical_and", category="Logic", label="AND")
@@ -214,7 +227,14 @@ class LogicalAnd(MathNode):
             a = "false"
         if not b:
             b = "false"
-        return f"{a} && {b}"
+        if (
+            a.startswith("[[ ")
+            and a.endswith(" ]]")
+            and b.startswith("[[ ")
+            and b.endswith(" ]]")
+        ):
+            return condition(f"[[ {a[3:-3]} && {b[3:-3]} ]]")
+        return condition(f"{a} && {b}")
 
 
 @register_node("logical_or", category="Logic", label="OR")
@@ -232,7 +252,14 @@ class LogicalOr(MathNode):
             a = "false"
         if not b:
             b = "false"
-        return f"{a} || {b}"
+        if (
+            a.startswith("[[ ")
+            and a.endswith(" ]]")
+            and b.startswith("[[ ")
+            and b.endswith(" ]]")
+        ):
+            return condition(f"[[ {a[3:-3]} || {b[3:-3]} ]]")
+        return condition(f"{a} || {b}")
 
 
 @register_node(
@@ -251,7 +278,7 @@ class LogicalNot(MathNode):
         a = self.inputs[0].get_condition(context)
         if not a:
             a = "false"
-        return f"! {a}"
+        return condition(f"! {a}")
 
 
 @register_node(
@@ -268,4 +295,4 @@ class CommandConditionNode(BaseNode):
         self.properties["command"] = ""
 
     def emit_condition(self, context: BashContext) -> str:
-        return f"[ {self.properties['command']} ]"
+        return condition(f"[ {self.properties['command']} ]")

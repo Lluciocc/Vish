@@ -17,6 +17,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from core.bash_values import command_substitution, condition, literal
 from core.port_types import PortType
 from nodes.filesystem_nodes import ArgumentNode
 from nodes.registry import register_node
@@ -45,7 +46,7 @@ class ConcatenateStringsNode(BinaryStringNode):
     def emit_bash_value(self, context):
         first = self._argument("first", 0, context)
         second = self._argument("second", 1, context)
-        return f"$(printf '%s%s' {first} {second})"
+        return command_substitution(f"printf '%s%s' {first} {second}")
 
 
 @register_node(
@@ -64,7 +65,9 @@ class StringLengthNode(ArgumentNode):
 
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
-        return f"$(VISH_TEXT={text}; printf '%s' \"${{#VISH_TEXT}}\")"
+        return command_substitution(
+            f"VISH_TEXT={text}; printf '%s' \"${{#VISH_TEXT}}\""
+        )
 
 
 class StringPredicateNode(BinaryStringNode):
@@ -75,7 +78,9 @@ class StringPredicateNode(BinaryStringNode):
     def _condition(self, context):
         text = self._argument("text", 0, context)
         value = self._argument("value", 1, context)
-        return f"[[ {text} {self.operator} {self.prefix}{value}{self.suffix} ]]"
+        return condition(
+            f"[[ {text} {self.operator} {self.prefix}{value}{self.suffix} ]]"
+        )
 
     def emit_condition(self, context):
         return self._condition(context)
@@ -148,12 +153,12 @@ class ReplaceTextNode(ArgumentNode):
         text = self._argument("text", 0, context)
         search = self._argument("search", 1, context)
         replacement = self._argument("replacement", 2, context)
-        return (
-            f"$(VISH_TEXT={text}; VISH_SEARCH={search}; "
+        return command_substitution(
+            f"VISH_TEXT={text}; VISH_SEARCH={search}; "
             f"VISH_REPLACEMENT={replacement}; "
             "if [[ -z $VISH_SEARCH ]]; then printf '%s' \"$VISH_TEXT\"; "
             "else printf '%s' "
-            "\"${VISH_TEXT//$VISH_SEARCH/$VISH_REPLACEMENT}\"; fi)"
+            '"${VISH_TEXT//$VISH_SEARCH/$VISH_REPLACEMENT}"; fi'
         )
 
 
@@ -176,11 +181,11 @@ class SubstringNode(ArgumentNode):
 
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
-        start = self._argument("start", 1, context, 0)
-        length = self._argument("length", 2, context, 1)
-        return (
-            f"$(VISH_TEXT={text}; VISH_START={start}; VISH_LENGTH={length}; "
-            "printf '%s' \"${VISH_TEXT:VISH_START:VISH_LENGTH}\")"
+        start = self._numeric_argument("start", 1, context, 0)
+        length = self._numeric_argument("length", 2, context, 1)
+        return command_substitution(
+            f"VISH_TEXT={text}; VISH_START={start}; VISH_LENGTH={length}; "
+            "printf '%s' \"${VISH_TEXT:VISH_START:VISH_LENGTH}\""
         )
 
 
@@ -205,9 +210,8 @@ class TrimNode(UnaryStringNode):
 
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
-        return (
-            f"$(printf '%s' {text} | "
-            "sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
+        return command_substitution(
+            f"printf '%s' {text} | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'"
         )
 
 
@@ -225,7 +229,9 @@ class UppercaseNode(UnaryStringNode):
 
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
-        return f"$(VISH_TEXT={text}; printf '%s' \"${{VISH_TEXT^^}}\")"
+        return command_substitution(
+            f"VISH_TEXT={text}; printf '%s' \"${{VISH_TEXT^^}}\""
+        )
 
 
 @register_node(
@@ -242,7 +248,9 @@ class LowercaseNode(UnaryStringNode):
 
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
-        return f"$(VISH_TEXT={text}; printf '%s' \"${{VISH_TEXT,,}}\")"
+        return command_substitution(
+            f"VISH_TEXT={text}; printf '%s' \"${{VISH_TEXT,,}}\""
+        )
 
 
 @register_node(
@@ -260,10 +268,10 @@ class SplitNode(BinaryStringNode):
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
         delimiter = self._argument("delimiter", 1, context)
-        return (
-            f"$(VISH_TEXT={text}; VISH_DELIMITER={delimiter}; "
+        return command_substitution(
+            f"VISH_TEXT={text}; VISH_DELIMITER={delimiter}; "
             "if [[ -z $VISH_DELIMITER ]]; then printf '%s' \"$VISH_TEXT\"; "
-            "else printf '%s' \"${VISH_TEXT//$VISH_DELIMITER/$'\\n'}\"; fi)"
+            "else printf '%s' \"${VISH_TEXT//$VISH_DELIMITER/$'\\n'}\"; fi"
         )
 
 
@@ -282,12 +290,12 @@ class JoinNode(BinaryStringNode):
     def emit_bash_value(self, context):
         items = self._argument("items", 0, context)
         delimiter = self._argument("delimiter", 1, context)
-        return (
-            f"$(VISH_ITEMS={items}; VISH_DELIMITER={delimiter}; VISH_FIRST=1; "
+        return command_substitution(
+            f"VISH_ITEMS={items}; VISH_DELIMITER={delimiter}; VISH_FIRST=1; "
             "while IFS= read -r VISH_ITEM || [[ -n $VISH_ITEM ]]; do "
             "if (( VISH_FIRST )); then VISH_FIRST=0; "
             "else printf '%s' \"$VISH_DELIMITER\"; fi; "
-            "printf '%s' \"$VISH_ITEM\"; done <<< \"$VISH_ITEMS\")"
+            'printf \'%s\' "$VISH_ITEM"; done <<< "$VISH_ITEMS"'
         )
 
 
@@ -306,7 +314,7 @@ class MatchRegexNode(BinaryStringNode):
     def emit_condition(self, context):
         text = self._argument("text", 0, context)
         pattern = self._argument("pattern", 1, context)
-        return f"(VISH_REGEX={pattern}; [[ {text} =~ $VISH_REGEX ]])"
+        return condition(f"(VISH_REGEX={pattern}; [[ {text} =~ $VISH_REGEX ]])")
 
 
 @register_node(
@@ -329,11 +337,11 @@ class CaptureRegexNode(ArgumentNode):
     def emit_bash_value(self, context):
         text = self._argument("text", 0, context)
         pattern = self._argument("pattern", 1, context)
-        group = self._argument("group", 2, context, 1)
-        return (
-            f"$(VISH_TEXT={text}; VISH_REGEX={pattern}; VISH_GROUP={group}; "
+        group = self._numeric_argument("group", 2, context, 1)
+        return command_substitution(
+            f"VISH_TEXT={text}; VISH_REGEX={pattern}; VISH_GROUP={group}; "
             "if [[ $VISH_TEXT =~ $VISH_REGEX ]]; then "
-            "printf '%s' \"${BASH_REMATCH[$VISH_GROUP]}\"; fi)"
+            "printf '%s' \"${BASH_REMATCH[$VISH_GROUP]}\"; fi"
         )
 
 
@@ -352,4 +360,4 @@ class MultilineTextNode(ArgumentNode):
         self.multiline_properties.add("text")
 
     def emit_bash_value(self, context):
-        return self._argument("text", None, context)
+        return literal(self.properties.get("text", ""))

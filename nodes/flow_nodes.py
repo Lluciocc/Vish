@@ -18,6 +18,14 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    arithmetic_operand,
+    identifier,
+    number,
+    quote_user_list,
+    shell_list,
+    variable,
+)
 from core.debug import Debug
 from core.port_types import PortType
 from nodes.base_node import BaseNode
@@ -134,15 +142,18 @@ class ForNode(BaseNode):
         self.add_output("Next", PortType.EXEC, "Continue after loop")
 
         self.properties["variable"] = "item"
+        self.properties["list"] = "*"
 
     def emit_bash(self, context: BashContext) -> str:
-        var_name = self.properties.get("variable", "item")
-        list_expr = self.properties.get("list", "*")
+        var_name = identifier(self.properties.get("variable", "item"), "item")
+        list_expr = quote_user_list(self.properties.get("list", "*"))
 
         list_port = self.inputs[1]
         if list_port.connected_edges:
             source_node = list_port.connected_edges[0].source.node
-            list_expr = source_node.properties.get("value", list_expr)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                list_expr = shell_list(emitted)
 
         context.add_line(f"for {var_name} in {list_expr}; do")
         context.indent()
@@ -160,6 +171,10 @@ class ForNode(BaseNode):
             start_node = next_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
         return ""
+
+    def emit_bash_value(self, context):
+        var_name = identifier(self.properties.get("variable", "item"), "item")
+        return variable(var_name)
 
 
 @register_node(
@@ -214,7 +229,7 @@ class FunctionNode(BaseNode):
         self.properties["name"] = "my_function"
 
     def emit_bash(self, context: BashContext) -> str:
-        name = self.properties.get("name", "my_function")
+        name = identifier(self.properties.get("name", "my_function"), "my_function")
         context.add_function_line(f"{name}() {{")  # double { to escape in f-string
 
         prev_buffer = context._current_buffer
@@ -248,7 +263,7 @@ class CallNode(BaseNode):
         self.properties["function"] = "my_function"
 
     def emit_bash(self, context: BashContext) -> str:
-        return self.properties.get("function", "")
+        return identifier(self.properties.get("function", ""), "my_function")
 
 
 @register_node(
@@ -264,9 +279,11 @@ class ReturnNode(BaseNode):
         self.add_input("Value", PortType.STRING, "Return value")
 
     def emit_bash(self, context):
-        value = "0"
+        value = number(0)
         val_port = self.inputs[1]
         if val_port.connected_edges:
             src = val_port.connected_edges[0].source.node
-            value = src.properties.get("value", value)
-        return f"return {value}"
+            emitted = src.emit_bash_value(context)
+            if emitted is not None:
+                value = emitted
+        return f"return {arithmetic_operand(value)}"

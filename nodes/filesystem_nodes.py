@@ -17,8 +17,14 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-import shlex
-
+from core.bash_values import (
+    arithmetic_operand,
+    command_substitution,
+    condition,
+    number,
+    shell_word,
+    user_interpolation,
+)
 from core.port_types import PortType
 from nodes.base_node import BaseNode
 from nodes.registry import register_node
@@ -30,15 +36,25 @@ class ArgumentNode(BaseNode):
         if port is not None and port.connected_edges:
             source = port.connected_edges[0].source.node
             value = source.emit_bash_value(context)
-            if value is None:
-                value = source.emit_bash(context)
             if value is not None:
-                return str(value)
-        return shlex.quote(str(self.properties.get(key, default)))
+                return shell_word(value)
+        value = self.properties.get(key, default)
+        expand_tilde = port is not None and port.port_type == PortType.PATH
+        return shell_word(user_interpolation(value, expand_tilde=expand_tilde))
+
+    def _numeric_argument(self, key, port_index, context, default=0):
+        port = self.inputs[port_index]
+        if port.connected_edges:
+            source = port.connected_edges[0].source.node
+            value = source.emit_bash_value(context)
+            if value is not None:
+                return arithmetic_operand(value, default=default)
+        return str(number(self.properties.get(key, default), default=default))
 
     def _add_exec_ports(self):
         self.add_input("Exec", PortType.EXEC, "Control flow input")
         self.add_output("Exec", PortType.EXEC, "Control flow output")
+
 
 @register_node(
     "directory_exists",
@@ -55,7 +71,7 @@ class DirectoryExistsNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_condition(self, context):
-        return f"[ -d {self._argument('path', 0, context)} ]"
+        return condition(f"[ -d {self._argument('path', 0, context)} ]")
 
 
 @register_node(
@@ -187,7 +203,7 @@ class ReadFileNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return f"$(cat -- {self._argument('path', 0, context)})"
+        return command_substitution(f"cat -- {self._argument('path', 0, context)}")
 
 
 class FileContentWriterNode(ArgumentNode):
@@ -247,7 +263,9 @@ class ListDirectoryNode(ArgumentNode):
         self.properties["path"] = "."
 
     def emit_bash_value(self, context):
-        return f"$(ls -A -- {self._argument('path', 0, context, '.')})"
+        return command_substitution(
+            f"ls -A -- {self._argument('path', 0, context, '.')}"
+        )
 
 
 @register_node(
@@ -265,7 +283,9 @@ class FileSizeNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return f"$(stat -c '%s' -- {self._argument('path', 0, context)})"
+        return command_substitution(
+            f"stat -c '%s' -- {self._argument('path', 0, context)}"
+        )
 
 
 @register_node(
@@ -284,10 +304,10 @@ class FileExtensionNode(ArgumentNode):
 
     def emit_bash_value(self, context):
         path = self._argument("path", 0, context)
-        return (
-            "$(VISH_NAME=$(basename -- "
+        return command_substitution(
+            "VISH_NAME=$(basename -- "
             f"{path}); if [[ $VISH_NAME == *.* && $VISH_NAME != .* ]]; then "
-            "printf '%s' \"${VISH_NAME##*.}\"; fi)"
+            "printf '%s' \"${VISH_NAME##*.}\"; fi"
         )
 
 
@@ -306,7 +326,7 @@ class FilenameNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return f"$(basename -- {self._argument('path', 0, context)})"
+        return command_substitution(f"basename -- {self._argument('path', 0, context)}")
 
 
 @register_node(
@@ -324,7 +344,7 @@ class ParentDirectoryNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return f"$(dirname -- {self._argument('path', 0, context)})"
+        return command_substitution(f"dirname -- {self._argument('path', 0, context)}")
 
 
 @register_node(
@@ -345,11 +365,11 @@ class JoinPathNode(ArgumentNode):
     def emit_bash_value(self, context):
         base = self._argument("base", 0, context)
         child = self._argument("child", 1, context)
-        return (
-            f"$(VISH_BASE={base}; VISH_CHILD={child}; "
+        return command_substitution(
+            f"VISH_BASE={base}; VISH_CHILD={child}; "
             "if [[ -z $VISH_BASE ]]; then printf '%s' \"$VISH_CHILD\"; "
             "elif [[ -z $VISH_CHILD ]]; then printf '%s' \"$VISH_BASE\"; "
-            "else printf '%s/%s' \"${VISH_BASE%/}\" \"${VISH_CHILD#/}\"; fi)"
+            'else printf \'%s/%s\' "${VISH_BASE%/}" "${VISH_CHILD#/}"; fi'
         )
 
 
@@ -366,8 +386,10 @@ class TemporaryPathNode(ArgumentNode):
         template = self.properties.get("template", "")
         option = f" {self.option}" if self.option else ""
         if not template_port.connected_edges and not template:
-            return f"$(mktemp{option})"
-        return f"$(mktemp{option} -- {self._argument('template', 0, context)})"
+            return command_substitution(f"mktemp{option}")
+        return command_substitution(
+            f"mktemp{option} -- {self._argument('template', 0, context)}"
+        )
 
 
 @register_node(

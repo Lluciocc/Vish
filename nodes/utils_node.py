@@ -18,6 +18,15 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    arithmetic,
+    arithmetic_operand,
+    literal,
+    number,
+    quote_literal,
+    shell_word,
+    user_interpolation,
+)
 from core.port_types import PortType
 from nodes.base_node import BaseNode
 from nodes.registry import register_node
@@ -36,14 +45,17 @@ class ToString(BaseNode):
         self.add_output("Output", PortType.VARIABLE, "String representation")
 
     def emit_bash(self, context):
+        return str(self.emit_bash_value(context))
+
+    def emit_bash_value(self, context):
         input_port = self.inputs[0]
 
         if input_port.connected_edges:
-            expr = input_port.connected_edges[0].source.node.emit_bash(context)
-        else:
-            expr = input_port.value or ""
+            value = input_port.connected_edges[0].source.node.emit_bash_value(context)
+            if value is not None:
+                return value
 
-        return f'"{expr}"'
+        return literal(input_port.value or "")
 
 
 @register_node(
@@ -59,14 +71,20 @@ class ToInt(BaseNode):
         self.add_output("Output", PortType.INT, "Integer representation")
 
     def emit_bash(self, context):
+        return str(self.emit_bash_value(context))
+
+    def emit_bash_value(self, context):
         input_port = self.inputs[0]
 
         if input_port.connected_edges:
-            expr = input_port.connected_edges[0].source.node.emit_bash(context)
+            value = input_port.connected_edges[0].source.node.emit_bash_value(context)
+            if value is None:
+                value = number(0)
         else:
-            expr = input_port.value or "0"
+            value = number(input_port.value or "0")
 
-        return f"$(( {expr} ))"
+        return arithmetic(f" {arithmetic_operand(value)} ")
+
 
 @register_node(
     "path_constant",
@@ -82,7 +100,8 @@ class PathConstant(BaseNode):
         self.properties["value"] = "~"
 
     def emit_bash_value(self, context: BashContext) -> str:
-        return str(self.properties.get("value", "~"))
+        return user_interpolation(self.properties.get("value", "~"), expand_tilde=True)
+
 
 @register_node(
     "sleep",
@@ -99,14 +118,16 @@ class SleepNode(BaseNode):
         self.properties["duration"] = 1
 
     def emit_bash(self, context: BashContext) -> str:
-        duration = self.properties.get("duration", 1)
+        duration = number(self.properties.get("duration", 1), default="1")
 
         duration_port = self.inputs[1]
         if duration_port.connected_edges:
             source_node = duration_port.connected_edges[0].source.node
-            duration = source_node.properties.get("value", duration)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                duration = emitted
 
-        return f"sleep {duration}"
+        return f"sleep {arithmetic_operand(duration, default='1')}"
 
 
 @register_node(
@@ -127,7 +148,8 @@ class DownloadFileNode(BaseNode):
         url = self.properties.get("url", "")
         output_path = self.properties.get("output_path", "")
 
-        return f'curl -o "{output_path}" "{url}"'
+        output = shell_word(user_interpolation(output_path, expand_tilde=True))
+        return f"curl -o {output} -- {quote_literal(url)}"
 
 
 @register_node(
@@ -148,7 +170,10 @@ class GitCloneNode(BaseNode):
         repo_url = self.properties.get("repo_url", "")
         destination_path = self.properties.get("destination_path", "")
 
-        return f'git clone "{repo_url}" "{destination_path}"'
+        destination = shell_word(
+            user_interpolation(destination_path, expand_tilde=True)
+        )
+        return f"git clone -- {quote_literal(repo_url)} {destination}"
 
 
 @register_node(
@@ -167,4 +192,4 @@ class OpenWebsiteNode(BaseNode):
     def emit_bash(self, context: BashContext) -> str:
         url = self.properties.get("url", "")
 
-        return f'xdg-open "{url}"'
+        return f"xdg-open -- {quote_literal(url)}"
