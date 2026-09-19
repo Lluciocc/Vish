@@ -69,7 +69,10 @@ MODALS = {
             ("modal_rename_file", "Rename File"),
             ("modal_overwrite_file", "Overwrite File"),
         ],
-        "button_icons": [],  # TODO 2 entries
+        "button_icons": [
+            ("modal", "rename_file"),
+            ("modal", "overwrite_file"),
+        ],
     },
     "delete_theme": {
         "type": "question",
@@ -78,7 +81,7 @@ MODALS = {
         "buttons": [QMessageBox.Yes, QMessageBox.No],
         "default_button": QMessageBox.No,
         "button_texts": [("modal_delete_file", "Delete File")],
-        "button_icons": [],  # TODO 1 entry
+        "button_icons": [("modal", "delete_file")],
     },
     "delete_theme_not_exist": {
         "type": "info",
@@ -111,26 +114,29 @@ MODALS = {
             ("modal_copy_link", "Copy Link"),
             ("modal_open_link", "Open Link"),
         ],
-        "button_icons": [("menu_app", "clipboard")],  # TODO 2 entries
+        "button_icons": [
+            ("menu_app", "clipboard"),
+            ("modal", "open_link"),
+        ],
     },
 }
 
 BUTTONDEFAULT = {
     QMessageBox.Ok: {
         "text": ("modal_button_ok", "Okay"),
-        "icon": ("None", ""),  # TODO
+        "icon": ("modal", "ok"),
     },
     QMessageBox.Yes: {
         "text": ("modal_button_yes", "Yes"),
-        "icon": ("None", ""),  # TODO
+        "icon": ("modal", "yes"),
     },
     QMessageBox.No: {
         "text": ("modal_button_no", "No"),
-        "icon": ("None", ""),  # TODO
+        "icon": ("modal", "no"),
     },
     QMessageBox.Cancel: {
         "text": ("modal_button_cancel", "Cancel"),
-        "icon": ("None", ""),  # TODO
+        "icon": ("modal", "cancel"),
     },
 }
 
