@@ -17,10 +17,12 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
+from core.bash_values import BashValue
+
 
 class BashContext:
     def __init__(self):
-        self.variables: dict[str, str] = {}
+        self.variables: dict[str, BashValue] = {}
         self.indent_level = 0
         self.lines: list[str] = []
         self.function_lines = []

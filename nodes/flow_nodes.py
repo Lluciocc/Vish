@@ -18,6 +18,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    BashValue,
+    identifier,
+    number,
+    render_arithmetic,
+    render_condition,
+    render_loop_list,
+    user_loop_list,
+    variable,
+)
 from core.debug import Debug
 from core.port_types import PortType
 from nodes.base_node import BaseNode
@@ -96,7 +106,7 @@ class IfNode(BaseNode):
             Debug.Warn("If Node: No condition connected, skipping if statement.")
             return ""
 
-        context.add_line(f"if {cond}; then")
+        context.add_line(f"if {render_condition(cond)}; then")
         context.indent()
         self._emit_branch(context, 0)
         context.dedent()
@@ -134,16 +144,24 @@ class ForNode(BaseNode):
         self.add_output("Next", PortType.EXEC, "Continue after loop")
 
         self.properties["variable"] = "item"
+        self.properties["list"] = "*"
 
     def emit_bash(self, context: BashContext) -> str:
-        var_name = self.properties.get("variable", "item")
-        list_expr = self.properties.get("list", "*")
+        var_name = identifier(self.properties.get("variable", "item"), "item")
+        list_value = user_loop_list(self.properties.get("list", "*"))
 
         list_port = self.inputs[1]
         if list_port.connected_edges:
             source_node = list_port.connected_edges[0].source.node
-            list_expr = source_node.properties.get("value", list_expr)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                list_value = emitted
 
+        list_expr = render_loop_list(list_value)
         context.add_line(f"for {var_name} in {list_expr}; do")
         context.indent()
 
@@ -160,6 +178,10 @@ class ForNode(BaseNode):
             start_node = next_port.connected_edges[0].target.node
             BaseNode.emit_exec_chain(start_node, context)
         return ""
+
+    def emit_bash_value(self, context):
+        var_name = identifier(self.properties.get("variable", "item"), "item")
+        return variable(var_name)
 
 
 @register_node(
@@ -182,7 +204,7 @@ class WhileNode(BaseNode):
             Debug.Warn("While Node: No condition connected, skipping while loop.")
             return ""
 
-        context.add_line(f"while {cond}; do")
+        context.add_line(f"while {render_condition(cond)}; do")
         context.indent()
 
         body_port = self.outputs[0]
@@ -214,7 +236,7 @@ class FunctionNode(BaseNode):
         self.properties["name"] = "my_function"
 
     def emit_bash(self, context: BashContext) -> str:
-        name = self.properties.get("name", "my_function")
+        name = identifier(self.properties.get("name", "my_function"), "my_function")
         context.add_function_line(f"{name}() {{")  # double { to escape in f-string
 
         prev_buffer = context._current_buffer
@@ -248,7 +270,7 @@ class CallNode(BaseNode):
         self.properties["function"] = "my_function"
 
     def emit_bash(self, context: BashContext) -> str:
-        return self.properties.get("function", "")
+        return identifier(self.properties.get("function", ""), "my_function")
 
 
 @register_node(
@@ -264,9 +286,13 @@ class ReturnNode(BaseNode):
         self.add_input("Value", PortType.STRING, "Return value")
 
     def emit_bash(self, context):
-        value = "0"
+        value = number(0)
         val_port = self.inputs[1]
         if val_port.connected_edges:
             src = val_port.connected_edges[0].source.node
-            value = src.properties.get("value", value)
-        return f"return {value}"
+            emitted = src.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(f"{src.title} returned a rendered Bash value")
+                value = emitted
+        return f"return {render_arithmetic(value)}"

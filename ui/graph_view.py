@@ -654,7 +654,10 @@ class GraphView(QGraphicsView):
         self.zoom_in_button.setFixedSize(28, 28)
 
         self.zoom_label = ZoomLabel("100%")
-        self.zoom_label.setFixedWidth(32)
+        font_metrics = self.zoom_label.fontMetrics()
+        widest_digit = max(font_metrics.horizontalAdvance(str(digit)) for digit in range(10))
+        zoom_label_width = widest_digit * 3 + font_metrics.horizontalAdvance("%") + 4
+        self.zoom_label.setFixedWidth(zoom_label_width)
         self.zoom_label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
         self.zoom_slider = QSlider(Qt.Horizontal)
 

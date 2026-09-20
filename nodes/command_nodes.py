@@ -18,6 +18,16 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_context import BashContext
+from core.bash_values import (
+    BashValue,
+    command_substitution,
+    number,
+    raw_command,
+    render_arithmetic,
+    render_raw_command,
+    render_word,
+    user_interpolation,
+)
 from core.port_types import PortType
 from nodes.base_node import BaseNode
 from nodes.registry import register_node
@@ -39,14 +49,23 @@ class RunCommandNode(BaseNode):
         self.properties["command"] = "ls"
 
     def emit_bash(self, context: BashContext) -> str:
-        command = self.properties.get("command", "")
+        command = raw_command(self.properties.get("command", ""))
 
         cmd_port = self.inputs[1]
         if cmd_port.connected_edges:
             source_node = cmd_port.connected_edges[0].source.node
-            command = source_node.properties.get("value", command)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                command = emitted
 
-        return command
+        return render_raw_command(command)
+
+    def emit_bash_value(self, context: BashContext):
+        return command_substitution(self.emit_bash(context))
 
 
 @register_node(
@@ -67,20 +86,35 @@ class PipeNode(BaseNode):
         self.properties["Command 2"] = "grep test"
 
     def emit_bash(self, context: BashContext) -> str:
-        cmd1 = self.properties.get("Command 1", "ls")
-        cmd2 = self.properties.get("Command 2", "")
+        cmd1 = raw_command(self.properties.get("Command 1", "ls"))
+        cmd2 = raw_command(self.properties.get("Command 2", ""))
 
         cmd1_port = self.inputs[1]
         if cmd1_port.connected_edges:
             source_node = cmd1_port.connected_edges[0].source.node
-            cmd1 = source_node.properties.get("value", cmd1)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                cmd1 = emitted
 
         cmd2_port = self.inputs[2]
         if cmd2_port.connected_edges:
             source_node = cmd2_port.connected_edges[0].source.node
-            cmd2 = source_node.properties.get("value", cmd2)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                cmd2 = emitted
 
-        return f"{cmd1} | {cmd2}"
+        return f"{render_raw_command(cmd1)} | {render_raw_command(cmd2)}"
+
+    def emit_bash_value(self, context: BashContext):
+        return command_substitution(self.emit_bash(context))
 
 
 @register_node(
@@ -98,7 +132,7 @@ class EchoNode(BaseNode):
         self.properties["text"] = "Hello"
 
     def emit_bash(self, context: BashContext) -> str:
-        text = self.properties.get("text", "")
+        text = user_interpolation(self.properties.get("text", ""))
 
         text_port = self.inputs[1]
 
@@ -107,19 +141,13 @@ class EchoNode(BaseNode):
 
             value = source_node.emit_bash_value(context)
             if value is not None:
+                if not isinstance(value, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
                 text = value
 
-        # if the text looks like a variable reference, command substitution, or is already quoted, don't add extra quotes
-        if (
-            text.isdigit()
-            or text.startswith("$")
-            or text.startswith('"')
-            or text.startswith("'")
-            or text.startswith("`")
-        ):
-            return f"echo {text}"
-
-        return f'echo "{text}"'
+        return f"echo {render_word(text)}"
 
 
 @register_node(
@@ -136,11 +164,17 @@ class ExitNode(BaseNode):
         self.properties["code"] = 0
 
     def emit_bash(self, context: BashContext) -> str:
-        code = self.properties.get("code", 0)
+        code = number(self.properties.get("code", 0))
 
         code_port = self.inputs[1]
         if code_port.connected_edges:
             source_node = code_port.connected_edges[0].source.node
-            code = source_node.properties.get("value", code)
+            emitted = source_node.emit_bash_value(context)
+            if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                code = emitted
 
-        return f"exit {code}"
+        return f"exit {render_arithmetic(code)}"
