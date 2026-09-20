@@ -19,10 +19,13 @@
 
 from core.bash_context import BashContext
 from core.bash_values import (
-    arithmetic_operand,
+    BashValue,
     command_substitution,
     number,
-    shell_word,
+    raw_command,
+    render_arithmetic,
+    render_raw_command,
+    render_word,
     user_interpolation,
 )
 from core.port_types import PortType
@@ -46,16 +49,20 @@ class RunCommandNode(BaseNode):
         self.properties["command"] = "ls"
 
     def emit_bash(self, context: BashContext) -> str:
-        command = self.properties.get("command", "")
+        command = raw_command(self.properties.get("command", ""))
 
         cmd_port = self.inputs[1]
         if cmd_port.connected_edges:
             source_node = cmd_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
-                command = str(emitted)
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                command = emitted
 
-        return command
+        return render_raw_command(command)
 
     def emit_bash_value(self, context: BashContext):
         return command_substitution(self.emit_bash(context))
@@ -79,24 +86,32 @@ class PipeNode(BaseNode):
         self.properties["Command 2"] = "grep test"
 
     def emit_bash(self, context: BashContext) -> str:
-        cmd1 = self.properties.get("Command 1", "ls")
-        cmd2 = self.properties.get("Command 2", "")
+        cmd1 = raw_command(self.properties.get("Command 1", "ls"))
+        cmd2 = raw_command(self.properties.get("Command 2", ""))
 
         cmd1_port = self.inputs[1]
         if cmd1_port.connected_edges:
             source_node = cmd1_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
-                cmd1 = str(emitted)
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                cmd1 = emitted
 
         cmd2_port = self.inputs[2]
         if cmd2_port.connected_edges:
             source_node = cmd2_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
-                cmd2 = str(emitted)
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                cmd2 = emitted
 
-        return f"{cmd1} | {cmd2}"
+        return f"{render_raw_command(cmd1)} | {render_raw_command(cmd2)}"
 
     def emit_bash_value(self, context: BashContext):
         return command_substitution(self.emit_bash(context))
@@ -126,9 +141,13 @@ class EchoNode(BaseNode):
 
             value = source_node.emit_bash_value(context)
             if value is not None:
+                if not isinstance(value, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
                 text = value
 
-        return f"echo {shell_word(text)}"
+        return f"echo {render_word(text)}"
 
 
 @register_node(
@@ -152,6 +171,10 @@ class ExitNode(BaseNode):
             source_node = code_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
                 code = emitted
 
-        return f"exit {arithmetic_operand(code)}"
+        return f"exit {render_arithmetic(code)}"

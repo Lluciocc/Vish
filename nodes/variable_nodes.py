@@ -19,11 +19,12 @@
 
 from core.bash_context import BashContext
 from core.bash_values import (
+    BashValue,
     condition,
     identifier,
     literal,
-    shell_assignment,
-    shell_word,
+    render_assignment,
+    render_word,
     user_interpolation,
     variable,
 )
@@ -58,10 +59,14 @@ class SetVariableNode(BaseNode):
 
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
                 value = emitted
 
-        value_expr = shell_assignment(value)
-        context.variables[var_name] = value_expr
+        value_expr = render_assignment(value)
+        context.variables[var_name] = value
         return f"{var_name}={value_expr}"
 
 
@@ -80,7 +85,7 @@ class GetVariableNode(BaseNode):
 
     def emit_bash(self, context: BashContext) -> str:
         var_name = identifier(self.properties.get("variable", "VAR"), "VAR")
-        return str(variable(var_name))
+        return render_word(variable(var_name))
 
     def emit_bash_value(self, context):
         var_name = identifier(self.properties.get("variable", "VAR"), "VAR")
@@ -112,9 +117,13 @@ class FileExistsNode(BaseNode):
             source_node = path_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
                 path = emitted
 
-        return condition(f"[[ -f {shell_word(path)} ]]")
+        return condition(f"[[ -f {render_word(path)} ]]")
 
 
 @register_node(
@@ -130,5 +139,5 @@ class StringConstantNode(BaseNode):
         self.add_output("Value", PortType.STRING, "String value")
         self.properties["value"] = ""
 
-    def emit_bash_value(self, context: BashContext) -> str:
+    def emit_bash_value(self, context: BashContext) -> BashValue:
         return literal(self.properties.get("value", ""))

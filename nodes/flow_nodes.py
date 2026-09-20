@@ -19,11 +19,13 @@
 
 from core.bash_context import BashContext
 from core.bash_values import (
-    arithmetic_operand,
+    BashValue,
     identifier,
     number,
-    quote_user_list,
-    shell_list,
+    render_arithmetic,
+    render_condition,
+    render_loop_list,
+    user_loop_list,
     variable,
 )
 from core.debug import Debug
@@ -104,7 +106,7 @@ class IfNode(BaseNode):
             Debug.Warn("If Node: No condition connected, skipping if statement.")
             return ""
 
-        context.add_line(f"if {cond}; then")
+        context.add_line(f"if {render_condition(cond)}; then")
         context.indent()
         self._emit_branch(context, 0)
         context.dedent()
@@ -146,15 +148,20 @@ class ForNode(BaseNode):
 
     def emit_bash(self, context: BashContext) -> str:
         var_name = identifier(self.properties.get("variable", "item"), "item")
-        list_expr = quote_user_list(self.properties.get("list", "*"))
+        list_value = user_loop_list(self.properties.get("list", "*"))
 
         list_port = self.inputs[1]
         if list_port.connected_edges:
             source_node = list_port.connected_edges[0].source.node
             emitted = source_node.emit_bash_value(context)
             if emitted is not None:
-                list_expr = shell_list(emitted)
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(
+                        f"{source_node.title} returned a rendered Bash value"
+                    )
+                list_value = emitted
 
+        list_expr = render_loop_list(list_value)
         context.add_line(f"for {var_name} in {list_expr}; do")
         context.indent()
 
@@ -197,7 +204,7 @@ class WhileNode(BaseNode):
             Debug.Warn("While Node: No condition connected, skipping while loop.")
             return ""
 
-        context.add_line(f"while {cond}; do")
+        context.add_line(f"while {render_condition(cond)}; do")
         context.indent()
 
         body_port = self.outputs[0]
@@ -285,5 +292,7 @@ class ReturnNode(BaseNode):
             src = val_port.connected_edges[0].source.node
             emitted = src.emit_bash_value(context)
             if emitted is not None:
+                if not isinstance(emitted, BashValue):
+                    raise TypeError(f"{src.title} returned a rendered Bash value")
                 value = emitted
-        return f"return {arithmetic_operand(value)}"
+        return f"return {render_arithmetic(value)}"

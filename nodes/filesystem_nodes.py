@@ -18,11 +18,13 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from core.bash_values import (
-    arithmetic_operand,
+    BashValue,
     command_substitution,
     condition,
     number,
-    shell_word,
+    path_expression,
+    render_arithmetic,
+    render_word,
     user_interpolation,
 )
 from core.port_types import PortType
@@ -31,25 +33,38 @@ from nodes.registry import register_node
 
 
 class ArgumentNode(BaseNode):
-    def _argument(self, key, port_index, context, default=""):
+    def _value(self, key, port_index, context, default="") -> BashValue:
         port = self.inputs[port_index] if port_index is not None else None
         if port is not None and port.connected_edges:
             source = port.connected_edges[0].source.node
             value = source.emit_bash_value(context)
             if value is not None:
-                return shell_word(value)
+                if not isinstance(value, BashValue):
+                    raise TypeError(f"{source.title} returned a rendered Bash value")
+                return value
         value = self.properties.get(key, default)
-        expand_tilde = port is not None and port.port_type == PortType.PATH
-        return shell_word(user_interpolation(value, expand_tilde=expand_tilde))
+        if port is not None and port.port_type == PortType.PATH:
+            return path_expression(value)
+        return user_interpolation(value)
 
-    def _numeric_argument(self, key, port_index, context, default=0):
+    def _render_argument(self, key, port_index, context, default="") -> str:
+        return render_word(self._value(key, port_index, context, default))
+
+    def _numeric_value(self, key, port_index, context, default=0) -> BashValue:
         port = self.inputs[port_index]
         if port.connected_edges:
             source = port.connected_edges[0].source.node
             value = source.emit_bash_value(context)
             if value is not None:
-                return arithmetic_operand(value, default=default)
-        return str(number(self.properties.get(key, default), default=default))
+                if not isinstance(value, BashValue):
+                    raise TypeError(f"{source.title} returned a rendered Bash value")
+                return value
+        return number(self.properties.get(key, default), default=default)
+
+    def _render_numeric_argument(self, key, port_index, context, default=0) -> str:
+        return render_arithmetic(
+            self._numeric_value(key, port_index, context, default), default=default
+        )
 
     def _add_exec_ports(self):
         self.add_input("Exec", PortType.EXEC, "Control flow input")
@@ -71,7 +86,7 @@ class DirectoryExistsNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_condition(self, context):
-        return condition(f"[ -d {self._argument('path', 0, context)} ]")
+        return condition(f"[ -d {self._render_argument('path', 0, context)} ]")
 
 
 @register_node(
@@ -88,7 +103,7 @@ class CreateDirectoryNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash(self, context):
-        return f"mkdir -p -- {self._argument('path', 1, context)}"
+        return f"mkdir -p -- {self._render_argument('path', 1, context)}"
 
 
 @register_node(
@@ -107,8 +122,8 @@ class CopyFileNode(ArgumentNode):
         self.properties["destination"] = ""
 
     def emit_bash(self, context):
-        source = self._argument("source", 1, context)
-        destination = self._argument("destination", 2, context)
+        source = self._render_argument("source", 1, context)
+        destination = self._render_argument("destination", 2, context)
         return f"cp -- {source} {destination}"
 
 
@@ -128,8 +143,8 @@ class CopyDirectoryNode(CopyFileNode):
         self.properties["destination"] = ""
 
     def emit_bash(self, context):
-        source = self._argument("source", 1, context)
-        destination = self._argument("destination", 2, context)
+        source = self._render_argument("source", 1, context)
+        destination = self._render_argument("destination", 2, context)
         return f"cp -R -- {source} {destination}"
 
 
@@ -149,8 +164,8 @@ class MoveFileNode(CopyFileNode):
         self.properties["destination"] = ""
 
     def emit_bash(self, context):
-        source = self._argument("source", 1, context)
-        destination = self._argument("destination", 2, context)
+        source = self._render_argument("source", 1, context)
+        destination = self._render_argument("destination", 2, context)
         return f"mv -- {source} {destination}"
 
 
@@ -168,7 +183,7 @@ class DeleteFileNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash(self, context):
-        return f"rm -f -- {self._argument('path', 1, context)}"
+        return f"rm -f -- {self._render_argument('path', 1, context)}"
 
 
 @register_node(
@@ -185,7 +200,7 @@ class DeleteDirectoryNode(DeleteFileNode):
         self.properties["path"] = ""
 
     def emit_bash(self, context):
-        return f"rm -rf -- {self._argument('path', 1, context)}"
+        return f"rm -rf -- {self._render_argument('path', 1, context)}"
 
 
 @register_node(
@@ -203,7 +218,8 @@ class ReadFileNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return command_substitution(f"cat -- {self._argument('path', 0, context)}")
+        path = self._render_argument("path", 0, context)
+        return command_substitution(f"cat -- {path}")
 
 
 class FileContentWriterNode(ArgumentNode):
@@ -217,8 +233,8 @@ class FileContentWriterNode(ArgumentNode):
         self.properties["content"] = ""
 
     def emit_bash(self, context):
-        path = self._argument("path", 1, context)
-        content = self._argument("content", 2, context)
+        path = self._render_argument("path", 1, context)
+        content = self._render_argument("content", 2, context)
         return f"printf '%s' {content} {self.redirect} {path}"
 
 
@@ -264,7 +280,7 @@ class ListDirectoryNode(ArgumentNode):
 
     def emit_bash_value(self, context):
         return command_substitution(
-            f"ls -A -- {self._argument('path', 0, context, '.')}"
+            f"ls -A -- {self._render_argument('path', 0, context, '.')}"
         )
 
 
@@ -284,7 +300,7 @@ class FileSizeNode(ArgumentNode):
 
     def emit_bash_value(self, context):
         return command_substitution(
-            f"stat -c '%s' -- {self._argument('path', 0, context)}"
+            f"stat -c '%s' -- {self._render_argument('path', 0, context)}"
         )
 
 
@@ -303,7 +319,7 @@ class FileExtensionNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        path = self._argument("path", 0, context)
+        path = self._render_argument("path", 0, context)
         return command_substitution(
             "VISH_NAME=$(basename -- "
             f"{path}); if [[ $VISH_NAME == *.* && $VISH_NAME != .* ]]; then "
@@ -326,7 +342,8 @@ class FilenameNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return command_substitution(f"basename -- {self._argument('path', 0, context)}")
+        path = self._render_argument("path", 0, context)
+        return command_substitution(f"basename {path}")
 
 
 @register_node(
@@ -344,7 +361,8 @@ class ParentDirectoryNode(ArgumentNode):
         self.properties["path"] = ""
 
     def emit_bash_value(self, context):
-        return command_substitution(f"dirname -- {self._argument('path', 0, context)}")
+        path = self._render_argument("path", 0, context)
+        return command_substitution(f"dirname -- {path}")
 
 
 @register_node(
@@ -363,8 +381,8 @@ class JoinPathNode(ArgumentNode):
         self.properties["child"] = ""
 
     def emit_bash_value(self, context):
-        base = self._argument("base", 0, context)
-        child = self._argument("child", 1, context)
+        base = self._render_argument("base", 0, context)
+        child = self._render_argument("child", 1, context)
         return command_substitution(
             f"VISH_BASE={base}; VISH_CHILD={child}; "
             "if [[ -z $VISH_BASE ]]; then printf '%s' \"$VISH_CHILD\"; "
@@ -388,7 +406,7 @@ class TemporaryPathNode(ArgumentNode):
         if not template_port.connected_edges and not template:
             return command_substitution(f"mktemp{option}")
         return command_substitution(
-            f"mktemp{option} -- {self._argument('template', 0, context)}"
+            f"mktemp{option} -- {self._render_argument('template', 0, context)}"
         )
 
 
