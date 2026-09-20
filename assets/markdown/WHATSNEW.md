@@ -1,4 +1,9 @@
 ## Notes
+### v1.1.5
+This release expands Vish with new nodes for file system operations, paths, strings, conversions, logic, and multiline text.
+
+Nodes and ports have been redesigned with adaptive widths, clearer spacing, optional data type hints, and collapsible nodes. It also adds new icons, improves light and dark themes, and fixes several visual and interaction issues.
+
 ### v1.1.4
 Repository moved to [Codeberg](https://codeberg.org/Lluciocc/Vish) and licence changed to GPL-3.0-or-later! This makes sure our work and any fork stays free software for ever.
 

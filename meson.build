@@ -1,6 +1,6 @@
 project(
   'vish',
-  version: '1.1.4',
+  version: '1.1.5',
   meson_version: '>=0.56'
 )
 python = import('python').find_installation('python3')
