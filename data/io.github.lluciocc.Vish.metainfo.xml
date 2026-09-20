@@ -52,6 +52,18 @@
   </screenshots>
 
   <releases>
+    <release version="1.1.5" date="2026-09-20">
+      <description>
+        <ul>
+          <li>Added new file system, path, string, conversion, logic, and multiline text nodes</li>
+          <li>Redesigned nodes and ports with adaptive widths, clearer spacing, data type hints, and collapsible nodes</li>
+          <li>Added settings for port data type hints and automatic node collapsing</li>
+          <li>Expanded node, category, and dialog icons for both light and dark themes</li>
+          <li>Improved theme fallback handling, dropdowns, menus, and connection feedback</li>
+          <li>Fixed missing node registration and several visual and interaction issues</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.1.4" date="2026-09-13">
       <description>
         <ul>
