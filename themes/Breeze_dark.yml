@@ -78,6 +78,7 @@ theme_main:
     NODES_STRING:           "#8853ffcb"
     NODES_CONVERSION:       "#887c55b6"
     NODES_BASH_FUNCTION:    "#88e64ade"
+    NODES_PATH:             "#88f38181"
 
 
 theme_detail:
