@@ -125,16 +125,20 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
             )
 
         for edge in self.drag_edges:
-            if edge.source_port:
-                if edge.source_port.edges:
-                    if edge in edge.source_port.edges:
-                        self.colorize_port(edge.source_port, True)
-                        edge.source_port.edges.remove(edge)
-            if edge.target_port:
-                if edge.target_port.edges:
-                    if edge in edge.target_port.edges:
-                        self.colorize_port(edge.target_port, True)
-                        edge.target_port.edges.remove(edge)
+            if (
+                edge.source_port
+                and edge.source_port.edges
+                and edge in edge.source_port.edges
+            ):
+                self.colorize_port(edge.source_port, True)
+                edge.source_port.edges.remove(edge)
+            if (
+                edge.target_port
+                and edge.target_port.edges
+                and edge in edge.target_port.edges
+            ):
+                self.colorize_port(edge.target_port, True)
+                edge.target_port.edges.remove(edge)
             if edge.edge:
                 self.graph.remove_edge(edge.edge.id)
             self.removeItem(edge)
@@ -173,6 +177,13 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
                 valid = GraphValidator.is_valid_port_type(
                     self.pending_port.edges, first_port
                 )
+                if (
+                    first_port.port.port_type != PortType.ANY
+                    and second_port.port.port_type == PortType.ANY
+                    and second_port.edges
+                    and first_port.port.port_type != second_port.edges[0].source_port.port.port_type
+                ):
+                    valid = False
             if valid:
                 if Config.DEBUG:
                     if backswitch:
@@ -250,27 +261,30 @@ class GraphScene(QGraphicsScene):  # TODO Add undo commands
                 return
 
         modifier = QApplication.keyboardModifiers()
-        if second_port.edges:
-            if modifier == Qt.AltModifier:  # Deleting previous edges (Alt)
+        if second_port.edges and modifier == Qt.AltModifier:  # Deleting previous edges (Alt)
+            if Config.DEBUG:
+                Logger.LogMessage(
+                    "SCENE.END_CONNECTION: delete previous drag_edges"
+                )
+            if (
+                first_port.port.port_type == second_port.port.port_type
+                or first_port.port.port_type != PortType.EXEC
+                and second_port.port.port_type == PortType.ANY
+            ):
+                self.pending_edges.clear()
+                for edge in self.drag_edges:
+                    self.pending_edges.append(edge)
+                self.drag_edges.clear()
+                for edge in second_port.edges:
+                    self.drag_edges.append(edge)
                 if Config.DEBUG:
-                    Logger.LogMessage(
-                        "SCENE.END_CONNECTION: delete previous drag_edges"
-                    )
-                if first_port.port.port_type == second_port.port.port_type:
-                    self.pending_edges.clear()
-                    for edge in self.drag_edges:
-                        self.pending_edges.append(edge)
-                    self.drag_edges.clear()
-                    for edge in second_port.edges:
-                        self.drag_edges.append(edge)
-                    if Config.DEBUG:
-                        self.edge_logger_counter = f"-{len(self.drag_edges)}"
-                    self.delete_edges()
-                    for edge in self.pending_edges:
-                        self.drag_edges.append(edge)
-                    self.pending_edges.clear()
-                else:
-                    self.restore_pending_connection()
+                    self.edge_logger_counter = f"-{len(self.drag_edges)}"
+                self.delete_edges()
+                for edge in self.pending_edges:
+                    self.drag_edges.append(edge)
+                self.pending_edges.clear()
+            else:
+                self.restore_pending_connection()
 
         if self.pending_port:  # Check for self-connection on multi-dragging
             for drag_edge in self.drag_edges:
