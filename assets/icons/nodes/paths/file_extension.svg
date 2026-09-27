@@ -1,11 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com">
-  <g fill="none" stroke="#f9f9f9" stroke-linecap="round" stroke-linejoin="round">
-    <path stroke-width="17" d="M 70,28 H 145 L 188,71 V 220 Q 188,228 180,228 H 70 Q 62,228 62,220 V 36 Q 62,28 70,28 Z M 146,30 V 70 H 186"/>
-    <g stroke-width="11"/>
-  </g>
-  <text style="fill: rgb(255, 255, 255); font-family: Amiko; font-size: 40px; white-space: pre; transform-box: fill-box; transform-origin: 34.9961% 34.9421%;" x="81.651" y="194.634">.EXT</text>
-  <defs>
-    <style bx:fonts="Amiko">@import url(https://fonts.googleapis.com/css2?family=Amiko%3Aital%2Cwght%400%2C400%3B0%2C600%3B0%2C700&amp;display=swap);</style>
-  </defs>
-</svg>
+<svg viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg" style="fill:#f9f9f9"><path d="m 93.5,34 c -13,0 -26,13 -26,26 v 96 c 0,13 13,26 26,26 h 69 c 13,0 26,-13 26,-26 V 87 l -53,-53 z M 105,50 h 30.5 v 37 h 37 v 57.5 c 0,14 -7.5,21.5 -21.5,21.5 h -46 c -14,0 -21.5,-7.5 -21.5,-21.5 v -73 C 83.5,56.1 92.6,50 105,50 Z m 81,148 c -15.7,0 -15.7,24 0,24 h 24 c 15.7,0 15.7,-24 0,-24 z m -144,8 c -10.5,0 -10.5,16 0,16 h 96 c 10.5,0 10.5,-16 0,-16 z m 118,4.3 c -7.8,0 -7.8,12 0,12 7.8,0 7.8,-12 0,-12 z"/></svg>
