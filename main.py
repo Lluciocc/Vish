@@ -47,13 +47,14 @@ from core.projects import ProjectManager
 from core.serializer import Serializer
 from core.traduction import Traduction
 from nodes import (  # noqa: F401
+    argument_nodes,
     command_nodes,
     filesystem_nodes,
+    flow_nodes,
     operation_nodes,
     string_nodes,
     utils_node,
     variable_nodes,
-    flow_nodes,
 )
 from nodes.flow_nodes import StartNode
 from nodes.registry import NODE_REGISTRY
