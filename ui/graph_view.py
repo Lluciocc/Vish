@@ -30,6 +30,7 @@ from PySide6.QtGui import (
     QCursor,
     QKeySequence,
     QMouseEvent,
+    QNativeGestureEvent,
     QPainter,
     QUndoStack,
 )
@@ -223,33 +224,53 @@ class GraphView(QGraphicsView):
         return node_item
 
     def wheelEvent(self, event):
-        zoom_step = 1.15
-        min_scale = 0.2
-        max_scale = 3.0
+        # Two-finger trackpad scrolling moves around the graph, just like
+        # dragging with the middle mouse button. Ctrl + scroll keeps zoom
+        # readily available for trackpads and physical mouse wheels.
+        if event.modifiers() & Qt.ControlModifier:
+            delta = event.pixelDelta().y() or event.angleDelta().y()
+            if delta:
+                self._zoom_by(1.15 ** (delta / 120.0))
+        else:
+            delta = event.pixelDelta()
+            if delta.isNull():
+                # angleDelta uses eighths of a degree. Half of one standard
+                # wheel step gives a comfortable 60-pixel canvas movement.
+                delta = event.angleDelta() / 2
+
+            dx, dy = delta.x(), delta.y()
+            if event.modifiers() & Qt.ShiftModifier and not dx:
+                dx, dy = dy, 0
+
+            horizontal = self.horizontalScrollBar()
+            vertical = self.verticalScrollBar()
+            horizontal.setValue(horizontal.value() - round(dx))
+            vertical.setValue(vertical.value() - round(dy))
+
+        event.accept()
+
+    def _zoom_by(self, zoom_factor):
+        current_scale = self.transform().m11()
+        proposed_scale = max(0.2, min(3.0, current_scale * zoom_factor))
+        if proposed_scale == current_scale:
+            return
 
         self.setTransformationAnchor(QGraphicsView.AnchorUnderMouse)
-        current_scale = self.transform().m11()
-        if event.angleDelta().y() > 0:
-            zoom_factor = zoom_step
-        else:
-            zoom_factor = 1 / zoom_step
-
-        proposed_scale = current_scale * zoom_factor
-
-        if min_scale <= current_scale <= max_scale:
-            proposed_scale = max(min_scale, min(max_scale, proposed_scale))
-        else:
-            if current_scale > max_scale and proposed_scale > current_scale:
-                return
-            if current_scale < min_scale and proposed_scale < current_scale:
-                return
-
         applied_factor = proposed_scale / current_scale
         self.scale(applied_factor, applied_factor)
-
         self._sync_zoom_from_transform()
 
     def viewportEvent(self, event):
+        if (
+            isinstance(event, QNativeGestureEvent)
+            and event.gestureType() == Qt.ZoomNativeGesture
+        ):
+            zoom_factor = 1.0 + event.value()
+            if zoom_factor > 0:
+                self._zoom_by(zoom_factor)
+            event.accept()
+            return True
+
         if isinstance(event, QMouseEvent):
             if (
                 event.button() == Qt.MiddleButton
