@@ -39,3 +39,22 @@ def create_node(node_type):
     if not entry:
         raise ValueError(f"Unknown node type: {node_type}")
     return entry["class"]()
+
+
+def compatible_node_types(source_ports):
+    """Return node types with one port compatible with all source ports."""
+    source_ports = tuple(source_ports)
+    if not source_ports:
+        return set(NODE_REGISTRY)
+
+    compatible = set()
+    for node_type, entry in NODE_REGISTRY.items():
+        node = entry["class"]()
+        candidate_ports = node.inputs + node.outputs
+        if any(
+            all(source.can_connect_to(candidate) for source in source_ports)
+            for candidate in candidate_ports
+        ):
+            compatible.add(node_type)
+
+    return compatible

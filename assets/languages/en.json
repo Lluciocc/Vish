@@ -11,6 +11,7 @@
     "running_generated_bash_script": "Running generated bash script...",
     "add_node": "Add a node",
     "search_nodes": "Search...",
+    "filter_compatible_nodes": "Only show compatible nodes",
     "lang_set": "Language set to {lang}",
     "button_generate_bash": "Generate Bash Script",
     "button_save": "Save",

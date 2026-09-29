@@ -1,5 +1,6 @@
 # own gitignore file
 test/
+tests/
 build*
 flatpak-*
 repo

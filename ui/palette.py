@@ -20,6 +20,7 @@
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
+    QCheckBox,
     QFrame,
     QLineEdit,
     QTreeWidget,
@@ -30,7 +31,7 @@ from PySide6.QtWidgets import (
 
 from core.icons import Icon
 from core.traduction import Traduction
-from nodes.registry import NODE_REGISTRY
+from nodes.registry import NODE_REGISTRY, compatible_node_types
 from themes.theme_manager import Theme
 
 links = {}
@@ -73,8 +74,10 @@ class CustomQTreeWidget(QTreeWidget):
 class NodePalette(QWidget):
     node_selected = Signal(str)
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, source_ports=()):
         super().__init__(parent)
+        self.source_ports = tuple(source_ports)
+        self._compatible_node_types = compatible_node_types(self.source_ports)
         self.setWindowTitle(Traduction.get_trad("add_node", "Add Node"))
         self.setWindowFlags(
             Qt.Popup | Qt.FramelessWindowHint | Qt.NoDropShadowWindowHint
@@ -91,6 +94,18 @@ class NodePalette(QWidget):
         )
         self.search_input.textChanged.connect(self.filter_nodes)
 
+        self.compatible_only_checkbox = QCheckBox(
+            Traduction.get_trad(
+                "filter_compatible_nodes", "Only show compatible nodes"
+            ),
+            self,
+        )
+        self.compatible_only_checkbox.setChecked(bool(self.source_ports))
+        self.compatible_only_checkbox.setVisible(bool(self.source_ports))
+        self.compatible_only_checkbox.toggled.connect(
+            lambda: self.filter_nodes(self.search_input.text())
+        )
+
         self.tree = CustomQTreeWidget()
         self.tree.setHeaderHidden(True)
         self.tree.itemDoubleClicked.connect(self.on_item_activated)
@@ -106,11 +121,13 @@ class NodePalette(QWidget):
 
         layout = QVBoxLayout(self.background)
         layout.addWidget(self.search_input)
+        layout.addWidget(self.compatible_only_checkbox)
         layout.addWidget(separator)
         layout.addWidget(self.tree)
 
         self._node_chosen = False
         self.populate_tree()
+        self.filter_nodes("")
         self.setStyleSheet(tree_style())
 
     def keyPressEventArrow(self, event):
@@ -163,7 +180,12 @@ class NodePalette(QWidget):
 
             for j in range(category.childCount()):
                 item = category.child(j)
-                visible = text in item.text(0).lower()
+                node_type = item.data(0, Qt.UserRole)
+                is_compatible = (
+                    not self.compatible_only_checkbox.isChecked()
+                    or node_type in self._compatible_node_types
+                )
+                visible = text in item.text(0).lower() and is_compatible
                 item.setHidden(not visible)
                 visible_category |= visible
                 if visible and (first_Visible_item is None):

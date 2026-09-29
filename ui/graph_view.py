@@ -148,7 +148,12 @@ class GraphView(QGraphicsView):
         if self._palette and self._palette.isVisible():
             self._palette.close()
 
-        palette = NodePalette(self)
+        source_ports = [
+            edge.source_port.port
+            for edge in self.graph_scene.drag_edges
+            if edge.source_port
+        ]
+        palette = NodePalette(self, source_ports=source_ports)
         self._palette = palette
 
         palette.node_selected.connect(
@@ -194,8 +199,11 @@ class GraphView(QGraphicsView):
             for port in node_item.port_items.values():
                 if port.is_input == target_is_input:
                     target_port = port
-                    valid = GraphValidator.is_valid_connection(
-                        self.graph, source_port, target_port
+                    valid = all(
+                        GraphValidator.is_valid_connection(
+                            self.graph, edge.source_port, target_port
+                        )
+                        for edge in scene.drag_edges
                     )
                     if valid:
                         valid_port = target_port
