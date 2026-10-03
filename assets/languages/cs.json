@@ -12,12 +12,25 @@
     "add_node": "Přidat uzel",
     "search_nodes": "Hledat...",
     "lang_set": "Jazyk nastaven na {lang}",
+
     "button_generate_bash": "Generovat Bash skript",
     "button_save": "Uložit",
     "button_load": "Načíst",
     "button_run_bash": "Spustit Bash skript",
     "button_copy_clipboard": "Kopírovat do schránky",
     "more_options": "Další možnosti",
+    "settings": "Nastavení",
+    "keyboard_shortcuts": "Klávesové zkratky",
+    "full_screen": "Celá obrazovka",
+    "about": "O aplikaci",
+
+
+
+
+
+
+
+
 
     "never_modified": "Nikdy uloženo",
     "welcome_title": "Vítejte",
@@ -27,7 +40,6 @@
     "new_project_name": "Název projektu",
     "select_project_folder": "Vyberte složku projektu",
 
-    "settings": "Nastavení",
     "appearance": "Vzhled",
     "theme": "Téma",
     "language": "Jazyk",
@@ -39,7 +51,6 @@
 
 
     "custom_shebang": "Vlastní shebang",
-    "full_screen": "Celá obrazovka",
     "close": "Zavřít",
 
 
@@ -47,7 +58,6 @@
 
 
 
-    "about": "O aplikaci",
     "app_name": "Vizuální Bash Editor",
     "app_tagline": "Vizuální způsob vytváření Bash skriptů",
 
@@ -63,7 +73,6 @@
     "about_theme_repo": "Repozitář témat",
 
 
-    "keyboard_shortcuts": "Klávesové zkratky",
     "general": "Obecné",
     "edition": "Úpravy",
     "graph": "Graf",

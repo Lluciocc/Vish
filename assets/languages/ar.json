@@ -12,22 +12,34 @@
     "add_node": "إضافة عقدة",
     "search_nodes": "...البحث",
     "lang_set": "{lang} ضبط اللغة على",
+
     "button_generate_bash": ".Bash Script إنشاء",
     "button_save": "حفظ",
     "button_load": "تحميل",
     "button_run_bash": "تشغيل Bash Script",
     "button_copy_clipboard": "Clipboard نسخ إلى",
 
-
-
-
-
-
-
-
-
-
     "settings": "الإعدادات",
+    "keyboard_shortcuts": "اختصارات لوحة المفاتيح",
+    "full_screen": "ملء الشاشة",
+    "about": "حول",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     "appearance": "المظهر",
     "theme": "سمة",
     "language": "اللغة",
@@ -39,7 +51,6 @@
 
 
     "custom_shebang": "Shebang مخصص",
-    "full_screen": "ملء الشاشة",
     "close": "إغلاق",
 
 
@@ -47,7 +58,6 @@
 
 
 
-    "about": "حول",
     "app_name": "Bashالمحرر المرئي ل",
     "app_tagline": "Bashطريقة مرئية لبناء البرامج النصية ل",
 
@@ -63,7 +73,6 @@
 
 
 
-    "keyboard_shortcuts": "اختصارات لوحة المفاتيح",
     "general": "عام",
     "edition": "تحرير",
     "graph": "الرسم البياني",
