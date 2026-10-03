@@ -34,7 +34,7 @@ class Config:
         "generate_button",
         "save_button",
         "load_button",
-        "layout_default_button",
+        "layout_button",
         "stretch",
         "run_bash_button",
         "clipboard_button",
