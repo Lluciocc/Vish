@@ -106,7 +106,7 @@ class Toolbar(QHBoxLayout):
             ],
             "layout_button": [
                 self.layout_button,
-                ("layout_options", "Layout Options"),
+                ("layout_options", "Layouts"),
             ],
             "layout_default_action": [
                 self.layout_default_action,
@@ -130,22 +130,22 @@ class Toolbar(QHBoxLayout):
             ],
             "layout_viewport_wide_action": [
                 self.layout_viewport_wide_action,
-                ("viewport_wide_layout", "Viewport-Wide Layout"),
+                ("viewport_wide_layout", "Wide Graph-Viewport Layout"),
                 self.set_layout_viewport_wide,
             ],
             "layout_viewport_wide_button": [
                 self.layout_viewport_wide_button,
-                ("viewport_wide_layout", "Viewport-Wide Layout"),
+                ("viewport_wide_layout", "Wide Graph-Viewport Layout"),
                 self.set_layout_viewport_wide,
             ],
             "layout_center_action": [
                 self.layout_center_action,
-                ("center_layout", "Center Layout"),
+                ("viewport_center_layout", "Center Graph-Viewport Layout"),
                 self.set_layout_center,
             ],
             "layout_center_button": [
                 self.layout_center_button,
-                ("center_layout", "Center Layout"),
+                ("viewport_center_layout", "Center Graph-Viewport Layout"),
                 self.set_layout_center,
             ],
             "layout_frame_action": [
@@ -307,7 +307,7 @@ class Toolbar(QHBoxLayout):
 
     def apply_ui_texts(self, text=True):
         for items in self.TOOLS:
-            if isinstance(self.TOOLS[items][0], QToolButton):
+            if items == "hamburger_menu_button":
                 self.TOOLS[items][0].setToolTip(
                     Traduction.get_trad(*self.TOOLS[items][1])
                 )
