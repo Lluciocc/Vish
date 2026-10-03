@@ -38,7 +38,9 @@ class Config:
         "run_bash_button",
         "clipboard_button",
         "hamburger_menu_button",
+        "layout_button",
     ]
+    LAYOUT = ["default", False, False]
     PORT_HINT = True
     COLLAPSE_NODES = True
 

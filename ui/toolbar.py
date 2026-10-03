@@ -21,7 +21,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QAction
 from PySide6.QtWidgets import QApplication, QHBoxLayout, QMenu, QPushButton, QToolButton
 
-from core.config import Config
+from core.config import Config, ConfigManager
 from core.icons import Icon
 from core.traduction import Traduction
 from themes.theme_manager import Theme
@@ -104,6 +104,45 @@ class Toolbar(QHBoxLayout):
                 ("about", "About"),
                 self.editor.open_about,
             ],
+            "layout_button": [
+                self.layout_button,
+                ("layout_options", "Layout Options"),
+            ],
+            "layout_default_action": [
+                self.layout_default_action,
+                ("default_layout", "Default Layout"),
+                self.set_layout_default,
+            ],
+            "layout_phone_action": [
+                self.layout_phone_action,
+                ("phone_layout", "Phone Layout"),
+                self.set_layout_phone,
+            ],
+            "layout_viewport_wide_action": [
+                self.layout_viewport_wide_action,
+                ("viewport_wide_layout", "Viewport-Wide Layout"),
+                self.set_layout_viewport_wide,
+            ],
+            "layout_frame_action": [
+                self.layout_frame_action,
+                ("frame_layout", "Frame Layout"),
+                self.set_layout_frame,
+            ],
+            "layout_center_action": [
+                self.layout_center_action,
+                ("center_layout", "Center Layout"),
+                self.set_layout_center,
+            ],
+            "mirror_horizontal_action": [
+                self.layout_mirror_horizontal_action,
+                ("mirror_layout_horizontal", "Mirror Layout Horizontal"),
+                self.mirror_layout_horizontal,
+            ],
+            "mirror_vertical_action": [
+                self.layout_mirror_vertical_action,
+                ("mirror_layout_vertical", "Mirror Layout Vertical"),
+                self.mirror_layout_vertical,
+            ],
         }
         self.setup_signals()
         self.apply_ui_texts()
@@ -147,12 +186,70 @@ class Toolbar(QHBoxLayout):
 
         self.hamburger_button.setMenu(self.more_menu)
 
+        self.layout_button = QToolButton()
+        self.layout_button.setText("Layouts")
+        self.layout_button.setPopupMode(QToolButton.InstantPopup)
+
+        self.layout_menu = QMenu(self.editor)
+        self.layout_menu.setWindowFlags(
+            self.layout_menu.windowFlags()
+            | Qt.FramelessWindowHint
+            | Qt.NoDropShadowWindowHint
+        )
+        self.layout_menu.setAttribute(Qt.WA_TranslucentBackground, True)
+
+        self.layout_default_action = self.layout_menu.addAction("")
+        self.layout_phone_action = self.layout_menu.addAction("")
+        self.layout_viewport_wide_action = self.layout_menu.addAction("")
+        self.layout_frame_action = self.layout_menu.addAction("")
+        self.layout_center_action = self.layout_menu.addAction("")
+        self.layout_menu.addSeparator()
+        self.layout_mirror_horizontal_action = self.layout_menu.addAction("")
+        print(self.layout_menu.menuAction())
+        self.layout_mirror_vertical_action = self.layout_menu.addAction("")
+
+        self.layout_button.setMenu(self.layout_menu)
+
     def setup_signals(self):
         for items in self.TOOLS:
             if isinstance(self.TOOLS[items][0], QPushButton):
                 self.TOOLS[items][0].clicked.connect(self.TOOLS[items][2])
             elif isinstance(self.TOOLS[items][0], QAction):
                 self.TOOLS[items][0].triggered.connect(self.TOOLS[items][2])
+
+    def set_layout_default(self):
+        Config.LAYOUT[0] = "default"
+        self.set_layout()
+
+    def set_layout_phone(self):
+        Config.LAYOUT[0] = "phone"
+        self.set_layout()
+
+    def set_layout_viewport_wide(self):
+        Config.LAYOUT[0] = "viewport_wide"
+        self.set_layout()
+
+    def set_layout_frame(self):
+        Config.LAYOUT[0] = "frame"
+        self.set_layout()
+
+    def set_layout_center(self):
+        Config.LAYOUT[0] = "center"
+        self.set_layout()
+
+    def mirror_layout_horizontal(self):
+        Config.LAYOUT[1] = not Config.LAYOUT[1]
+        self.set_mirror_icon("mirror_horizontal_action")
+        self.set_layout()
+
+    def mirror_layout_vertical(self):
+        Config.LAYOUT[2] = not Config.LAYOUT[2]
+        self.set_mirror_icon("mirror_vertical_action")
+        self.set_layout()
+
+    def set_layout(self):
+        ConfigManager.save_config()
+        self.editor.work_space.set_layout()
 
     def resize_buttons(self, width):
         if self.min_width > width:
@@ -189,14 +286,38 @@ class Toolbar(QHBoxLayout):
         for button in self.TOOLS:
             if not isinstance(self.TOOLS[button][0], QToolButton):
                 self.TOOLS[button][0].setIcon(
-                    Icon.load_icon("menu_app", button.rsplit("_", 1)[0])
+                    Icon.load_icon("toolbar", button.rsplit("_", 1)[0])
                 )
+                if button.startswith("mirror_"):
+                    self.set_mirror_icon(button)
                 if isinstance(self.TOOLS[button][0], QPushButton):
                     self.TOOLS[button][0].setStyleSheet(pushbutton_style())
             elif isinstance(self.TOOLS[button][0], QToolButton):
                 self.TOOLS[button][0].setStyleSheet(toolbutton_style())
 
         self.more_menu.setStyleSheet(apply_menu_style())
+        self.layout_menu.setStyleSheet(apply_menu_style())
+
+    def set_mirror_icon(self, button):
+        if button == "mirror_horizontal_action":
+            if Config.LAYOUT[1]:
+                self.TOOLS[button][0].setIcon(
+                    Icon.load_icon("toolbar", "layout_mirrored")
+                )
+            else:
+                self.TOOLS[button][0].setIcon(
+                    Icon.load_icon("toolbar", "layout_not_mirrored")
+                )
+        if button == "mirror_vertical_action":
+            if Config.LAYOUT[2]:
+                self.TOOLS[button][0].setIcon(
+                    Icon.load_icon("toolbar", "layout_mirrored")
+                )
+            else:
+                self.TOOLS[button][0].setIcon(
+                    Icon.load_icon("toolbar", "layout_not_mirrored")
+                )
+
 
 
 def apply_menu_style() -> str:
@@ -219,6 +340,9 @@ def apply_menu_style() -> str:
         }}
         QMenu::item:selected {{
             background: {Theme.get_color("TOOLBAR-MENU_ITEM_SELECTION")};
+        }}
+        QMenu::separator {{
+                background: {Theme.get_color("TOOLBAR-MENU_ITEM_SEPARATOR")};
         }}
     """
 
