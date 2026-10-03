@@ -29,7 +29,6 @@ from PySide6.QtWidgets import (
     QDialog,
     QFileDialog,
     QMainWindow,
-    QSplitter,
     QTextEdit,
     QVBoxLayout,
     QWidget,
