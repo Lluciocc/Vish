@@ -113,8 +113,18 @@ class Toolbar(QHBoxLayout):
                 ("default_layout", "Default Layout"),
                 self.set_layout_default,
             ],
+            "layout_default_button": [
+                self.layout_default_button,
+                ("default_layout", "Default Layout"),
+                self.set_layout_default,
+            ],
             "layout_phone_action": [
                 self.layout_phone_action,
+                ("phone_layout", "Phone Layout"),
+                self.set_layout_phone,
+            ],
+            "layout_phone_button": [
+                self.layout_phone_button,
                 ("phone_layout", "Phone Layout"),
                 self.set_layout_phone,
             ],
@@ -123,23 +133,48 @@ class Toolbar(QHBoxLayout):
                 ("viewport_wide_layout", "Viewport-Wide Layout"),
                 self.set_layout_viewport_wide,
             ],
-            "layout_frame_action": [
-                self.layout_frame_action,
-                ("frame_layout", "Frame Layout"),
-                self.set_layout_frame,
+            "layout_viewport_wide_button": [
+                self.layout_viewport_wide_button,
+                ("viewport_wide_layout", "Viewport-Wide Layout"),
+                self.set_layout_viewport_wide,
             ],
             "layout_center_action": [
                 self.layout_center_action,
                 ("center_layout", "Center Layout"),
                 self.set_layout_center,
             ],
+            "layout_center_button": [
+                self.layout_center_button,
+                ("center_layout", "Center Layout"),
+                self.set_layout_center,
+            ],
+            "layout_frame_action": [
+                self.layout_frame_action,
+                ("frame_layout", "Frame Layout"),
+                self.set_layout_frame,
+            ],
+            "layout_frame_button": [
+                self.layout_frame_button,
+                ("frame_layout", "Frame Layout"),
+                self.set_layout_frame,
+            ],
             "mirror_horizontal_action": [
                 self.layout_mirror_horizontal_action,
                 ("mirror_layout_horizontal", "Mirror Layout Horizontal"),
                 self.mirror_layout_horizontal,
             ],
+            "mirror_horizontal_button": [
+                self.layout_mirror_horizontal_button,
+                ("mirror_layout_horizontal", "Mirror Layout Horizontal"),
+                self.mirror_layout_horizontal,
+            ],
             "mirror_vertical_action": [
                 self.layout_mirror_vertical_action,
+                ("mirror_layout_vertical", "Mirror Layout Vertical"),
+                self.mirror_layout_vertical,
+            ],
+            "mirror_vertical_button": [
+                self.layout_mirror_vertical_button,
                 ("mirror_layout_vertical", "Mirror Layout Vertical"),
                 self.mirror_layout_vertical,
             ],
@@ -167,6 +202,13 @@ class Toolbar(QHBoxLayout):
         self.keyboard_button = QPushButton()
         self.fullscreen_button = QPushButton()
         self.about_button = QPushButton()
+        self.layout_default_button = QPushButton()
+        self.layout_phone_button = QPushButton()
+        self.layout_viewport_wide_button = QPushButton()
+        self.layout_center_button = QPushButton()
+        self.layout_frame_button = QPushButton()
+        self.layout_mirror_horizontal_button = QPushButton()
+        self.layout_mirror_vertical_button = QPushButton()
 
         self.hamburger_button = QToolButton()
         self.hamburger_button.setText("☰")
@@ -205,7 +247,6 @@ class Toolbar(QHBoxLayout):
         self.layout_center_action = self.layout_menu.addAction("")
         self.layout_menu.addSeparator()
         self.layout_mirror_horizontal_action = self.layout_menu.addAction("")
-        print(self.layout_menu.menuAction())
         self.layout_mirror_vertical_action = self.layout_menu.addAction("")
 
         self.layout_button.setMenu(self.layout_menu)
@@ -240,11 +281,13 @@ class Toolbar(QHBoxLayout):
     def mirror_layout_horizontal(self):
         Config.LAYOUT[1] = not Config.LAYOUT[1]
         self.set_mirror_icon("mirror_horizontal_action")
+        self.set_mirror_icon("mirror_horizontal_button")
         self.set_layout()
 
     def mirror_layout_vertical(self):
         Config.LAYOUT[2] = not Config.LAYOUT[2]
         self.set_mirror_icon("mirror_vertical_action")
+        self.set_mirror_icon("mirror_vertical_button")
         self.set_layout()
 
     def set_layout(self):
@@ -299,7 +342,7 @@ class Toolbar(QHBoxLayout):
         self.layout_menu.setStyleSheet(apply_menu_style())
 
     def set_mirror_icon(self, button):
-        if button == "mirror_horizontal_action":
+        if button.startswith("mirror_horizontal_"):
             if Config.LAYOUT[1]:
                 self.TOOLS[button][0].setIcon(
                     Icon.load_icon("toolbar", "layout_mirrored")
@@ -308,7 +351,7 @@ class Toolbar(QHBoxLayout):
                 self.TOOLS[button][0].setIcon(
                     Icon.load_icon("toolbar", "layout_not_mirrored")
                 )
-        if button == "mirror_vertical_action":
+        if button.startswith("mirror_vertical_"):
             if Config.LAYOUT[2]:
                 self.TOOLS[button][0].setIcon(
                     Icon.load_icon("toolbar", "layout_mirrored")
