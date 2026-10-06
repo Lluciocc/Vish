@@ -487,9 +487,10 @@ class VisualBashEditor(QMainWindow):
         self.set_run_output_visible(True)
         bash_script = self.output_text.toPlainText()
         self.run_output_text.clear()
-        if (
-            not bash_script.strip() or len(bash_script) == 49
-        ):  # 49 is length of the header
+        header = ""
+        for string in BashEmitter(self.graph).header:
+            header += string + " "
+        if len(bash_script) < len(header):
             Debug.Warn(
                 Traduction.get_trad(
                     "no_bash_script", "No bash script found to run the graph."
