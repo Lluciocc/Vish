@@ -41,7 +41,7 @@ class BashEmitter:
         if Config.CUSTOM_SHEBANG:
             self.header[0] = Config.CUSTOM_SHEBANG
         for node in self.graph.nodes.values():
-            if node.node_type == "function":
+            if node.node_type == "function" and node.outputs and node.outputs[0].connected_edges:
                 if node.id in context.emitted_nodes:
                     continue
                 context.emitted_nodes.add(node.id)
