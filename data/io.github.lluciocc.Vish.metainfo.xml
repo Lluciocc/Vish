@@ -41,10 +41,10 @@
     <name>Lluciocc</name>
   </developer>
 
-  <supports>
+  <recommends>
     <control>keyboard</control>
     <control>pointing</control>
-  </supports>
+  </recommends>
 
   <requires>
     <display_length compare="ge">360</display_length>
