@@ -14,6 +14,13 @@
         Bash commands and basic programming concepts.
         Vish is made for educational purposes and to simplify the process of creating Bash scripts.
     </p>
+    <p xml:lang="de">
+        Vish ist ein Editor um Bash Skripte mit einer Knoten-Benutzeroberfläche zu erstellen.
+        Es erlaubt Nutzenden ihre Skripte zu designen, indem Knoten verbunden werden, die
+        Bash-Befehle und Programmierkonzepte repräsentieren.
+        Vish wurde als Lernprogramm erstellt, sowie um den Prozess zur Erstellung von Bash-Skripten 
+        zu vereinfachen.
+    </p>
   </description>
 
   <branding>
@@ -34,6 +41,15 @@
     <name>Lluciocc</name>
   </developer>
 
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+
+  <requires>
+    <display_length compare="ge">360</display_length>
+  </requires>
+  
   <content_rating type="oars-1.1"/>
   
   <screenshots>
