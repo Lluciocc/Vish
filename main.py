@@ -29,7 +29,6 @@ from PySide6.QtWidgets import (
     QDialog,
     QFileDialog,
     QMainWindow,
-    QSplitter,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -63,6 +62,7 @@ from ui.about.about import AboutDialog
 from ui.comment_box import COMMENT_Z_BASE, CommentBoxItem
 from ui.graph_view import GraphView
 from ui.keyboard_shortcuts import KeyboardShortcutsDialog
+from ui.layouts import Layout
 from ui.main_style import Style
 from ui.modal import Modal
 from ui.property_panel import PropertyPanel
@@ -102,24 +102,15 @@ class VisualBashEditor(QMainWindow):
         self.setCentralWidget(self.central_widget)
         main_layout = QVBoxLayout(self.central_widget)
 
-        self.toolbar = Toolbar(self)
-        main_layout.addLayout(self.toolbar)
-
-        self.splitter = QSplitter(Qt.Horizontal)
-        self.splitter.setHandleWidth(12)
 
         self.graph_view = GraphView(self.graph, self)
         self.graph_view.setStyleSheet(Style.apply_viewport_style())
-        self.splitter.addWidget(self.graph_view)
 
         self.property_panel = PropertyPanel(graph_view=self.graph_view)
-        self.splitter.addWidget(self.property_panel)
-
-        self.output_splitter = QSplitter(Qt.Vertical)
 
         self.output_text = QTextEdit()
         self.output_text.setReadOnly(True)
-        self.output_text.setMinimumWidth(300)
+        self.output_text.setMinimumWidth(200)
         self.run_output_text = QTextEdit()
         self.run_output_text.setReadOnly(True)
         self.run_output_text.setVisible(False)
@@ -128,30 +119,28 @@ class VisualBashEditor(QMainWindow):
         self.run_output_text.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.run_output_text.setLineWrapMode(QTextEdit.NoWrap)
 
-        self.output_splitter.addWidget(self.output_text)
-        self.output_splitter.addWidget(self.run_output_text)
-        self.output_splitter.setSizes([300, 0])
-        self.output_splitter.setStyleSheet(Style.apply_bash_textedit_style())
-
-        self.splitter.addWidget(self.output_splitter)
-
         self.output_text.setStyleSheet(f"color: {Theme.get_color('MAIN-BASH_TEXT')}")
         self.bash_highlighter = BashHighlighter(self.output_text.document())
 
-        self.splitter.setSizes([900, 300, 400])
-        main_layout.addWidget(self.splitter)
+        self.toolbar = Toolbar(self)
+        self.work_space = Layout(self)
+
+        main_layout.addLayout(self.toolbar)
+        main_layout.addWidget(self.work_space)
 
         self._connect_signals()
 
     def resizeEvent(self, event):
         self.toolbar.resize_buttons(event.size().width())
         if Info.get_device_type() == "phone":
-            if self.splitter.orientation() is self.splitter.orientation().Horizontal:
+            if self.main_splitter.orientation() is self.work_space.main_splitter.orientation().Horizontal:
                 if event.size().width() < event.size().height():
-                    self.splitter.setOrientation(Qt.Vertical)
+                    Config.LAYOUT[0] = "phone"
+                    self.work_space.set_layout()
             else:
                 if event.size().width() > event.size().height():
-                    self.splitter.setOrientation(Qt.Horizontal)
+                    Config.LAYOUT[0] = "default"
+                    self.work_space.set_layout()
 
         super().resizeEvent(event)
 
@@ -315,11 +304,14 @@ class VisualBashEditor(QMainWindow):
 
         splitter = self.graph_view.parent()
         old_view = self.graph_view
+        for index in range(splitter.count()):
+            if splitter.widget(index) == old_view:
+                self.graph_view = GraphView(self.graph, self)
+                old_view.setParent(None)
+                splitter.insertWidget(index, self.graph_view)
+                self.work_space.set_layout()
+                break
 
-        self.graph_view = GraphView(self.graph, self)
-        splitter.insertWidget(0, self.graph_view)
-
-        old_view.setParent(None)
         old_view.deleteLater()
 
         self.property_panel.graph_view = self.graph_view
@@ -359,7 +351,6 @@ class VisualBashEditor(QMainWindow):
             QTimer.singleShot(0, lambda: self._restore_viewport(viewport))
 
         self._connect_signals()
-        splitter.setSizes([900, 300, 400])
 
     def _restore_viewport(self, viewport):
         center = QPointF(viewport.get("x", 0), viewport.get("y", 0))
@@ -517,7 +508,7 @@ class VisualBashEditor(QMainWindow):
                 output = self.run_no_pty(temp_script_path)
 
             self.run_output_text.setVisible(True)
-            self.output_splitter.setSizes([200, 150])
+            self.work_space.set_layout()
 
             self.run_output_text.setHtml(ansi_to_html(output))
 
@@ -534,15 +525,11 @@ class VisualBashEditor(QMainWindow):
     def toggle_run_output(self):
         visible = self.run_output_text.isVisible()
         self.run_output_text.setVisible(not visible)
-
-        if visible:
-            self.output_splitter.setSizes([1, 0])
-        else:
-            self.output_splitter.setSizes([200, 150])
+        self.work_space.set_layout()
 
     def refresh_ui_colors(self):
         self.graph_view.setStyleSheet(Style.apply_viewport_style())
-        self.output_splitter.setStyleSheet(Style.apply_bash_textedit_style())
+        self.work_space._apply_theme()
         self.central_widget.setStyleSheet(Style.toolpanels_style())
         self.output_text.setStyleSheet(f"color: {Theme.get_color('MAIN-BASH_TEXT')}")
         self.bash_highlighter = BashHighlighter(self.output_text.document())

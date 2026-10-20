@@ -12,12 +12,25 @@
     "add_node": "Adicionar um nodo",
     "search_nodes": "Procurar...",
     "lang_set": "Idioma definido como {lang}",
+
     "button_generate_bash": "Gerar Script Bash",
     "button_save": "Salvar",
     "button_load": "Carregar",
     "button_run_bash": "Executar Script Bash",
     "button_copy_clipboard": "Copiar para Área de Transferência",
     "more_options": "Mais opções",
+    "settings": "Configurações",
+    "keyboard_shortcuts": "Atalhos do Teclado",
+    "full_screen": "Tela Cheia",
+    "about": "Sobre",
+
+
+
+
+
+
+
+
 
     "never_modified": "Nunca salvo",
     "welcome_title": "Bem-vindo",
@@ -27,7 +40,6 @@
     "new_project_name": "Nome do Projeto",
     "select_project_folder": "Selecionar Pasta do Projeto",
 
-    "settings": "Configurações",
     "appearance": "Aparência",
     "theme": "Tema",
     "language": "Idioma",
@@ -39,7 +51,6 @@
 
 
     "custom_shebang": "Shebang Personalizado",
-    "full_screen": "Tela Cheia",
     "close": "Fechar",
 
 
@@ -47,7 +58,6 @@
     "import_theme": "Importar",
     "delete_theme": "Excluir",
 
-    "about": "Sobre",
     "app_name": "Editor Visual de Bash",
     "app_tagline": "Uma maneira visual de construir scripts Bash",
 
@@ -63,7 +73,6 @@
     "about_theme_repo": "Repositório de Coleção de Temas",
     "about_matrix": "Entre em nossa sala do Matrix",
 
-    "keyboard_shortcuts": "Atalhos do Teclado",
     "general": "Geral",
     "edition": "Editar",
     "graph": "Grafo",
