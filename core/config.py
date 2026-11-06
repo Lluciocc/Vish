@@ -34,11 +34,13 @@ class Config:
         "generate_button",
         "save_button",
         "load_button",
+        "layout_button",
         "stretch",
         "run_bash_button",
         "clipboard_button",
         "hamburger_menu_button",
     ]
+    LAYOUT = ["default", False, False]
     PORT_HINT = True
     COLLAPSE_NODES = True
 

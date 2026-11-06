@@ -48,7 +48,9 @@ class BashValue:
 _SIMPLE_PARAMETER = re.compile(r"\$[A-Za-z_][A-Za-z0-9_]*")
 _BRACED_PARAMETER = re.compile(
     r"\$\{(?:#[A-Za-z_][A-Za-z0-9_]*|"
-    r"[A-Za-z_][A-Za-z0-9_]*(?:(?:##|#|%%|%)[^{}$`\"';()]*)?)\}"
+    r"[A-Za-z_][A-Za-z0-9_]*(?:(?:##|#|%%|%)[^{}$`\"';()]*)?|"
+    r"[0-9]+|"
+    r"[@#*?$!-])\}"
 )
 _NUMBER = re.compile(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)\Z")
 _IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
@@ -264,6 +266,8 @@ def render_arithmetic(value: BashValue, default="0") -> str:
         return value.text
     if value.kind == BashValueKind.VARIABLE:
         return f"${value.text}"
+    if value.kind == BashValueKind.EXPRESSION and _contains_parameter(value.text):
+        return value.text
     if value.kind == BashValueKind.COMMAND_SUBSTITUTION:
         return f"$({value.text})"
     if value.kind == BashValueKind.ARITHMETIC:
