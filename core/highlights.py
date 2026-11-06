@@ -47,6 +47,7 @@ class BashHighlighter(QSyntaxHighlighter):
         comment = QTextCharFormat()
         comment.setForeground(QColor(Theme.get_color("HIGHLIGHTS-COMMENT")))
         comment.setFontItalic(True)
+        self.comment_format = comment
 
         variable = QTextCharFormat()
         variable.setForeground(QColor(Theme.get_color("HIGHLIGHTS-VARIABLE")))
@@ -204,13 +205,46 @@ class BashHighlighter(QSyntaxHighlighter):
 
         self.rules.append((QRegularExpression(r"\b\d+\b"), number))
 
-        self.rules.append((QRegularExpression(r"#.*"), comment))
-
         self.function_def_regex = QRegularExpression(
             r"^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\(\)\s*\{"
         )
         self.function_def_format = function_def
         self.function_call_format = function_call
+
+    @staticmethod
+    def _comment_start(text: str) -> int:
+        quote = None
+        escaped = False
+
+        for index, character in enumerate(text):
+            if escaped:
+                escaped = False
+                continue
+
+            if quote == "'":
+                if character == "'":
+                    quote = None
+                continue
+
+            if character == "\\":
+                escaped = True
+                continue
+
+            if quote == '"':
+                if character == '"':
+                    quote = None
+                continue
+
+            if character in {"'", '"'}:
+                quote = character
+                continue
+
+            if character == "#" and (
+                index == 0 or text[index - 1].isspace() or text[index - 1] in ";|&()<>"
+            ):
+                return index
+
+        return -1
 
     def highlightBlock(self, text: str):
         match = self.function_def_regex.match(text)
@@ -238,3 +272,9 @@ class BashHighlighter(QSyntaxHighlighter):
                 self.setFormat(
                     m.capturedStart(), m.capturedLength(), self.function_call_format
                 )
+
+        comment_start = self._comment_start(text)
+        if comment_start >= 0:
+            self.setFormat(
+                comment_start, len(text) - comment_start, self.comment_format
+            )
