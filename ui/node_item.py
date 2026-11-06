@@ -31,8 +31,8 @@ from ui.port_item import PortItem
 
 
 class NodeItem(QGraphicsItem):
-    DEFAULT_WIDTH = 180
-    MIN_WIDTH = 36
+    DEFAULT_WIDTH = 180 # Should be (PORT_SPACING / 2) * any integer.
+    MIN_WIDTH = 18
     HEADER_HEIGHT = 34
     PORT_SPACING = 24
     NODE_HEIGHT_SPACING = 12
@@ -79,11 +79,14 @@ class NodeItem(QGraphicsItem):
             port_item.calculate_required_space()
 
         min_header_width = self.title_item.document().idealWidth() + self.ICON_SIZE + self.MIN_WIDTH
-        min_body_width = self.width_input + self.width_output + self.MIN_WIDTH
-        if self.DEFAULT_WIDTH < min_header_width:
-            self.width = min_header_width
-        if self.width < min_body_width:
-            self.width = min_body_width
+        min_body_width = self.width_input + self.width_output + 2 * self.MIN_WIDTH
+        # rasterize width for cleaner node alignments
+        header_width = round(min_header_width / (self.PORT_SPACING / 2) + 0.5) * self.PORT_SPACING / 2
+        body_width = round(min_body_width / (self.PORT_SPACING / 2) + 0.5) * self.PORT_SPACING / 2
+        if self.DEFAULT_WIDTH < header_width:
+            self.width = header_width
+        if self.width < body_width:
+            self.width = body_width
         if self.width != self.old_width:
             for port_id in self.port_items:
                 port_item = self.port_items[port_id]

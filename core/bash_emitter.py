@@ -27,26 +27,32 @@ class BashEmitter:
     def __init__(self, graph: Graph):
         self.graph = graph
 
-    def emit(self) -> str:
-        context = BashContext()
-
-        header = [
+        self.header = [
             "#!/usr/bin/env bash",
             "",
             "# Generated with Visual Bash Editor",
             "",
             "",
         ]
+
+    def emit(self) -> str:
+        context = BashContext()
+
         if Config.CUSTOM_SHEBANG:
-            header[0] = Config.CUSTOM_SHEBANG
+            self.header[0] = Config.CUSTOM_SHEBANG
         for node in self.graph.nodes.values():
-            if node.node_type == "function":
+            if node.node_type == "function" and self.node_connected(node):
                 if node.id in context.emitted_nodes:
                     continue
                 context.emitted_nodes.add(node.id)
                 node.emit_bash(context)
         start_node = self.graph.get_start_node()
-        if start_node and start_node.outputs and start_node.outputs[0].connected_edges:
+        if start_node and self.node_connected(start_node):
             first = start_node.outputs[0].connected_edges[0].target.node
             BaseNode.emit_exec_chain(first, context)
-        return "\n".join(header) + context.get_script()
+        return "\n".join(self.header) + context.get_script()
+
+    def node_connected(self, node):
+        if node.outputs and node.outputs[0].connected_edges:
+            return True
+        return False

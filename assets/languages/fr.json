@@ -12,12 +12,25 @@
     "add_node": "Ajouter un noeud",
     "search_nodes": "Rechercher...",
     "lang_set": "La langue a été mise à jour vers {lang}",
+
     "button_generate_bash": "Générer le script Bash",
     "button_save": "Sauvegarder",
     "button_load": "Charger",
     "button_run_bash": "Exécuter le script Bash",
     "button_copy_clipboard": "Copier dans le presse-papiers",
     "more_options": "Plus d'options",
+    "settings": "Paramètres",
+    "keyboard_shortcuts": "Raccourcis clavier",
+    "full_screen": "Plein écran",
+    "about": "À propos",
+
+
+
+
+
+
+
+
 
     "never_modified": "Jamais enregistré",
     "welcome_title": "Bienvenue",
@@ -27,7 +40,6 @@
     "new_project_name": "Nom du projet",
     "select_project_folder": "Sélectionner le dossier du projet",
 
-    "settings": "Paramètres",
     "appearance": "Apparence",
     "theme": "Thème",
     "language": "Langue",
@@ -39,7 +51,6 @@
 
 
     "custom_shebang": "Shebang personnalisé",
-    "full_screen": "Plein écran",
     "close": "Fermer",
 
 
@@ -47,7 +58,6 @@
     "import_theme": "Importer",
     "delete_theme": "Supprimer",
 
-    "about": "À propos",
     "app_name": "Visual Bash Editor",
     "app_tagline": "Une manière visuelle de créer des scripts Bash",
 
@@ -63,7 +73,6 @@
     "about_theme_repo": "Dépôt de collection de thèmes",
     "about_matrix": "Rejoindre notre salon Matrix",
 
-    "keyboard_shortcuts": "Raccourcis clavier",
     "general": "Général",
     "edition": "Édition",
     "graph": "Graphe",

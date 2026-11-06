@@ -12,22 +12,34 @@
     "add_node": "Aggiungi un nodo",
     "search_nodes": "Cerca...",
     "lang_set": "Lingua impostata su {lang}",
+
     "button_generate_bash": "Genera Script Bash",
     "button_save": "Salva",
     "button_load": "Carica",
     "button_run_bash": "Esegui Script Bash",
     "button_copy_clipboard": "Copia negli appunto",
 
-
-
-
-
-
-
-
-
-
     "settings": "Impostazioni",
+    "keyboard_shortcuts": "Scorciatoie da tastiera",
+    "full_screen": "Schermo intero",
+    "about": "Informazioni",
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     "appearance": "Aspetto",
     "theme": "Tema",
     "language": "Lingua",
@@ -39,7 +51,6 @@
 
 
     "custom_shebang": "Shebang Personalizzato",
-    "full_screen": "Schermo intero",
     "close": "Chiudi",
 
 
@@ -47,7 +58,6 @@
 
 
 
-    "about": "Informazioni",
     "app_name": "Visual Bash Editor",
     "app_tagline": "Un modo visuale per costruzione script in Bash",
 
@@ -63,7 +73,6 @@
 
 
 
-    "keyboard_shortcuts": "Scorciatoie da tastiera",
     "general": "Generale",
     "edition": "Modifica",
     "graph": "Grafico",

@@ -77,6 +77,7 @@ theme_detail:
     TOOLBAR-MENU_TEXT:                          "FONT"
     TOOLBAR-MENU_BORDER:                        "CONTRAST"
     TOOLBAR-MENU_ITEM_SELECTION:                "CUSTOM_ACCENT"
+    TOOLBAR-MENU_ITEM_SEPARATOR:                "CONTRAST"
 
     TOOLBAR-TOOLBUTTON_TEXT:                    "FONT"
     TOOLBAR-TOOLBUTTON_BORDER:                  "CONTRAST"
@@ -208,6 +209,13 @@ theme_detail:
     BASE_NODE-MATCH_REGEX:                      "NODES_LOGICAL"
     BASE_NODE-CAPTURE_REGEX:                    "NODES_STRING"
     BASE_NODE-MULTILINE_TEXT:                   "NODES_STRING"
+
+    BASE_NODE-GET_ARGUMENT:                     "NODES_STRING"
+    BASE_NODE-ARGUMENT_COUNT:                   "NODES_MATH"
+    BASE_NODE-ALL_ARGUMENTS:                    "NODES_STRING"
+    BASE_NODE-SCRIPT_NAME:                      "NODES_STRING"
+    BASE_NODE-HAS_FLAG:                         "NODES_LOGICAL"
+    BASE_NODE-GET_FLAG_VALUE:                   "NODES_STRING"
 
     # NODE ITEM
     NODE_ITEM-TITLE:                            "#f9f9f9"   # Matches SVG colors.
